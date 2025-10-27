@@ -1,0 +1,21 @@
+<h2>Ingresar</h2>
+<form (ngSubmit)="submit()">
+  <label
+    >Email<input type="email" [(ngModel)]="email" name="email" required
+  /></label>
+  <label
+    >Contraseña<input
+      type="password"
+      [(ngModel)]="password"
+      name="password"
+      required
+  /></label>
+  <button type="submit" [disabled]="loading">Entrar</button>
+</form>
+
+<div class="quick">
+  <p>Accesos rápidos:</p>
+  <button (click)="quick('admin')">Admin</button>
+  <button (click)="quick('especialista')">Especialista</button>
+  <button (click)="quick('paciente')">Paciente</button>
+</div>

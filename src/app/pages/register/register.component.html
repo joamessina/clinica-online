@@ -1,0 +1,81 @@
+<h2>Registro</h2>
+
+<form (ngSubmit)="submit()">
+  <label
+    >Perfil
+    <select [(ngModel)]="role" name="role">
+      <option value="paciente">Paciente</option>
+      <option value="especialista">Especialista</option>
+    </select>
+  </label>
+
+  <div class="grid">
+    <label>Nombre<input name="nombre" [(ngModel)]="nombre" required /></label>
+    <label
+      >Apellido<input name="apellido" [(ngModel)]="apellido" required
+    /></label>
+    <label
+      >Edad><input type="number" name="edad" [(ngModel)]="edad" min="0"
+    /></label>
+    <label>DNI><input name="dni" [(ngModel)]="dni" required /></label>
+    <label *ngIf="role === 'paciente'"
+      >Obra Social<input name="obra" [(ngModel)]="obra_social"
+    /></label>
+  </div>
+
+  <label
+    >Email<input type="email" name="email" [(ngModel)]="email" required
+  /></label>
+  <label
+    >Contraseña<input
+      type="password"
+      name="password"
+      [(ngModel)]="password"
+      required
+  /></label>
+
+  <div *ngIf="role === 'paciente'">
+    <p>Subir 2 imágenes de perfil (obligatorio)</p>
+    <input
+      type="file"
+      (change)="onFileChange($event, 'img1')"
+      accept="image/*"
+    />
+    <input
+      type="file"
+      (change)="onFileChange($event, 'img2')"
+      accept="image/*"
+    />
+  </div>
+
+  <div *ngIf="role === 'especialista'">
+    <p>Imagen de perfil</p>
+    <input
+      type="file"
+      (change)="onFileChange($event, 'avatar')"
+      accept="image/*"
+    />
+
+    <div class="specialty">
+      <label
+        >Especialidad existente
+        <select [(ngModel)]="selectedSpecialtyId" name="selEspecialidad">
+          <option [ngValue]="null">-- Seleccione --</option>
+          <option *ngFor="let s of specialties()" [value]="s.id">
+            {{ s.nombre }}
+          </option>
+        </select>
+      </label>
+      <div>
+        <input
+          placeholder="Agregar nueva"
+          [(ngModel)]="especialidadNueva"
+          name="espNueva"
+        />
+        <button type="button" (click)="addSpecialty()">Agregar</button>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" [disabled]="loading">Crear cuenta</button>
+</form>

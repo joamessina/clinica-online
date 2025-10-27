@@ -1,0 +1,32 @@
+<h2>Usuarios</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Role</th>
+      <th>Email</th>
+      <th>DNI</th>
+      <th>Obra Social</th>
+      <th>Aprobado</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let u of users()">
+      <td>{{ u.apellido }}, {{ u.nombre }}</td>
+      <td>{{ u.role }}</td>
+      <td>{{ u.email }}</td>
+      <td>{{ u.dni }}</td>
+      <td>{{ u.obra_social || "-" }}</td>
+      <td *ngIf="u.role === 'especialista'">
+        {{ u.is_approved ? "Sí" : "No" }}
+      </td>
+      <td *ngIf="u.role !== 'especialista'">-</td>
+      <td>
+        <button *ngIf="u.role === 'especialista'" (click)="toggleApproval(u)">
+          {{ u.is_approved ? "Desaprobar" : "Aprobar" }}
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
