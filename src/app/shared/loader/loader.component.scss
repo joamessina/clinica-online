@@ -1,22 +1,17 @@
-.backdrop {
+.loader-overlay{
   position: fixed;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.15);
-  z-index: 9999;
+  background: rgba(255,255,255,.6);
+  display: grid;
+  place-items: center;
+  z-index: 2000;
 }
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 4px solid #ccc;
-  border-top-color: #000;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+.loader-card{
+  background: #fff;
+  border-radius: .75rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,.15);
+  display: grid;
+  place-items: center;
+  gap: .5rem;
 }

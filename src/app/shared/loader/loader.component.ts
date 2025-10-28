@@ -1,11 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  standalone: true,
   selector: 'app-loader',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './loader.component.html',
   styleUrls: ['./loader.component.scss'],
 })
-export class LoaderComponent {}
+export class LoaderComponent {
+  /** NO es una función. Es una PROP booleana. */
+  @Input() active = false;
+  @Input() text: string | null = null;
+}

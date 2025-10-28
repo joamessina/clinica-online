@@ -1,14 +1,18 @@
 import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
-import { AuthService } from '../services/auth.services';
+import { SessionService } from '../services/session.service';
 
 export const authGuard: CanActivateFn = async () => {
-  const auth = inject(AuthService);
+  const session = inject(SessionService);
   const router = inject(Router);
-  const session = await auth.getSession();
-  if (!session) {
-    router.navigateByUrl('/login');
-    return false;
+
+  // Si no está logueado, refrescamos una vez (puede venir de un reload)
+  if (!session.isLoggedIn()) {
+    await session.refresh();
+    if (!session.isLoggedIn()) {
+      router.navigateByUrl('/login');
+      return false;
+    }
   }
   return true;
 };

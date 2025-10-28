@@ -1,11 +1,19 @@
-<header class="app-header">
-  <a routerLink="/">Clínica Online</a>
-  <nav>
-    <a routerLink="/login">Login</a>
-    <a routerLink="/registro">Registro</a>
-  </nav>
-</header>
+<nav class="navbar navbar-expand-lg bg-body-tertiary px-3">
+  <a class="navbar-brand" routerLink="/">Clínica Online</a>
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <ng-container *ngIf="isLogged(); else loggedOut">
+      <span class="text-muted">Hola, {{ profile()?.nombre || 'Usuario' }}</span>
+      <a class="btn btn-outline-primary btn-sm" routerLink="/admin/usuarios" *ngIf="profile()?.role==='admin'">Usuarios</a>
+      <button class="btn btn-warning btn-sm ms-2" (click)="logout()">Salir</button>
+    </ng-container>
+    <ng-template #loggedOut>
+      <a class="btn btn-outline-secondary btn-sm" routerLink="/login">Login</a>
+      <a class="btn btn-primary btn-sm" routerLink="/registro">Registro</a>
+    </ng-template>
+  </div>
+</nav>
 
-<main><router-outlet /></main>
+<router-outlet></router-outlet>
 
-<app-loader></app-loader>
+<!-- Overlay global del loader -->
+<app-loader [active]="loader.active()"></app-loader>

@@ -6,7 +6,7 @@ import {
   Profile,
   Role,
 } from '../../core/services/profile.service';
-import { AuthService } from '../../core/services/auth.services';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   standalone: true,

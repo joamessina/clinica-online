@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { v4 as uuidv4 } from 'uuid';
-import { AuthService } from '../../core/services/auth.services';
+import { AuthService } from '../../core/services/auth.service';
 import { ProfileService, Role } from '../../core/services/profile.service';
 import { SupabaseClientService } from '../../core/supabase/supabase-client.service';
 import { SpecialtyService } from '../../core/services/specialty.service';

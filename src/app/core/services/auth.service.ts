@@ -6,21 +6,18 @@ import { Session, User } from '@supabase/supabase-js';
 export class AuthService {
   private sb = inject(SupabaseClientService).client;
 
-  async signUpEmail(email: string, password: string) {
-    return await this.sb.auth.signUp({
-      email,
-      password,
+  signUpEmail(email: string, password: string) {
+    return this.sb.auth.signUp({
+      email, password,
       options: { emailRedirectTo: window.location.origin },
     });
   }
 
-  async signInEmail(email: string, password: string) {
-    return await this.sb.auth.signInWithPassword({ email, password });
+  signInEmail(email: string, password: string) {
+    return this.sb.auth.signInWithPassword({ email, password });
   }
 
-  async signOut() {
-    await this.sb.auth.signOut();
-  }
+  async signOut() { await this.sb.auth.signOut(); }
 
   async getSession(): Promise<Session | null> {
     const { data } = await this.sb.auth.getSession();
