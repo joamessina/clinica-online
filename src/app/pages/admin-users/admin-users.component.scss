@@ -1,0 +1,23 @@
+/* Card/table polish */
+.table-sticky thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Spinner overlay during loading */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(2px);
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,.4);
+}
+
+/* Compact spacing on desktop, comfy on mobile */
+:host ::ng-deep .table td, 
+:host ::ng-deep .table th { vertical-align: middle; }
+
+/* Small fix so dropdown aligns within table on small screens */
+.dropdown-menu { font-size: .9rem; }
