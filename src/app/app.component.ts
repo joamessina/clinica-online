@@ -4,8 +4,8 @@ import {
   RouterLink,
   RouterOutlet,
   Router,
-  NavigationEnd,
   NavigationStart,
+  NavigationEnd,
   NavigationCancel,
   NavigationError,
 } from '@angular/router';
@@ -30,15 +30,19 @@ export class AppComponent {
   ready = this.session.ready;
 
   constructor() {
-    this.loader.bindToRouter(this.router);
-
     this.router.events.subscribe((ev) => {
-      if (ev instanceof NavigationStart) console.log('[nav] start', ev.url);
-      if (ev instanceof NavigationEnd)
-        console.log('[nav] end', ev.urlAfterRedirects);
-      if (ev instanceof NavigationCancel) console.log('[nav] cancel', ev.url);
-      if (ev instanceof NavigationError)
-        console.log('[nav] error', ev.url, ev.error);
+      if (ev instanceof NavigationStart) {
+        console.log('[nav] start', ev.url);
+        this.loader.show?.();
+      }
+      if (
+        ev instanceof NavigationEnd ||
+        ev instanceof NavigationCancel ||
+        ev instanceof NavigationError
+      ) {
+        console.log('[nav] end/cancel', (ev as any).url || '');
+        this.loader.hide?.();
+      }
     });
   }
 

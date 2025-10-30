@@ -24,7 +24,8 @@
   <router-outlet></router-outlet>
 </ng-container>
 <ng-template #booting>
-  <div class="p-4 text-center text-muted">Cargando…</div>
+  <div class="text-center mt-5">Cargando...</div>
 </ng-template>
 
+<!-- Overlay global del loader -->
 <app-loader [active]="loader.active()"></app-loader>

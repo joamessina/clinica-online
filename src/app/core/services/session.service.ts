@@ -1,4 +1,4 @@
-import { Injectable, computed, signal, inject, effect } from '@angular/core';
+import { Injectable, computed, signal, inject } from '@angular/core';
 import { SupabaseClientService } from '../supabase/supabase-client.service';
 import type { User } from '@supabase/supabase-js';
 import { Profile } from './profile.service';
@@ -6,6 +6,7 @@ import { Profile } from './profile.service';
 @Injectable({ providedIn: 'root' })
 export class SessionService {
   private sb = inject(SupabaseClientService).client;
+  private _whenProfileReadyResolvers: Array<() => void> = [];
 
   private _user = signal<User | null>(null);
   private _profile = signal<Profile | null>(null);
@@ -14,13 +15,14 @@ export class SessionService {
   private _initialized!: Promise<void>;
   private _resolveInitialized!: () => void;
   private _initialSeen = false;
-  private _ready = signal(false);
-  ready = this._ready.asReadonly();
 
-  user = this._user.asReadonly();
-  profile = this._profile.asReadonly();
-  loading = this._loading.asReadonly();
-  isLoggedIn = computed(() => !!this._user());
+  private _ready = signal(false);
+  readonly ready = this._ready.asReadonly();
+
+  readonly user = this._user.asReadonly();
+  readonly profile = this._profile.asReadonly();
+  readonly loading = this._loading.asReadonly();
+  readonly isLoggedIn = computed(() => !!this._user());
 
   constructor() {
     this._initialized = new Promise<void>(
@@ -33,52 +35,44 @@ export class SessionService {
       if (event === 'INITIAL_SESSION' && !this._initialSeen) {
         this._initialSeen = true;
         await this.loadProfile();
-        this._resolveInitialized();
-        this.markReady('INITIAL_SESSION');
-
         console.log('[session] ready via INITIAL_SESSION');
-      } else if (event === 'SIGNED_OUT') {
-        this._profile.set(null);
-        this.markReady('SIGNED_OUT');
+        this._resolveInitialized();
+        this._ready.set(true);
       } else if (
         event === 'SIGNED_IN' ||
         event === 'TOKEN_REFRESHED' ||
-        event === 'USER_UPDATED'
+        event === 'USER_UPDATED' ||
+        event === 'SIGNED_OUT'
       ) {
         await this.loadProfile();
-        this.markReady(event);
       }
     });
 
-    this.sb.auth.getSession().then(async ({ data }) => {
-      this._user.set(data.session?.user ?? null);
-      if (!this._initialSeen) {
+    this.sb.auth
+      .getSession()
+      .then(async ({ data }) => {
+        if (this._initialSeen) return;
+        this._user.set(data.session?.user ?? null);
         this._initialSeen = true;
         await this.loadProfile();
-        this._resolveInitialized();
-        this.markReady('getSession fallback');
         console.log('[session] ready via getSession fallback');
-      }
-    });
-  }
-
-  private markReady(from: string) {
-    if (!this._ready()) {
-      this._ready.set(true);
-      console.log('[session] ready ->', from);
-    }
+        this._resolveInitialized();
+        this._ready.set(true);
+      })
+      .catch(() => {
+        if (!this._initialSeen) {
+          this._initialSeen = true;
+          this._profile.set(null);
+          this._resolveInitialized();
+          this._ready.set(true);
+        }
+      });
   }
 
   async waitForProfile(): Promise<void> {
     if (!this.loading()) return;
-
-    await new Promise<void>((resolve) => {
-      const watcher = effect(() => {
-        if (!this.loading()) {
-          watcher.destroy();
-          resolve();
-        }
-      });
+    return new Promise<void>((resolve) => {
+      this._whenProfileReadyResolvers.push(resolve);
     });
   }
 
@@ -121,30 +115,33 @@ export class SessionService {
       }
     } finally {
       this._loading.set(false);
+      const pending = this._whenProfileReadyResolvers.splice(0);
+      for (const resolve of pending) resolve();
     }
   }
 
   async ensureReady(): Promise<void> {
-    if (this._ready()) return;
     if (this._initialSeen) {
-      this.markReady('ensureReady() shortcut');
+      this._ready.set(true);
       return;
     }
 
-    await Promise.race([
-      this._initialized,
-      (async () => {
-        const { data } = await this.sb.auth.getSession();
-        this._user.set(data.session?.user ?? null);
+    const timeout = new Promise<void>((res) =>
+      setTimeout(() => {
         if (!this._initialSeen) {
+          console.warn(
+            '[session] ensureReady(): timeout; continuando sin sesión'
+          );
           this._initialSeen = true;
-          await this.loadProfile();
+          this._profile.set(null);
           this._resolveInitialized?.();
         }
-      })(),
-    ]);
+        res();
+      }, 1500)
+    );
 
-    this.markReady('ensureReady()');
+    await Promise.race([this._initialized, timeout]);
+    this._ready.set(true);
   }
 
   async refresh() {

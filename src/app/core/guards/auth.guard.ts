@@ -12,27 +12,26 @@ export const authGuard: CanActivateFn = async (route, state) => {
   await session.waitForProfile();
 
   const user = session.user();
-  const profile = session.profile();
-
   if (!user) {
     return router.createUrlTree(['/login'], {
       queryParams: { redirect: state.url },
     });
   }
 
-  const allowedRoles = route.data?.['roles'] as Role[] | undefined;
-  if (allowedRoles?.length) {
-    const role = profile?.role as Role | undefined;
+  const allowed = route.data?.['roles'] as Role[] | undefined;
+  const prof = session.profile();
+
+  if (allowed?.length) {
+    const role = prof?.role as Role | undefined;
 
     if (
       role === 'especialista' &&
-      allowedRoles.includes('especialista') &&
-      !profile?.is_approved
+      allowed.includes('especialista') &&
+      !prof?.is_approved
     ) {
       return router.createUrlTree(['/paciente']);
     }
-
-    if (!role || !allowedRoles.includes(role)) {
+    if (!role || !allowed.includes(role)) {
       return router.createUrlTree(['/paciente']);
     }
   }
