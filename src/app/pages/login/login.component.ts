@@ -36,7 +36,6 @@ export class LoginComponent {
       const prof = this.session.profile();
       console.log('[login] profile ->', prof);
 
-      // defensa: si aún no hay perfil, mandalo a /paciente y vemos
       if (!prof) {
         this.router.navigateByUrl('/paciente');
         return;
@@ -48,7 +47,8 @@ export class LoginComponent {
       }
 
       if (prof.role === 'admin') this.router.navigateByUrl('/admin/usuarios');
-      else if (prof.role === 'especialista') this.router.navigateByUrl('/especialista');
+      else if (prof.role === 'especialista')
+        this.router.navigateByUrl('/especialista');
       else this.router.navigateByUrl('/paciente');
     });
   }

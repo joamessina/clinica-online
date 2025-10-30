@@ -20,10 +20,14 @@ export class SpecialtyService {
       .single();
   }
   async linkToMe(specialtyId: string) {
-    const { data: auth } = await this.sb.auth.getUser();
-    if (!auth.user) return { error: 'No auth' };
+    const {
+      data: { session },
+    } = await this.sb.auth.getSession();
+    const uid = session?.user?.id;
+    if (!uid) return { error: 'No auth' };
+
     return await this.sb
       .from('profile_specialty')
-      .insert({ profile_id: auth.user.id, specialty_id: specialtyId });
+      .insert({ profile_id: uid, specialty_id: specialtyId });
   }
 }

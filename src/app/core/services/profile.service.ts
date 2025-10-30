@@ -26,13 +26,18 @@ export class ProfileService {
   }
 
   async getMyProfile(): Promise<Profile | null> {
-    const { data: auth } = await this.sb.auth.getUser();
-    if (!auth.user) return null;
+    const {
+      data: { session },
+    } = await this.sb.auth.getSession();
+    const uid = session?.user?.id;
+    if (!uid) return null;
+
     const { data } = await this.sb
       .from('profiles')
       .select('*')
-      .eq('id', auth.user.id)
+      .eq('id', uid)
       .single();
+
     return (data as Profile) ?? null;
   }
 

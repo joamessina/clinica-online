@@ -11,8 +11,7 @@ export const specialistApprovedGuard: CanActivateFn = async () => {
   }
   const me = session.profile();
   if (!me || me.role !== 'especialista' || !me.is_approved) {
-    router.navigateByUrl('/');
-    return false;
+    return router.createUrlTree(['/']);
   }
   return true;
 };

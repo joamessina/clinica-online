@@ -2,17 +2,40 @@ import { CanActivateFn, Router } from '@angular/router';
 import { inject } from '@angular/core';
 import { SessionService } from '../services/session.service';
 
-export const authGuard: CanActivateFn = async () => {
-  const session = inject(SessionService);
-  const router = inject(Router);
+type Role = 'admin' | 'especialista' | 'paciente';
 
-  // Si no está logueado, refrescamos una vez (puede venir de un reload)
-  if (!session.isLoggedIn()) {
-    await session.refresh();
-    if (!session.isLoggedIn()) {
-      router.navigateByUrl('/login');
-      return false;
+export const authGuard: CanActivateFn = async (route, state) => {
+  const router = inject(Router);
+  const session = inject(SessionService);
+
+  await session.ensureReady();
+  await session.waitForProfile();
+
+  const user = session.user();
+  const profile = session.profile();
+
+  if (!user) {
+    return router.createUrlTree(['/login'], {
+      queryParams: { redirect: state.url },
+    });
+  }
+
+  const allowedRoles = route.data?.['roles'] as Role[] | undefined;
+  if (allowedRoles?.length) {
+    const role = profile?.role as Role | undefined;
+
+    if (
+      role === 'especialista' &&
+      allowedRoles.includes('especialista') &&
+      !profile?.is_approved
+    ) {
+      return router.createUrlTree(['/paciente']);
+    }
+
+    if (!role || !allowedRoles.includes(role)) {
+      return router.createUrlTree(['/paciente']);
     }
   }
+
   return true;
 };

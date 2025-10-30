@@ -7,8 +7,7 @@ export const emailVerifiedGuard: CanActivateFn = async () => {
   const router = inject(Router);
   const user = await auth.getCurrentUser();
   if (!user || !user.email_confirmed_at) {
-    router.navigateByUrl('/login');
-    return false;
+    return router.createUrlTree(['/login']);
   }
   return true;
 };
