@@ -6,7 +6,7 @@ export const loginGuard: CanActivateFn = async () => {
   const router = inject(Router);
   const session = inject(SessionService);
 
-  await session.ensureReady();
+  await session.waitReady();
   await session.waitForProfile();
 
   if (!session.user()) return true;

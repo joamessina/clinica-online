@@ -6,7 +6,7 @@ export const adminGuard: CanActivateFn = async () => {
   const router = inject(Router);
   const session = inject(SessionService);
 
-  await session.ensureReady();
+  await session.waitReady();
   const user = session.user();
   const profile = session.profile();
 
