@@ -22,6 +22,14 @@ export const routes: Routes = [
     canActivate: [loginGuard],
   },
 
+  {
+  path: 'registro',
+  canActivate: [loginGuard], // <- si está logueado, no entra
+  loadComponent: () =>
+    import('./pages/register/register.component').then(m => m.RegisterComponent),
+},
+
+
   // Paciente: requiere estar logueado
   {
     path: 'paciente',

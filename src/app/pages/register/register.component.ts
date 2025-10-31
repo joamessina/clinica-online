@@ -1,11 +1,14 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { v4 as uuidv4 } from 'uuid';
-import { AuthService } from '../../core/services/auth.service';
-import { ProfileService, Role } from '../../core/services/profile.service';
+import { Router } from '@angular/router';
+
+import { LoaderService } from '../../core/services/loader.service';
 import { SupabaseClientService } from '../../core/supabase/supabase-client.service';
+import { AuthService } from '../../core/services/auth.service';
 import { SpecialtyService } from '../../core/services/specialty.service';
+
+type Rol = 'paciente' | 'especialista';
 
 @Component({
   standalone: true,
@@ -14,8 +17,21 @@ import { SpecialtyService } from '../../core/services/specialty.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
-export class RegisterComponent {
-  role: Role = 'paciente';
+export class RegisterComponent implements OnInit {
+selectedSpecialtyId: any;
+especialidadNueva: any;
+loading: any;
+addSpecialty() {
+throw new Error('Method not implemented.');
+}
+  private loader = inject(LoaderService);
+  private router = inject(Router);
+  private sb = inject(SupabaseClientService).client;
+  private auth = inject(AuthService);
+  private specialtySvc = inject(SpecialtyService);
+
+  // form
+  rol: Rol = 'paciente';
   nombre = '';
   apellido = '';
   edad: number | null = null;
@@ -23,131 +39,116 @@ export class RegisterComponent {
   obra_social = '';
   email = '';
   password = '';
-  especialidadNueva = '';
-  selectedSpecialtyId: string | null = null;
-  img1?: File;
-  img2?: File;
-  avatar?: File;
-  loading = false;
 
-  private auth = inject(AuthService);
-  private profileSrv = inject(ProfileService);
-  private sb = inject(SupabaseClientService).client;
   specialties = signal<{ id: string; nombre: string }[]>([]);
+  specialtyId: string | null = null;   // "-1" = otra
+  specialtyOther = '';
 
-  async ngOnInit() {
-    const { data } = await inject(SpecialtyService).listActive();
-    this.specialties.set(
-      (data ?? []).map((d: any) => ({ id: d.id, nombre: d.nombre }))
-    );
+  // files
+  foto1?: File;      // paciente: principal
+  foto2?: File;      // paciente: extra
+  fotoEsp?: File;    // especialista: avatar
+
+  ngOnInit() {
+    this.cargarEspecialidades();
   }
 
-  onFileChange(e: Event, which: 'img1' | 'img2' | 'avatar') {
-    const f = (e.target as HTMLInputElement).files?.[0];
-    if (!f) return;
-    this[which] = f;
+  async cargarEspecialidades() {
+    try {
+      const { data, error } = await this.specialtySvc.listActive();
+      if (!error) {
+        this.specialties.set((data ?? []).map((d: any) => ({ id: d.id, nombre: d.nombre })));
+      }
+    } catch { /* noop */ }
   }
 
-  async addSpecialty() {
-    if (!this.especialidadNueva.trim()) return;
-    const { data, error } = await inject(SpecialtyService).add(
-      this.especialidadNueva.trim()
-    );
-    if (error) {
-      alert(error.message);
-      return;
+  onFileChange(which: 'p1' | 'p2' | 'esp', ev: Event) {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0] || undefined;
+    if (which === 'p1') this.foto1 = file;
+    if (which === 'p2') this.foto2 = file;
+    if (which === 'esp') this.fotoEsp = file;
+  }
+
+  get isEspecialista() { return this.rol === 'especialista'; }
+
+  private validar(): string | null {
+    if (!this.nombre.trim()) return 'Nombre requerido';
+    if (!this.apellido.trim()) return 'Apellido requerido';
+    if (!this.edad || this.edad <= 0) return 'Edad inválida';
+    if (!/^\d{6,}$/.test(this.dni)) return 'DNI inválido';
+    if (!/^\S+@\S+\.\S+$/.test(this.email)) return 'Email inválido';
+    if ((this.password ?? '').length < 6) return 'Contraseña mínima 6 caracteres';
+
+    if (this.rol === 'paciente') {
+      if (!this.obra_social.trim()) return 'Obra social requerida';
+      if (!this.foto1 || !this.foto2) return 'Pacientes: subí 2 imágenes de perfil';
+    } else {
+      const eligioOtra = this.specialtyId === '-1';
+      if (!eligioOtra && !this.specialtyId) return 'Elegí una especialidad';
+      if (eligioOtra && !this.specialtyOther.trim()) return 'Ingresá la nueva especialidad';
+      if (!this.fotoEsp) return 'Especialistas: subí una imagen de perfil';
     }
-    this.specialties.set([
-      ...(this.specialties() ?? []),
-      { id: data.id, nombre: data.nombre },
-    ]);
-    this.selectedSpecialtyId = data.id;
-    this.especialidadNueva = '';
+    return null;
   }
 
   async submit() {
-    // Validaciones básicas
-    if (
-      !this.nombre ||
-      !this.apellido ||
-      !this.dni ||
-      !this.email ||
-      !this.password
-    ) {
-      return alert('Complete los campos obligatorios');
-    }
-    if (this.role === 'paciente' && (!this.img1 || !this.img2)) {
-      return alert('Paciente: suba 2 imágenes');
-    }
-    if (this.role === 'especialista' && !this.avatar) {
-      return alert('Especialista: suba imagen de perfil');
-    }
+    const msg = this.validar();
+    if (msg) { alert(msg); return; }
 
-    this.loading = true;
+    await this.loader.run(async () => {
+      // 1) Crear usuario (envía mail). No hay session hasta confirmar.
+      const { data: signup, error } = await this.auth.signUpEmail(this.email, this.password);
+      if (error) { alert(error.message); return; }
 
-    // 1) Crear auth user
-    const { data: sign, error: authErr } = await this.auth.signUpEmail(
-      this.email,
-      this.password
-    );
-    if (authErr || !sign.user) {
-      this.loading = false;
-      return alert(authErr?.message ?? 'Error de registro');
-    }
+      // 2) Subir imágenes a 'avatars/pending/<clave>/...'
+      const pendingKey =
+        localStorage.getItem('reg_pending_key') ??
+        (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
+      localStorage.setItem('reg_pending_key', pendingKey);
 
-    const userId = sign.user.id;
+      const bucket = this.sb.storage.from('avatars');
+      const folder = `pending/${pendingKey}`;
 
-    // 2) Subir imágenes a Storage
-    let avatar_url: string | undefined;
-    let extra_img_url: string | undefined;
+      const upload = async (file: File | undefined, name: string) => {
+        if (!file) return null;
+        const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
+        const path = `${folder}/${name}-${Date.now()}.${ext}`;
+        const { error: upErr } = await bucket.upload(path, file, { upsert: true });
+        if (upErr) throw upErr;
+        return path; // guardamos el PATH (no la URL)
+      };
 
-    if (this.role === 'paciente') {
-      const n1 = `${userId}/${uuidv4()}-${this.img1!.name}`;
-      const n2 = `${userId}/${uuidv4()}-${this.img2!.name}`;
-      await this.sb.storage
-        .from('patient-gallery')
-        .upload(n1, this.img1!, { upsert: true });
-      await this.sb.storage
-        .from('patient-gallery')
-        .upload(n2, this.img2!, { upsert: true });
-      extra_img_url = n2;
-      // usar la primera como avatar por defecto
-      avatar_url = n1;
-    } else if (this.role === 'especialista') {
-      const n = `${userId}/${uuidv4()}-${this.avatar!.name}`;
-      await this.sb.storage
-        .from('avatars')
-        .upload(n, this.avatar!, { upsert: true });
-      avatar_url = n;
-    }
+      let avatarPath1: string | null = null;
+      let avatarPath2: string | null = null;
+      try {
+        if (this.rol === 'paciente') {
+          avatarPath1 = await upload(this.foto1, 'paciente-1');
+          avatarPath2 = await upload(this.foto2, 'paciente-2');
+        } else {
+          avatarPath1 = await upload(this.fotoEsp, 'especialista');
+        }
+      } catch (e: any) {
+        console.warn('Upload pending falló:', e?.message || e);
+      }
 
-    // 3) Upsert de profile con datos completos
-    const base: any = {
-      id: userId,
-      role: this.role,
-      nombre: this.nombre,
-      apellido: this.apellido,
-      edad: this.edad ?? 0,
-      dni: this.dni,
-      obra_social: this.role === 'paciente' ? this.obra_social : null,
-      email: this.email,
-      avatar_url,
-      extra_img_url,
-    };
-    const { error: upErr } = await this.profileSrv.upsertProfile(base);
-    if (upErr) {
-      this.loading = false;
-      return alert(upErr.message);
-    }
+      // 3) Guardar el formulario para completarlo al primer login
+      const payload = {
+        rol: this.rol,
+        nombre: this.nombre,
+        apellido: this.apellido,
+        edad: this.edad,
+        dni: this.dni,
+        obra_social: this.rol === 'paciente' ? this.obra_social : null,
+        specialtyId: this.specialtyId,         // "-1" si eligió "Otra"
+        specialtyOther: this.specialtyOther || '',
+        avatarPath1,
+        avatarPath2: this.rol === 'paciente' ? avatarPath2 : null,
+      };
+      localStorage.setItem('pendingProfile', JSON.stringify(payload));
 
-    // 4) Vincular especialidad (si corresponde)
-    if (this.role === 'especialista' && this.selectedSpecialtyId) {
-      await this.sb
-        .from('profile_specialty')
-        .insert({ profile_id: userId, specialty_id: this.selectedSpecialtyId });
-    }
-
-    this.loading = false;
-    alert('Registro realizado. Revise su email para confirmar la cuenta.');
+      alert('Te enviamos un correo para confirmar la cuenta. Luego iniciá sesión para completar el perfil.');
+      this.router.navigateByUrl('/login');
+    }, 'register');
   }
 }
