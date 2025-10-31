@@ -7,6 +7,7 @@ import { LoaderService } from '../../core/services/loader.service';
 import { SupabaseClientService } from '../../core/supabase/supabase-client.service';
 import { AuthService } from '../../core/services/auth.service';
 import { SpecialtyService } from '../../core/services/specialty.service';
+import { ToastService } from '../../core/services/toast.service';
 
 type Rol = 'paciente' | 'especialista';
 
@@ -18,19 +19,19 @@ type Rol = 'paciente' | 'especialista';
   styleUrls: ['./register.component.scss'],
 })
 export class RegisterComponent implements OnInit {
-selectedSpecialtyId: any;
-especialidadNueva: any;
-loading: any;
-addSpecialty() {
-throw new Error('Method not implemented.');
-}
+  selectedSpecialtyId: any;
+  especialidadNueva: any;
+  loading: any;
+  addSpecialty() {
+    throw new Error('Method not implemented.');
+  }
   private loader = inject(LoaderService);
   private router = inject(Router);
   private sb = inject(SupabaseClientService).client;
   private auth = inject(AuthService);
   private specialtySvc = inject(SpecialtyService);
+  private toast = inject(ToastService);
 
-  // form
   rol: Rol = 'paciente';
   nombre = '';
   apellido = '';
@@ -41,13 +42,12 @@ throw new Error('Method not implemented.');
   password = '';
 
   specialties = signal<{ id: string; nombre: string }[]>([]);
-  specialtyId: string | null = null;   // "-1" = otra
+  specialtyId: string | null = null;
   specialtyOther = '';
 
-  // files
-  foto1?: File;      // paciente: principal
-  foto2?: File;      // paciente: extra
-  fotoEsp?: File;    // especialista: avatar
+  foto1?: File;
+  foto2?: File;
+  fotoEsp?: File;
 
   ngOnInit() {
     this.cargarEspecialidades();
@@ -57,9 +57,11 @@ throw new Error('Method not implemented.');
     try {
       const { data, error } = await this.specialtySvc.listActive();
       if (!error) {
-        this.specialties.set((data ?? []).map((d: any) => ({ id: d.id, nombre: d.nombre })));
+        this.specialties.set(
+          (data ?? []).map((d: any) => ({ id: d.id, nombre: d.nombre }))
+        );
       }
-    } catch { /* noop */ }
+    } catch {}
   }
 
   onFileChange(which: 'p1' | 'p2' | 'esp', ev: Event) {
@@ -70,7 +72,9 @@ throw new Error('Method not implemented.');
     if (which === 'esp') this.fotoEsp = file;
   }
 
-  get isEspecialista() { return this.rol === 'especialista'; }
+  get isEspecialista() {
+    return this.rol === 'especialista';
+  }
 
   private validar(): string | null {
     if (!this.nombre.trim()) return 'Nombre requerido';
@@ -78,45 +82,45 @@ throw new Error('Method not implemented.');
     if (!this.edad || this.edad <= 0) return 'Edad inválida';
     if (!/^\d{6,}$/.test(this.dni)) return 'DNI inválido';
     if (!/^\S+@\S+\.\S+$/.test(this.email)) return 'Email inválido';
-    if ((this.password ?? '').length < 6) return 'Contraseña mínima 6 caracteres';
+    if ((this.password ?? '').length < 6)
+      return 'Contraseña mínima 6 caracteres';
 
     if (this.rol === 'paciente') {
       if (!this.obra_social.trim()) return 'Obra social requerida';
-      if (!this.foto1 || !this.foto2) return 'Pacientes: subí 2 imágenes de perfil';
+      if (!this.foto1 || !this.foto2)
+        return 'Pacientes: subí 2 imágenes de perfil';
     } else {
       const eligioOtra = this.specialtyId === '-1';
       if (!eligioOtra && !this.specialtyId) return 'Elegí una especialidad';
-      if (eligioOtra && !this.specialtyOther.trim()) return 'Ingresá la nueva especialidad';
+      if (eligioOtra && !this.specialtyOther.trim())
+        return 'Ingresá la nueva especialidad';
       if (!this.fotoEsp) return 'Especialistas: subí una imagen de perfil';
     }
     return null;
   }
-
   async submit() {
     const msg = this.validar();
-    if (msg) { alert(msg); return; }
+    if (msg) {
+      this.toast.error(msg);
+      return;
+    }
 
     await this.loader.run(async () => {
-      // 1) Crear usuario (envía mail). No hay session hasta confirmar.
-      const { data: signup, error } = await this.auth.signUpEmail(this.email, this.password);
-      if (error) { alert(error.message); return; }
-
-      // 2) Subir imágenes a 'avatars/pending/<clave>/...'
-      const pendingKey =
-        localStorage.getItem('reg_pending_key') ??
-        (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2));
-      localStorage.setItem('reg_pending_key', pendingKey);
-
+      // 1) Subir imágenes (si corresponde) - SIN estar logueado
       const bucket = this.sb.storage.from('avatars');
-      const folder = `pending/${pendingKey}`;
+      const folder = `pending/${
+        crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)
+      }`;
 
       const upload = async (file: File | undefined, name: string) => {
         if (!file) return null;
         const ext = (file.name.split('.').pop() || 'jpg').toLowerCase();
         const path = `${folder}/${name}-${Date.now()}.${ext}`;
-        const { error: upErr } = await bucket.upload(path, file, { upsert: true });
+        const { error: upErr } = await bucket.upload(path, file, {
+          upsert: true,
+        });
         if (upErr) throw upErr;
-        return path; // guardamos el PATH (no la URL)
+        return path;
       };
 
       let avatarPath1: string | null = null;
@@ -129,25 +133,65 @@ throw new Error('Method not implemented.');
           avatarPath1 = await upload(this.fotoEsp, 'especialista');
         }
       } catch (e: any) {
-        console.warn('Upload pending falló:', e?.message || e);
+        console.warn('[register] upload pending error:', e?.message || e);
       }
 
-      // 3) Guardar el formulario para completarlo al primer login
-      const payload = {
-        rol: this.rol,
-        nombre: this.nombre,
-        apellido: this.apellido,
-        edad: this.edad,
-        dni: this.dni,
-        obra_social: this.rol === 'paciente' ? this.obra_social : null,
-        specialtyId: this.specialtyId,         // "-1" si eligió "Otra"
-        specialtyOther: this.specialtyOther || '',
-        avatarPath1,
-        avatarPath2: this.rol === 'paciente' ? avatarPath2 : null,
-      };
-      localStorage.setItem('pendingProfile', JSON.stringify(payload));
+      // 2) Upsert en pending_profiles (clave = email)
+      //    IMPORTANTE: esto tiene que estar antes del signUp
+      // 2) Upsert seguro vía RPC (antes del signUp)
+      const { error: ppErr } = await this.sb.rpc('upsert_pending_profile', {
+        _email: this.email.trim().toLowerCase(),
+        _rol: this.rol,
+        _nombre: this.nombre.trim(),
+        _apellido: this.apellido.trim(),
+        _edad: this.edad!,
+        _dni: this.dni.trim(),
+        _obra_social: this.rol === 'paciente' ? this.obra_social.trim() : null,
+        _specialty_id:
+          this.rol === 'especialista' ? this.selectedSpecialtyId ?? null : null,
+        _specialty_other:
+          this.rol === 'especialista' && this.specialtyId === '-1'
+            ? this.specialtyOther.trim() || null
+            : null,
+        _avatar_path1: avatarPath1,
+        _avatar_path2: this.rol === 'paciente' ? avatarPath2 : null,
+      });
 
-      alert('Te enviamos un correo para confirmar la cuenta. Luego iniciá sesión para completar el perfil.');
+      if (ppErr) {
+        console.warn('[register] rpc upsert_pending_profile error:', ppErr);
+        this.toast.error('No se pudo preparar el registro');
+        return;
+      }
+
+      // 3) Ahora sí: crear el usuario en auth (dispara el trigger)
+      // 3) SignUp con metadata (el trigger lee estos campos)
+      const { error: signErr } = await this.sb.auth.signUp({
+        email: this.email.trim().toLowerCase(),
+        password: this.password,
+        options: {
+          data: {
+            rol: this.rol, // 'paciente' | 'especialista' | 'admin'
+            nombre: this.nombre.trim(),
+            apellido: this.apellido.trim(),
+            edad: this.edad,
+            dni: this.dni.trim(),
+            obra_social:
+              this.rol === 'paciente' ? this.obra_social.trim() : null,
+            avatar_path1: avatarPath1, // el trigger lo guarda en avatar_url
+            avatar_path2: this.rol === 'paciente' ? avatarPath2 : null, // -> extra_img_url
+            // specialty_* ignorados por ahora (tu tabla profiles no los tiene)
+          },
+        },
+      });
+
+      if (signErr) {
+        this.toast.error(signErr.message);
+        return;
+      }
+
+      this.toast.success(
+        'Te enviamos un correo para confirmar la cuenta. Luego iniciá sesión para completar el perfil.'
+      );
       this.router.navigateByUrl('/login');
     }, 'register');
   }

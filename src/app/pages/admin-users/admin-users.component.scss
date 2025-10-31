@@ -12,12 +12,16 @@
   backdrop-filter: blur(2px);
   display: grid;
   place-items: center;
-  background: rgba(255,255,255,.4);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 /* Compact spacing on desktop, comfy on mobile */
-:host ::ng-deep .table td, 
-:host ::ng-deep .table th { vertical-align: middle; }
+:host ::ng-deep .table td,
+:host ::ng-deep .table th {
+  vertical-align: middle;
+}
 
 /* Small fix so dropdown aligns within table on small screens */
-.dropdown-menu { font-size: .9rem; }
+.dropdown-menu {
+  font-size: 0.9rem;
+}

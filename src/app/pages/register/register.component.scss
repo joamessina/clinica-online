@@ -1,0 +1,12 @@
+/* Ajustes suaves de spacing/estética */
+.card-header {
+  font-weight: 600;
+}
+
+.input-group > .form-control:focus {
+  box-shadow: none;
+}
+
+.form-text {
+  opacity: 0.85;
+}

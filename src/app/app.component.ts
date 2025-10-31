@@ -12,11 +12,18 @@ import {
 import { LoaderComponent } from './shared/loader/loader.component';
 import { SessionService } from './core/services/session.service';
 import { LoaderService } from './core/services/loader.service';
+import { ToastsComponent } from './core/services/toast.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, LoaderComponent],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RouterLink,
+    LoaderComponent,
+    ToastsComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

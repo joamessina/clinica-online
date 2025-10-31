@@ -1,0 +1,59 @@
+:host {
+  display: block;
+}
+
+.hero {
+  position: relative;
+  min-height: clamp(420px, 60vh, 700px);
+  background: url("../../../assets/medicwallpaper.jpg") center/cover no-repeat
+    fixed;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(6, 12, 20, 0.65) 0%,
+    rgba(6, 12, 20, 0.45) 55%,
+    rgba(6, 12, 20, 0.2) 100%
+  );
+}
+
+.hero > .container {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-title {
+  color: #fff;
+  font-weight: 800;
+  font-size: clamp(2rem, 1.2rem + 2.5vw, 3.2rem);
+}
+
+.lead {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.btn-outline-light {
+  --bs-btn-color: #fff;
+  --bs-btn-border-color: #fff;
+  --bs-btn-hover-bg: #fff;
+  --bs-btn-hover-color: #0d6efd;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(6px);
+}
+
+@media (max-width: 576px) {
+  .hero {
+    background-attachment: scroll;
+    padding-block: 2rem;
+  }
+  .glass {
+    background: rgba(255, 255, 255, 0.92);
+  }
+}
