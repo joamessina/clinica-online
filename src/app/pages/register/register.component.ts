@@ -90,9 +90,9 @@ export class RegisterComponent implements OnInit {
       if (!this.foto1 || !this.foto2)
         return 'Pacientes: subí 2 imágenes de perfil';
     } else {
-      const eligioOtra = this.specialtyId === '-1';
-      if (!eligioOtra && !this.specialtyId) return 'Elegí una especialidad';
-      if (eligioOtra && !this.specialtyOther.trim())
+      const eligioOtra = this.selectedSpecialtyId === '-1';
+      if (!eligioOtra && !this.selectedSpecialtyId) return 'Elegí una especialidad';
+      if (eligioOtra && !this.especialidadNueva.trim())
         return 'Ingresá la nueva especialidad';
       if (!this.fotoEsp) return 'Especialistas: subí una imagen de perfil';
     }
@@ -106,7 +106,6 @@ export class RegisterComponent implements OnInit {
     }
 
     await this.loader.run(async () => {
-      // 1) Subir imágenes (si corresponde) - SIN estar logueado
       const bucket = this.sb.storage.from('avatars');
       const folder = `pending/${
         crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)
@@ -135,10 +134,9 @@ export class RegisterComponent implements OnInit {
       } catch (e: any) {
         console.warn('[register] upload pending error:', e?.message || e);
       }
+      
+      
 
-      // 2) Upsert en pending_profiles (clave = email)
-      //    IMPORTANTE: esto tiene que estar antes del signUp
-      // 2) Upsert seguro vía RPC (antes del signUp)
       const { error: ppErr } = await this.sb.rpc('upsert_pending_profile', {
         _email: this.email.trim().toLowerCase(),
         _rol: this.rol,
@@ -150,8 +148,8 @@ export class RegisterComponent implements OnInit {
         _specialty_id:
           this.rol === 'especialista' ? this.selectedSpecialtyId ?? null : null,
         _specialty_other:
-          this.rol === 'especialista' && this.specialtyId === '-1'
-            ? this.specialtyOther.trim() || null
+          this.rol === 'especialista' && this.selectedSpecialtyId  === '-1'
+            ? this.especialidadNueva.trim() || null
             : null,
         _avatar_path1: avatarPath1,
         _avatar_path2: this.rol === 'paciente' ? avatarPath2 : null,
@@ -163,23 +161,20 @@ export class RegisterComponent implements OnInit {
         return;
       }
 
-      // 3) Ahora sí: crear el usuario en auth (dispara el trigger)
-      // 3) SignUp con metadata (el trigger lee estos campos)
       const { error: signErr } = await this.sb.auth.signUp({
         email: this.email.trim().toLowerCase(),
         password: this.password,
         options: {
           data: {
-            rol: this.rol, // 'paciente' | 'especialista' | 'admin'
+            rol: this.rol,
             nombre: this.nombre.trim(),
             apellido: this.apellido.trim(),
             edad: this.edad,
             dni: this.dni.trim(),
             obra_social:
               this.rol === 'paciente' ? this.obra_social.trim() : null,
-            avatar_path1: avatarPath1, // el trigger lo guarda en avatar_url
-            avatar_path2: this.rol === 'paciente' ? avatarPath2 : null, // -> extra_img_url
-            // specialty_* ignorados por ahora (tu tabla profiles no los tiene)
+            avatar_path1: avatarPath1, 
+            avatar_path2: this.rol === 'paciente' ? avatarPath2 : null, 
           },
         },
       });

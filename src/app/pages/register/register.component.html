@@ -245,7 +245,7 @@
                   name="selEspecialidad"
                 >
                   <option [ngValue]="null">-- Seleccione --</option>
-                  <option *ngFor="let s of specialties()" [value]="s.id">
+                  <option *ngFor="let s of specialties()" [ngValue]="s.id">
                     {{ s.nombre }}
                   </option>
                 </select>
