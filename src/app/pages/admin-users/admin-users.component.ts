@@ -14,6 +14,8 @@ interface AdminUser {
   obra_social: string | null;
   role: Role;
   is_approved: boolean;
+  avatar_url?: string | null;
+  specialtyName?: string | null;
 }
 
 @Component({
@@ -25,6 +27,11 @@ interface AdminUser {
 })
 export class AdminUsersComponent implements OnInit {
   private sb = inject(SupabaseClientService).client;
+  private avatarsBucket = this.sb.storage.from('avatars');
+
+  readonly placeholderUrl = this.avatarsBucket.getPublicUrl(
+    'system/userPlaceholder.png'
+  ).data.publicUrl;
 
   loading = signal(true);
   q = signal('');
@@ -140,20 +147,51 @@ export class AdminUsersComponent implements OnInit {
     await this.load();
   }
 
+  private normalizeAvatar(path: string | null): string {
+    if (!path) return this.placeholderUrl;
+    if (/^https?:\/\//i.test(path)) return path;
+    return (
+      this.avatarsBucket.getPublicUrl(path).data.publicUrl ||
+      this.placeholderUrl
+    );
+  }
+
+  imgFallback(ev: Event) {
+    const img = ev.target as HTMLImageElement;
+    img.onerror = null;
+    img.src = this.placeholderUrl;
+  }
+
   async load() {
     this.loading.set(true);
     const { data, error } = await this.sb
       .from('profiles')
-      .select('id,nombre,apellido,email,dni,obra_social,role,is_approved')
+      .select(
+        'id,nombre,apellido,email,dni,obra_social,role,is_approved,avatar_url,profile_specialty:profile_specialty (specialties:specialties ( nombre ))'
+      )
       .order('created_at', { ascending: false });
 
     if (error) {
       console.error('[admin/users] load error', error);
       this.rows.set([]);
     } else {
-      this.rows.set((data ?? []) as AdminUser[]);
+      const mapped = (data ?? []).map((r: any) => {
+        const row: AdminUser = {
+          id: r.id,
+          nombre: r.nombre,
+          apellido: r.apellido,
+          email: r.email,
+          dni: r.dni,
+          obra_social: r.obra_social,
+          role: r.role,
+          is_approved: r.is_approved,
+          avatar_url: this.normalizeAvatar(r.avatar_url ?? null),
+          specialtyName: r.profile_specialty?.[0]?.specialties?.nombre ?? null,
+        };
+        return row;
+      });
+      this.rows.set(mapped);
     }
-
     this.loading.set(false);
   }
 

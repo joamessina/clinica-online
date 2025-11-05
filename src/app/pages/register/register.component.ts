@@ -90,9 +90,10 @@ export class RegisterComponent implements OnInit {
       if (!this.foto1 || !this.foto2)
         return 'Pacientes: subí 2 imágenes de perfil';
     } else {
-      const eligioOtra = this.specialtyId === '-1';
-      if (!eligioOtra && !this.specialtyId) return 'Elegí una especialidad';
-      if (eligioOtra && !this.specialtyOther.trim())
+      const eligioOtra = this.selectedSpecialtyId === '-1';
+      if (!eligioOtra && !this.selectedSpecialtyId)
+        return 'Elegí una especialidad';
+      if (eligioOtra && !this.especialidadNueva.trim())
         return 'Ingresá la nueva especialidad';
       if (!this.fotoEsp) return 'Especialistas: subí una imagen de perfil';
     }
@@ -106,7 +107,6 @@ export class RegisterComponent implements OnInit {
     }
 
     await this.loader.run(async () => {
-      // 1) Subir imágenes (si corresponde) - SIN estar logueado
       const bucket = this.sb.storage.from('avatars');
       const folder = `pending/${
         crypto.randomUUID?.() ?? Math.random().toString(36).slice(2)
@@ -136,8 +136,6 @@ export class RegisterComponent implements OnInit {
         console.warn('[register] upload pending error:', e?.message || e);
       }
 
-      // 2) Upsert en pending_profiles (clave = email)
-      //    IMPORTANTE: esto tiene que estar antes del signUp
       // 2) Upsert seguro vía RPC (antes del signUp)
       const { error: ppErr } = await this.sb.rpc('upsert_pending_profile', {
         _email: this.email.trim().toLowerCase(),
@@ -150,7 +148,7 @@ export class RegisterComponent implements OnInit {
         _specialty_id:
           this.rol === 'especialista' ? this.selectedSpecialtyId ?? null : null,
         _specialty_other:
-          this.rol === 'especialista' && this.specialtyId === '-1'
+          this.rol === 'especialista' && this.selectedSpecialtyId === '-1'
             ? this.specialtyOther.trim() || null
             : null,
         _avatar_path1: avatarPath1,
@@ -163,7 +161,22 @@ export class RegisterComponent implements OnInit {
         return;
       }
 
-      // 3) Ahora sí: crear el usuario en auth (dispara el trigger)
+      const { data: dniTaken, error: dniChkErr } = await this.sb.rpc(
+        'dni_exists',
+        {
+          _dni: this.dni.trim(),
+        }
+      );
+      if (dniChkErr) {
+        console.warn('[register] dni_exists error:', dniChkErr);
+        this.toast.error('No se pudo validar el DNI. Intentá de nuevo.');
+        return;
+      }
+      if (dniTaken) {
+        this.toast.error('Ese DNI ya está registrado.');
+        return;
+      }
+
       // 3) SignUp con metadata (el trigger lee estos campos)
       const { error: signErr } = await this.sb.auth.signUp({
         email: this.email.trim().toLowerCase(),

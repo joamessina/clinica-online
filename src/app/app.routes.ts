@@ -1,4 +1,4 @@
-// src/app/app.routes.ts
+// src/app/app.routes.
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { loginGuard } from './core/guards/login.guard';
@@ -23,12 +23,13 @@ export const routes: Routes = [
   },
 
   {
-  path: 'registro',
-  canActivate: [loginGuard], // <- si está logueado, no entra
-  loadComponent: () =>
-    import('./pages/register/register.component').then(m => m.RegisterComponent),
-},
-
+    path: 'registro',
+    canActivate: [loginGuard], // <- si está logueado, no entra
+    loadComponent: () =>
+      import('./pages/register/register.component').then(
+        (m) => m.RegisterComponent
+      ),
+  },
 
   // Paciente: requiere estar logueado
   {
