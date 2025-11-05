@@ -91,7 +91,8 @@ export class RegisterComponent implements OnInit {
         return 'Pacientes: subí 2 imágenes de perfil';
     } else {
       const eligioOtra = this.selectedSpecialtyId === '-1';
-      if (!eligioOtra && !this.selectedSpecialtyId) return 'Elegí una especialidad';
+      if (!eligioOtra && !this.selectedSpecialtyId)
+        return 'Elegí una especialidad';
       if (eligioOtra && !this.especialidadNueva.trim())
         return 'Ingresá la nueva especialidad';
       if (!this.fotoEsp) return 'Especialistas: subí una imagen de perfil';
@@ -137,6 +138,7 @@ export class RegisterComponent implements OnInit {
       
       
 
+      // 2) Upsert seguro vía RPC (antes del signUp)
       const { error: ppErr } = await this.sb.rpc('upsert_pending_profile', {
         _email: this.email.trim().toLowerCase(),
         _rol: this.rol,
@@ -148,8 +150,8 @@ export class RegisterComponent implements OnInit {
         _specialty_id:
           this.rol === 'especialista' ? this.selectedSpecialtyId ?? null : null,
         _specialty_other:
-          this.rol === 'especialista' && this.selectedSpecialtyId  === '-1'
-            ? this.especialidadNueva.trim() || null
+          this.rol === 'especialista' && this.selectedSpecialtyId === '-1'
+            ? this.specialtyOther.trim() || null
             : null,
         _avatar_path1: avatarPath1,
         _avatar_path2: this.rol === 'paciente' ? avatarPath2 : null,
@@ -161,6 +163,23 @@ export class RegisterComponent implements OnInit {
         return;
       }
 
+      const { data: dniTaken, error: dniChkErr } = await this.sb.rpc(
+        'dni_exists',
+        {
+          _dni: this.dni.trim(),
+        }
+      );
+      if (dniChkErr) {
+        console.warn('[register] dni_exists error:', dniChkErr);
+        this.toast.error('No se pudo validar el DNI. Intentá de nuevo.');
+        return;
+      }
+      if (dniTaken) {
+        this.toast.error('Ese DNI ya está registrado.');
+        return;
+      }
+
+      // 3) SignUp con metadata (el trigger lee estos campos)
       const { error: signErr } = await this.sb.auth.signUp({
         email: this.email.trim().toLowerCase(),
         password: this.password,
