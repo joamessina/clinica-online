@@ -181,7 +181,6 @@ export class RegisterComponent implements OnInit {
         console.warn('[register] upload pending error:', e?.message || e);
       }
 
-      // 2) Upsert seguro vía RPC (antes del signUp)
       const { error: ppErr } = await this.sb.rpc('upsert_pending_profile', {
         _email: this.email.trim().toLowerCase(),
         _rol: this.rol,
@@ -222,7 +221,6 @@ export class RegisterComponent implements OnInit {
         return;
       }
 
-      // 3) SignUp con metadata (el trigger lee estos campos)
       const { error: signErr } = await this.sb.auth.signUp({
         email: this.email.trim().toLowerCase(),
         password: this.password,

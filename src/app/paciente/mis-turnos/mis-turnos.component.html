@@ -23,7 +23,6 @@
       <tr *ngFor="let t of filtered()">
         <td>{{ t.fecha | date : "d/MM" }}</td>
         <td>{{ t.hora?.slice(0, 5) }}</td>
-        <!-- "11:42" -->
         <td>{{ t.especialidad_nombre }}</td>
         <td>{{ t.especialista_nombre }}</td>
         <td>

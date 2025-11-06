@@ -17,16 +17,21 @@ export class EncuestaPacienteComponent {
   private svc = inject(AppointmentsService);
 
   appId = this.route.snapshot.paramMap.get('id')!;
-  // Ejemplo de 3 preguntas simples
-  p1: 'si'|'no'|'' = '';
-  p2: 'si'|'no'|'' = '';
+  p1: 'si' | 'no' | '' = '';
+  p2: 'si' | 'no' | '' = '';
   p3: string = '';
 
   async enviar() {
-    if (!this.p1 || !this.p2) { alert('Completá las preguntas.'); return; }
+    if (!this.p1 || !this.p2) {
+      alert('Completá las preguntas.');
+      return;
+    }
     const payload = { p1: this.p1, p2: this.p2, comentario: this.p3 };
     const { error } = await this.svc.sendSurvey(this.appId, payload);
-    if (error) { alert(error.message); return; }
+    if (error) {
+      alert(error.message);
+      return;
+    }
     alert('¡Encuesta enviada!');
     this.router.navigateByUrl('/paciente/mis-turnos');
   }

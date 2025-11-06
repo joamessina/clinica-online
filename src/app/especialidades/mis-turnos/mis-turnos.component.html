@@ -1,27 +1,71 @@
 <h3>Mis turnos</h3>
 
-<input class="form-control mb-3" [ngModel]="q()" (ngModelChange)="q.set($event)" placeholder="Filtrar por especialidad o paciente..."/>
+<input
+  class="form-control mb-3"
+  [ngModel]="q()"
+  (ngModelChange)="q.set($event)"
+  placeholder="Filtrar por especialidad o paciente..."
+/>
 
 <div class="table-responsive">
   <table class="table align-middle">
     <thead>
       <tr>
-        <th>Fecha</th><th>Hora</th><th>Especialidad</th><th>Paciente</th><th>Estado</th><th>Acciones</th>
+        <th>Fecha</th>
+        <th>Hora</th>
+        <th>Especialidad</th>
+        <th>Paciente</th>
+        <th>Estado</th>
+        <th>Acciones</th>
       </tr>
     </thead>
     <tbody>
       <tr *ngFor="let t of filtered()">
-        <td>{{ t.fecha | date:'d/MM' }}</td>
-        <td>{{ t.hora  | date:'HH:mm' }}</td>
+        <td>{{ t.fecha | date : "d/MM" }}</td>
+        <td>{{ t.hora?.slice(0, 5) }}</td>
         <td>{{ t.especialidad_nombre }}</td>
         <td>{{ t.paciente_nombre }}</td>
-        <td><span class="badge" [attr.data-status]="t.estado">{{ t.estado }}</span></td>
+        <td>
+          <span class="badge" [attr.data-status]="t.estado">{{
+            t.estado
+          }}</span>
+        </td>
         <td class="d-flex flex-wrap gap-1">
-          <button class="btn btn-sm btn-primary" *ngIf="canAccept(t)"  (click)="aceptar(t)">Aceptar</button>
-          <button class="btn btn-sm btn-outline-danger" *ngIf="canReject(t)" (click)="rechazar(t)">Rechazar</button>
-          <button class="btn btn-sm btn-outline-secondary" *ngIf="canCancel(t)" (click)="cancelar(t)">Cancelar</button>
-          <button class="btn btn-sm btn-success" *ngIf="canFinish(t)"  (click)="finalizar(t)">Finalizar</button>
-          <button class="btn btn-sm btn-outline-dark" *ngIf="hasResena(t)" (click)="verResena(t)">Ver reseña</button>
+          <button
+            class="btn btn-sm btn-primary"
+            *ngIf="canAccept(t)"
+            (click)="aceptar(t)"
+          >
+            Aceptar
+          </button>
+          <button
+            class="btn btn-sm btn-outline-danger"
+            *ngIf="canReject(t)"
+            (click)="rechazar(t)"
+          >
+            Rechazar
+          </button>
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            *ngIf="canCancel(t)"
+            (click)="cancelar(t)"
+          >
+            Cancelar
+          </button>
+          <button
+            class="btn btn-sm btn-success"
+            *ngIf="canFinish(t)"
+            (click)="finalizar(t)"
+          >
+            Finalizar
+          </button>
+          <button
+            class="btn btn-sm btn-outline-dark"
+            *ngIf="hasResena(t)"
+            (click)="verResena(t)"
+          >
+            Ver reseña
+          </button>
         </td>
       </tr>
     </tbody>

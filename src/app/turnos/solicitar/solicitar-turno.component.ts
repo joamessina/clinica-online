@@ -22,23 +22,18 @@ export class SolicitarTurnoComponent implements OnInit {
   private auth = inject(AuthService);
   private toast = inject(ToastService);
 
-  // filtros activos
   activeSpecialtyId: string | null = null;
   selectedSpecialistId: string | null = null;
 
-  // catálogos
   specialties: Especialidad[] = [];
   specialists: Especialista[] = [];
 
-  // slots disponibles
   slots: Slot[] = [];
   loadingSlots = false;
 
-  // agrupado por fecha para pintar tarjetas
   grouped: { fecha: string; horas: string[] }[] = [];
 
   async ngOnInit() {
-    // cargo especialidades al entrar
     try {
       this.specialties = await this.svc.listSpecialties();
     } catch (e) {
@@ -51,7 +46,6 @@ export class SolicitarTurnoComponent implements OnInit {
     this.selectedSpecialistId = null;
     this.slots = [];
     this.grouped = [];
-    // cargo especialistas de esa especialidad
     try {
       this.specialists = await this.svc.listSpecialistsBySpecialty(id);
     } catch (e) {
@@ -73,17 +67,15 @@ export class SolicitarTurnoComponent implements OnInit {
         this.activeSpecialtyId
       );
 
-      // agrupo slots por fecha -> {fecha, [horas]}
       const map = new Map<string, string[]>();
       for (const s of this.slots) {
         if (!map.has(s.fecha)) map.set(s.fecha, []);
         map.get(s.fecha)!.push(s.hora);
       }
-      // ordeno horas dentro del día y días asc
       this.grouped = Array.from(map.entries())
         .map(([fecha, horas]) => ({
           fecha,
-          horas: horas.sort(), // ya vienen "HH:mm:ss"
+          horas: horas.sort(),
         }))
         .sort((a, b) => a.fecha.localeCompare(b.fecha));
     } finally {
@@ -100,7 +92,7 @@ export class SolicitarTurnoComponent implements OnInit {
     const { error } = await this.svc.createAppointment({
       specialist_id: this.selectedSpecialistId!,
       specialty_id: this.activeSpecialtyId!,
-      patient_id: u.id, // id del user logueado
+      patient_id: u.id,
       fecha: s.fecha,
       hora: s.hora,
     });
@@ -110,7 +102,7 @@ export class SolicitarTurnoComponent implements OnInit {
       this.toast.error('No se pudo reservar el turno');
     } else {
       this.toast.success('Turno reservado');
-      await this.loadSlots(); // refresco para ocultar el slot tomado
+      await this.loadSlots();
     }
   }
 }
