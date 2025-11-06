@@ -8,24 +8,36 @@ import { SupabaseClientService } from '../../core/supabase/supabase-client.servi
 import { AuthService } from '../../core/services/auth.service';
 import { SpecialtyService } from '../../core/services/specialty.service';
 import { ToastService } from '../../core/services/toast.service';
+import { RecaptchaComponent } from '../../shared/recaptcha/recaptcha.component';
+import { environment } from '../../../environments/environment';
 
 type Rol = 'paciente' | 'especialista';
 
 @Component({
   standalone: true,
   selector: 'app-register',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RecaptchaComponent],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
-
 export class RegisterComponent implements OnInit {
-  selectedSpecialtyId: any;
-  especialidadNueva: any;
+  selectedSpecialtyId: string | null = null;
+  specialtyOther = '';
+
   loading: any;
+
   addSpecialty() {
-    throw new Error('Method not implemented.');
+    this.selectedSpecialtyId = '-1';
+    if (!this.specialtyOther) this.specialtyOther = '';
   }
+
+  captchaToken: string | null = null;
+  siteKey = environment.recaptchaSiteKey;
+
+  onCaptchaResolved(token: string | null) {
+    this.captchaToken = token;
+  }
+
   private loader = inject(LoaderService);
   private router = inject(Router);
   private sb = inject(SupabaseClientService).client;
@@ -35,8 +47,12 @@ export class RegisterComponent implements OnInit {
 
   rol: Rol | null = null;
 
-  patientImgUrl = this.sb.storage.from('avatars').getPublicUrl('system/user.jpg').data.publicUrl;
-  specialistImgUrl = this.sb.storage.from('avatars').getPublicUrl('system/especialidad.jpg').data.publicUrl;
+  patientImgUrl = this.sb.storage
+    .from('avatars')
+    .getPublicUrl('system/user.jpg').data.publicUrl;
+  specialistImgUrl = this.sb.storage
+    .from('avatars')
+    .getPublicUrl('system/especialidad.jpg').data.publicUrl;
 
   nombre = '';
   apellido = '';
@@ -48,7 +64,6 @@ export class RegisterComponent implements OnInit {
 
   specialties = signal<{ id: string; nombre: string }[]>([]);
   specialtyId: string | null = null;
-  specialtyOther = '';
 
   foto1?: File;
   foto2?: File;
@@ -84,7 +99,6 @@ export class RegisterComponent implements OnInit {
   get isEspecialista() {
     return this.rol === 'especialista';
   }
-  
 
   private validar(): string | null {
     if (!this.nombre.trim()) return 'Nombre requerido';
@@ -103,16 +117,37 @@ export class RegisterComponent implements OnInit {
       const eligioOtra = this.selectedSpecialtyId === '-1';
       if (!eligioOtra && !this.selectedSpecialtyId)
         return 'Elegí una especialidad';
-      if (eligioOtra && !this.especialidadNueva.trim())
+      if (eligioOtra && !this.specialtyOther.trim())
         return 'Ingresá la nueva especialidad';
       if (!this.fotoEsp) return 'Especialistas: subí una imagen de perfil';
     }
     return null;
   }
+
   async submit() {
+    if (!this.rol) {
+      this.toast.error('Elegí un perfil.');
+      return;
+    }
     const msg = this.validar();
     if (msg) {
       this.toast.error(msg);
+      return;
+    }
+
+    if (!this.captchaToken) {
+      this.toast.error('Completá el captcha.');
+      return;
+    }
+
+    const { data: verify, error: vErr } = await this.sb.functions.invoke(
+      'verify-recaptcha',
+      {
+        body: { token: this.captchaToken },
+      }
+    );
+    if (vErr || !verify?.success) {
+      this.toast.error('Captcha inválido. Intentá nuevamente.');
       return;
     }
 
@@ -145,8 +180,6 @@ export class RegisterComponent implements OnInit {
       } catch (e: any) {
         console.warn('[register] upload pending error:', e?.message || e);
       }
-      
-      
 
       // 2) Upsert seguro vía RPC (antes del signUp)
       const { error: ppErr } = await this.sb.rpc('upsert_pending_profile', {
@@ -202,8 +235,8 @@ export class RegisterComponent implements OnInit {
             dni: this.dni.trim(),
             obra_social:
               this.rol === 'paciente' ? this.obra_social.trim() : null,
-            avatar_path1: avatarPath1, 
-            avatar_path2: this.rol === 'paciente' ? avatarPath2 : null, 
+            avatar_path1: avatarPath1,
+            avatar_path2: this.rol === 'paciente' ? avatarPath2 : null,
           },
         },
       });

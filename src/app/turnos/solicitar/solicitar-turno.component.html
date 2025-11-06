@@ -1,40 +1,58 @@
 <h3>Solicitar turno</h3>
 
-<!-- Especialidades (chips rectangulares) -->
+<!-- Especialidades -->
 <p class="text-muted">Elegí una especialidad:</p>
 <div class="d-flex flex-wrap gap-2 mb-3">
-  <button class="btn btn-outline-primary"
-          [class.active]="selSpecialty===s.id"
-          *ngFor="let s of specialties()"
-          (click)="pickSpecialty(s.id)">
+  <button
+    class="btn btn-outline-primary"
+    *ngFor="let s of specialties"
+    [class.active]="activeSpecialtyId === s.id"
+    (click)="onPickSpecialty(s.id)"
+  >
     {{ s.nombre }}
   </button>
 </div>
 
-<!-- Especialistas (chips) -->
-<div *ngIf="selSpecialty">
+<!-- Especialistas -->
+<div *ngIf="activeSpecialtyId">
   <p class="text-muted">Elegí un especialista:</p>
   <div class="d-flex flex-wrap gap-2 mb-3">
-    <button class="btn btn-outline-secondary"
-            [class.active]="selSpecialist===p.id"
-            *ngFor="let p of specialists()"
-            (click)="pickSpecialist(p.id)">
+    <button
+      class="btn btn-outline-secondary"
+      *ngFor="let p of specialists"
+      [class.active]="selectedSpecialistId === p.id"
+      (click)="onPickSpecialist(p.id)"
+    >
       {{ p.nombre }} {{ p.apellido }}
     </button>
   </div>
 </div>
 
+<!-- Estado de carga -->
+<div *ngIf="loadingSlots" class="text-muted">Buscando turnos…</div>
+
+<!-- Sin slots -->
+<div
+  *ngIf="!loadingSlots && selectedSpecialistId && grouped.length === 0"
+  class="text-muted"
+>
+  No hay turnos disponibles.
+</div>
+
 <!-- Slots próximos 15 días -->
-<div *ngIf="selSpecialist && grouped().length===0" class="text-muted">No hay turnos disponibles.</div>
-<div class="row g-3" *ngIf="selSpecialist">
-  <div class="col-12 col-md-6 col-lg-4" *ngFor="let d of grouped()">
+<div class="row g-3" *ngIf="selectedSpecialistId && grouped.length">
+  <div class="col-12 col-md-6 col-lg-4" *ngFor="let d of grouped">
     <div class="card h-100">
-      <div class="card-header">{{ d.fecha | date:'EEEE d/MM' }}</div>
+      <div class="card-header">
+        {{ d.fecha | date : "EEEE d/MM" }}
+      </div>
       <div class="card-body d-flex flex-wrap gap-2">
-        <button class="btn btn-sm btn-outline-success"
-                *ngFor="let h of d.horas"
-                (click)="solicitar(d.fecha, h)">
-          {{ h | date:'HH:mm' }}
+        <button
+          class="btn btn-sm btn-outline-success"
+          *ngFor="let h of d.horas"
+          (click)="reservarTurno({ fecha: d.fecha, hora: h })"
+        >
+          {{ h.slice(0, 5) }}
         </button>
       </div>
     </div>

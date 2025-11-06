@@ -1,58 +1,116 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+// src/app/turnos/solicitar/solicitar-turno.component.ts
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { SpecialtyService } from '../../core/services/specialty.service';
-import { AppointmentsService } from '../../core/services/appointments.service';
-import { SessionService } from '../../core/services/session.service';
+import {
+  AppointmentsService,
+  Slot,
+} from '../../core/services/appointments.service';
+import { AuthService } from '../../core/services/auth.service';
+import { ToastService } from '../../core/services/toast.service';
+
+type Especialidad = { id: string; nombre: string };
+type Especialista = { id: string; nombre: string; apellido: string };
 
 @Component({
   standalone: true,
   selector: 'app-solicitar-turno',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   templateUrl: './solicitar-turno.component.html',
-  styleUrls: ['./solicitar-turno.component.scss'],
 })
 export class SolicitarTurnoComponent implements OnInit {
-  private specSvc = inject(SpecialtyService);
-  private apptSvc = inject(AppointmentsService);
-  private session = inject(SessionService);
+  private svc = inject(AppointmentsService);
+  private auth = inject(AuthService);
+  private toast = inject(ToastService);
 
-  specialties = signal<{id:string; nombre:string}[]>([]);
-  specialists = signal<{id:string; nombre:string; apellido:string}[]>([]);
-  slots = signal<{fecha:string; hora:string}[]>([]);
+  // filtros activos
+  activeSpecialtyId: string | null = null;
+  selectedSpecialistId: string | null = null;
 
-  selSpecialty: string | null = null;
-  selSpecialist: string | null = null;
+  // catálogos
+  specialties: Especialidad[] = [];
+  specialists: Especialista[] = [];
 
-  grouped = computed(() => {
-    const g: Record<string, {fecha:string; horas:string[]}> = {};
-    for (const s of this.slots()) {
-      g[s.fecha] ??= { fecha: s.fecha, horas: [] };
-      g[s.fecha].horas.push(s.hora);
-    }
-    return Object.values(g);
-  });
+  // slots disponibles
+  slots: Slot[] = [];
+  loadingSlots = false;
+
+  // agrupado por fecha para pintar tarjetas
+  grouped: { fecha: string; horas: string[] }[] = [];
 
   async ngOnInit() {
-    const { data } = await this.specSvc.listActive();
-    this.specialties.set((data ?? []).map((d:any)=>({id:d.id, nombre:d.nombre})));
+    // cargo especialidades al entrar
+    try {
+      this.specialties = await this.svc.listSpecialties();
+    } catch (e) {
+      console.warn(e);
+    }
   }
 
-  async pickSpecialty(id: string) {
-    this.selSpecialty = id; this.selSpecialist = null; this.slots.set([]);
-    this.specialists.set(await this.apptSvc.listSpecialistsBySpecialty(id));
+  async onPickSpecialty(id: string) {
+    this.activeSpecialtyId = id;
+    this.selectedSpecialistId = null;
+    this.slots = [];
+    this.grouped = [];
+    // cargo especialistas de esa especialidad
+    try {
+      this.specialists = await this.svc.listSpecialistsBySpecialty(id);
+    } catch (e) {
+      console.warn(e);
+    }
   }
 
-  async pickSpecialist(id: string) {
-    this.selSpecialist = id;
-    if (!this.selSpecialty) return;
-    this.slots.set(await this.apptSvc.availableSlots(id, this.selSpecialty));
+  async onPickSpecialist(id: string) {
+    this.selectedSpecialistId = id;
+    await this.loadSlots();
   }
 
-  async solicitar(fecha: string, hora: string) {
-    if (!this.selSpecialty || !this.selSpecialist) return;
-    const { error } = await this.apptSvc.requestAppointment(this.selSpecialty, this.selSpecialist, fecha, hora);
-    if (error) { alert(error.message); return; }
-    alert('Turno solicitado.');
+  private async loadSlots() {
+    if (!this.activeSpecialtyId || !this.selectedSpecialistId) return;
+    this.loadingSlots = true;
+    try {
+      this.slots = await this.svc.listAvailableSlotsLocal(
+        this.selectedSpecialistId,
+        this.activeSpecialtyId
+      );
+
+      // agrupo slots por fecha -> {fecha, [horas]}
+      const map = new Map<string, string[]>();
+      for (const s of this.slots) {
+        if (!map.has(s.fecha)) map.set(s.fecha, []);
+        map.get(s.fecha)!.push(s.hora);
+      }
+      // ordeno horas dentro del día y días asc
+      this.grouped = Array.from(map.entries())
+        .map(([fecha, horas]) => ({
+          fecha,
+          horas: horas.sort(), // ya vienen "HH:mm:ss"
+        }))
+        .sort((a, b) => a.fecha.localeCompare(b.fecha));
+    } finally {
+      this.loadingSlots = false;
+    }
+  }
+
+  async reservarTurno(s: Slot) {
+    const u = await this.auth.getCurrentUser();
+    if (!u) {
+      this.toast.error('Sesión expirada. Volvé a iniciar sesión.');
+      return;
+    }
+    const { error } = await this.svc.createAppointment({
+      specialist_id: this.selectedSpecialistId!,
+      specialty_id: this.activeSpecialtyId!,
+      patient_id: u.id, // id del user logueado
+      fecha: s.fecha,
+      hora: s.hora,
+    });
+
+    if (error) {
+      console.warn(error);
+      this.toast.error('No se pudo reservar el turno');
+    } else {
+      this.toast.success('Turno reservado');
+      await this.loadSlots(); // refresco para ocultar el slot tomado
+    }
   }
 }
