@@ -9,6 +9,17 @@ import { LoaderService } from '../../core/services/loader.service';
 import { SpecialtyService } from '../../core/services/specialty.service';
 import { SupabaseClientService } from '../../core/supabase/supabase-client.service';
 
+
+type QuickRole = 'paciente' | 'especialista' | 'admin';
+
+interface QuickUser {
+  label: string;
+  role: QuickRole;
+  email: string;    
+  password: string; 
+  avatar: string;
+}
+
 @Component({
   standalone: true,
   selector: 'app-login',
@@ -24,8 +35,29 @@ export class LoginComponent {
   private sb = inject(SupabaseClientService).client;
   private specialtySvc = inject(SpecialtyService);
 
+  
+  private avatars = {
+    paciente: this.sb.storage.from('avatars').getPublicUrl('system/user.jpg').data.publicUrl,
+    especialista: this.sb.storage.from('avatars').getPublicUrl('system/doctor.jpg').data.publicUrl,
+    admin: this.sb.storage.from('avatars').getPublicUrl('system/admin.jpg').data.publicUrl,
+  };
+
+   quickUsers: QuickUser[] = [
+    { label: 'Paciente 1', role: 'paciente', email: 'lucamerolla124@gmail.com', password: '123456', avatar: this.avatars.paciente },
+    { label: 'Paciente 2', role: 'paciente', email: 'pepeargento@yopmail.com', password: '123456', avatar: this.avatars.paciente },
+    { label: 'Paciente 3', role: 'paciente', email: 'cockyargento@yopmail.com', password: '123456', avatar: this.avatars.paciente },
+    { label: 'Especialista 1', role: 'especialista', email: 'terala6344@fergetic.com', password: '123456', avatar: this.avatars.especialista },
+    { label: 'Especialista 2', role: 'especialista', email: 'especialista@yopmail.com', password: '123456', avatar: this.avatars.especialista },
+    { label: 'Admin', role: 'admin', email: 'joaquin.messina@gmail.com', password: '123456', avatar: this.avatars.admin },
+  ];
+  
   email = '';
   password = '';
+
+  useQuick(u: QuickUser) {
+    this.email = u.email;
+    this.password = u.password;
+  }
 
   async submit() {
     await this.loader.run(async () => {
@@ -66,12 +98,10 @@ export class LoginComponent {
     const payload = JSON.parse(pendingRaw);
     const uid = this.session.user()!.id;
 
-    // mover imágenes pending -> profiles y obtener URL pública final
     const bucket = this.sb.storage.from('avatars');
     const move = async (path: string | null, finalName: string) => {
       if (!path) return null;
       const dst = `profiles/${uid}/${finalName}`;
-      // move = copy + delete bajo el capó; con policies de arriba funciona
       const { error: mvErr } = await bucket.move(path, dst);
       if (mvErr) {
         console.warn('move error', mvErr.message);
@@ -89,7 +119,6 @@ export class LoginComponent {
       avatarUrl = await move(payload.avatarPath1, 'avatar.jpg');
     }
 
-    // resolver especialidad si es especialista
     let finalSpecialtyId: string | null = null;
     if (payload.rol === 'especialista') {
       if (payload.specialtyId === '-1') {
@@ -101,7 +130,6 @@ export class LoginComponent {
       }
     }
 
-    // upsert del perfil ahora que tenés session (RLS: id = auth.uid())
     const { error: upErr } = await this.sb.from('profiles').upsert(
       {
         id: uid,
@@ -112,7 +140,7 @@ export class LoginComponent {
         dni: payload.dni,
         obra_social: payload.rol === 'paciente' ? payload.obra_social : null,
         is_approved: payload.rol === 'especialista' ? false : true,
-        email: this.email, // si guardás email en profiles
+        email: this.email, 
         avatar_url: avatarUrl,
         extra_img_url: payload.rol === 'paciente' ? extraUrl ?? null : null,
       },
@@ -121,7 +149,6 @@ export class LoginComponent {
 
     if (upErr) console.warn('upsert profile error:', upErr.message);
 
-    // vincular especialidad si aplica (tabla profile_specialty)
     if (payload.rol === 'especialista' && finalSpecialtyId) {
       const { error: linkErr } = await this.sb
         .from('profile_specialty')
@@ -132,7 +159,6 @@ export class LoginComponent {
       if (linkErr) console.warn('link especialidad error:', linkErr.message);
     }
 
-    // limpiar pendientes
     localStorage.removeItem('pendingProfile');
     localStorage.removeItem('reg_pending_key');
   }

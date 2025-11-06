@@ -1,0 +1,42 @@
+<h3>Solicitar turno</h3>
+
+<!-- Especialidades (chips rectangulares) -->
+<p class="text-muted">Elegí una especialidad:</p>
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <button class="btn btn-outline-primary"
+          [class.active]="selSpecialty===s.id"
+          *ngFor="let s of specialties()"
+          (click)="pickSpecialty(s.id)">
+    {{ s.nombre }}
+  </button>
+</div>
+
+<!-- Especialistas (chips) -->
+<div *ngIf="selSpecialty">
+  <p class="text-muted">Elegí un especialista:</p>
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <button class="btn btn-outline-secondary"
+            [class.active]="selSpecialist===p.id"
+            *ngFor="let p of specialists()"
+            (click)="pickSpecialist(p.id)">
+      {{ p.nombre }} {{ p.apellido }}
+    </button>
+  </div>
+</div>
+
+<!-- Slots próximos 15 días -->
+<div *ngIf="selSpecialist && grouped().length===0" class="text-muted">No hay turnos disponibles.</div>
+<div class="row g-3" *ngIf="selSpecialist">
+  <div class="col-12 col-md-6 col-lg-4" *ngFor="let d of grouped()">
+    <div class="card h-100">
+      <div class="card-header">{{ d.fecha | date:'EEEE d/MM' }}</div>
+      <div class="card-body d-flex flex-wrap gap-2">
+        <button class="btn btn-sm btn-outline-success"
+                *ngFor="let h of d.horas"
+                (click)="solicitar(d.fecha, h)">
+          {{ h | date:'HH:mm' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

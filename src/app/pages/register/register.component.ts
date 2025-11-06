@@ -18,6 +18,7 @@ type Rol = 'paciente' | 'especialista';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
+
 export class RegisterComponent implements OnInit {
   selectedSpecialtyId: any;
   especialidadNueva: any;
@@ -32,7 +33,11 @@ export class RegisterComponent implements OnInit {
   private specialtySvc = inject(SpecialtyService);
   private toast = inject(ToastService);
 
-  rol: Rol = 'paciente';
+  rol: Rol | null = null;
+
+  patientImgUrl = this.sb.storage.from('avatars').getPublicUrl('system/user.jpg').data.publicUrl;
+  specialistImgUrl = this.sb.storage.from('avatars').getPublicUrl('system/especialidad.jpg').data.publicUrl;
+
   nombre = '';
   apellido = '';
   edad: number | null = null;
@@ -51,6 +56,10 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit() {
     this.cargarEspecialidades();
+  }
+
+  chooseRole(role: Rol) {
+    this.rol = role;
   }
 
   async cargarEspecialidades() {
@@ -75,6 +84,7 @@ export class RegisterComponent implements OnInit {
   get isEspecialista() {
     return this.rol === 'especialista';
   }
+  
 
   private validar(): string | null {
     if (!this.nombre.trim()) return 'Nombre requerido';

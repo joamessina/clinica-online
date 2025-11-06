@@ -1,21 +1,46 @@
 <div class="row justify-content-center">
-  <div class="col-sm-10 col-md-6 col-lg-4">
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h5 class="mb-3">Ingresar</h5>
+  <div class="col-sm-12 col-md-10 col-lg-8">
 
-        <form (ngSubmit)="submit()">
-          <div class="mb-3">
-            <label class="form-label">Email</label>
-            <input [(ngModel)]="email" name="email" type="email" class="form-control" required />
+    <!-- Accesos rápidos -->
+    <div class="quick-access mb-3">
+      <div class="qa-list">
+        <button
+          type="button"
+          class="qa-btn"
+          *ngFor="let u of quickUsers"
+          (click)="useQuick(u)"
+        >
+          <img [src]="u.avatar" [alt]="u.label" />
+          <div class="qa-text">
+            <span class="qa-label">{{ u.label }}</span>
+            <small class="qa-role">{{ u.role }}</small>
           </div>
-          <div class="mb-3">
-            <label class="form-label">Contraseña</label>
-            <input [(ngModel)]="password" name="password" type="password" class="form-control" required />
-          </div>
-          <button type="submit" class="btn btn-primary w-100">Entrar</button>
-        </form>
+        </button>
       </div>
     </div>
+
+    <!-- Card de login -->
+    <div class="row justify-content-center">
+      <div class="col-sm-10 col-md-6 col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="mb-3">Ingresar</h5>
+
+            <form (ngSubmit)="submit()">
+              <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input [(ngModel)]="email" name="email" type="email" class="form-control" required />
+              </div>
+              <div class="mb-3">
+                <label class="form-label">Contraseña</label>
+                <input [(ngModel)]="password" name="password" type="password" class="form-control" required />
+              </div>
+              <button type="submit" class="btn btn-primary w-100">Entrar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

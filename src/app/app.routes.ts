@@ -4,65 +4,29 @@ import { authGuard } from './core/guards/auth.guard';
 import { loginGuard } from './core/guards/login.guard';
 
 export const routes: Routes = [
-  // Home público
-  {
-    path: '',
-    loadComponent: () =>
-      import('./pages/welcome/welcome.component').then(
-        (m) => m.WelcomeComponent
-      ),
-    pathMatch: 'full',
-  },
+  // Home
+  { path: '', loadComponent: () => import('./pages/welcome/welcome.component').then(m => m.WelcomeComponent), pathMatch: 'full' },
 
-  // Login (si ya está logueado, lo saco a su panel)
-  {
-    path: 'login',
-    loadComponent: () =>
-      import('./pages/login/login.component').then((m) => m.LoginComponent),
-    canActivate: [loginGuard],
-  },
+  // Auth
+  { path: 'login',    loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent), canActivate: [loginGuard] },
+  { path: 'registro', loadComponent: () => import('./pages/register/register.component').then(m => m.RegisterComponent), canActivate: [loginGuard] },
 
-  {
-    path: 'registro',
-    canActivate: [loginGuard], // <- si está logueado, no entra
-    loadComponent: () =>
-      import('./pages/register/register.component').then(
-        (m) => m.RegisterComponent
-      ),
-  },
+  // Dashboards
+  { path: 'paciente',      loadComponent: () => import('./pages/patient-dashboard/patient-dashboard.component').then(m => m.PatientDashboardComponent), canActivate: [authGuard] },
+  { path: 'especialista',  loadComponent: () => import('./pages/specialist-dashboard/specialist-dashboard.component').then(m => m.SpecialistDashboardComponent), canActivate: [authGuard], data: { roles: ['especialista'] } },
+  { path: 'admin/usuarios',loadComponent: () => import('./pages/admin-users/admin-users.component').then(m => m.AdminUsersComponent), canActivate: [authGuard], data: { roles: ['admin'] } },
 
-  // Paciente: requiere estar logueado
-  {
-    path: 'paciente',
-    canActivate: [authGuard],
-    loadComponent: () =>
-      import('./pages/patient-dashboard/patient-dashboard.component').then(
-        (m) => m.PatientDashboardComponent
-      ),
-  },
+  // NUEVO — Sprint 2
+  { path: 'paciente/mis-turnos',           loadComponent: () => import('./paciente/mis-turnos/mis-turnos.component').then(m => m.MisTurnosPacienteComponent), canActivate: [authGuard] },
+  { path: 'paciente/encuesta/:id',         loadComponent: () => import('./paciente/encuesta/encuesta.component').then(m => m.EncuestaPacienteComponent), canActivate: [authGuard] },
 
-  // Especialista (chequeo de aprobado lo hace el authGuard con data.roles)
-  {
-    path: 'especialista',
-    canActivate: [authGuard],
-    data: { roles: ['especialista'] },
-    loadComponent: () =>
-      import(
-        './pages/specialist-dashboard/specialist-dashboard.component'
-      ).then((m) => m.SpecialistDashboardComponent),
-  },
+  { path: 'especialista/mis-turnos',       loadComponent: () => import('./especialidades/mis-turnos/mis-turnos.component').then(m => m.MisTurnosEspecialistaComponent), canActivate: [authGuard], data: { roles: ['especialista'] } },
+  { path: 'especialista/mis-horarios',     loadComponent: () => import('./especialidades/mis-horarios/mis-horarios.component').then(m => m.MisHorariosComponent), canActivate: [authGuard], data: { roles: ['especialista'] } },
 
-  // Admin
-  {
-    path: 'admin/usuarios',
-    canActivate: [authGuard],
-    data: { roles: ['admin'] },
-    loadComponent: () =>
-      import('./pages/admin-users/admin-users.component').then(
-        (m) => m.AdminUsersComponent
-      ),
-  },
+  { path: 'admin/turnos',                  loadComponent: () => import('./admin/turnos/turnos-admin.component').then(m => m.TurnosAdminComponent), canActivate: [authGuard], data: { roles: ['admin'] } },
 
-  // 404 -> Home público
+  { path: 'turnos/solicitar',              loadComponent: () => import('./turnos/solicitar/solicitar-turno.component').then(m => m.SolicitarTurnoComponent), canActivate: [authGuard] },
+
+  // 404
   { path: '**', redirectTo: '' },
 ];

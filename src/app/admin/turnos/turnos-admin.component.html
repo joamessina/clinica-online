@@ -1,0 +1,26 @@
+<h3>Turnos (Admin)</h3>
+
+<input class="form-control mb-3" [ngModel]="q()" (ngModelChange)="q.set($event)" placeholder="Filtrar por especialidad o especialista..."/>
+
+<div class="table-responsive">
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>Fecha</th><th>Hora</th><th>Especialidad</th><th>Paciente</th><th>Especialista</th><th>Estado</th><th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let t of filtered()">
+        <td>{{ t.fecha | date:'d/MM' }}</td>
+        <td>{{ t.hora  | date:'HH:mm' }}</td>
+        <td>{{ t.especialidad_nombre }}</td>
+        <td>{{ t.paciente_nombre }}</td>
+        <td>{{ t.especialista_nombre }}</td>
+        <td><span class="badge" [attr.data-status]="t.estado">{{ t.estado }}</span></td>
+        <td>
+          <button class="btn btn-sm btn-outline-danger" *ngIf="canCancel(t)" (click)="cancelar(t)">Cancelar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
