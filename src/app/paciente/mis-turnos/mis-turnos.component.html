@@ -1,4 +1,11 @@
-<h3>Mis turnos</h3>
+<!-- Encabezado -->
+<div class="d-flex align-items-center justify-content-between mb-3">
+  <h3 class="mb-0">Mis turnos</h3>
+
+  <!-- botón volver a la derecha -->
+  <app-back-button variant="outline-secondary" size="sm" label="Volver">
+  </app-back-button>
+</div>
 
 <input
   class="form-control mb-3"
@@ -30,35 +37,41 @@
             t.estado
           }}</span>
         </td>
-        <td class="d-flex flex-wrap gap-1">
-          <button
-            class="btn btn-sm btn-outline-danger"
-            *ngIf="canCancel(t)"
-            (click)="cancelar(t)"
-          >
-            Cancelar
-          </button>
-          <button
-            class="btn btn-sm btn-outline-secondary"
-            *ngIf="hasResena(t)"
-            (click)="verResena(t)"
-          >
-            Ver reseña
-          </button>
-          <button
-            class="btn btn-sm btn-outline-primary"
-            *ngIf="canSurvey(t)"
-            (click)="abrirEncuesta(t)"
-          >
-            Completar encuesta
-          </button>
-          <button
-            class="btn btn-sm btn-success"
-            *ngIf="canFeedback(t)"
-            (click)="feedback(t)"
-          >
-            Calificar atención
-          </button>
+
+        <td class="actions">
+          <div class="btn-group btn-group-sm flex-wrap">
+            <button
+              class="btn btn-outline-danger"
+              *ngIf="canCancel(t)"
+              (click)="cancelar(t)"
+            >
+              Cancelar
+            </button>
+
+            <button
+              class="btn btn-outline-secondary"
+              *ngIf="hasResena(t)"
+              (click)="verResena(t)"
+            >
+              Ver reseña
+            </button>
+
+            <button
+              class="btn btn-outline-primary"
+              *ngIf="canSurvey(t)"
+              (click)="abrirEncuesta(t)"
+            >
+              Completar encuesta
+            </button>
+
+            <button
+              class="btn btn-success"
+              *ngIf="canFeedback(t)"
+              (click)="feedback(t)"
+            >
+              Calificar atención
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>

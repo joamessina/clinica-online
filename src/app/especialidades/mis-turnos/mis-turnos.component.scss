@@ -1,0 +1,66 @@
+/* Fija layout de tabla y alinea verticalmente */
+.table {
+  table-layout: fixed;
+}
+.table thead th,
+.table tbody td {
+  vertical-align: middle;
+}
+
+/* Anchos sugeridos por columna (ajustá si querés) */
+.table thead th:nth-child(1),
+.table tbody td:nth-child(1) {
+  width: 90px;
+} /* Fecha  */
+.table thead th:nth-child(2),
+.table tbody td:nth-child(2) {
+  width: 80px;
+} /* Hora   */
+.table thead th:nth-child(3),
+.table tbody td:nth-child(3) {
+  width: 170px;
+} /* Espec. */
+.table thead th:nth-child(5),
+.table tbody td:nth-child(5) {
+  width: 120px;
+} /* Estado */
+.table thead th:nth-child(6),
+.table tbody td:nth-child(6) {
+  width: 340px;
+} /* Acciones */
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+/* Badges por estado */
+.badge[data-status="PENDIENTE"] {
+  color: #664d03;
+  background: #fff3cd;
+}
+.badge[data-status="ACEPTADO"] {
+  color: #084298;
+  background: #cfe2ff;
+}
+.badge[data-status="REALIZADO"] {
+  color: #0f5132;
+  background: #d1e7dd;
+}
+.badge[data-status="RECHAZADO"],
+.badge[data-status="CANCELADO"] {
+  color: #842029;
+  background: #f8d7da;
+}
+
+/* Responsive: apilá un poco en pantallas chicas */
+@media (max-width: 992px) {
+  .table thead th:nth-child(6),
+  .table tbody td:nth-child(6) {
+    width: 100%;
+  }
+  .actions {
+    gap: 0.3rem;
+  }
+}

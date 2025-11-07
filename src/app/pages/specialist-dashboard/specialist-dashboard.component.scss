@@ -1,0 +1,108 @@
+/* specialist-dashboard.component.scss */
+:host {
+  display: block;
+  padding-inline: clamp(12px, 3vw, 28px); /* era la línea problemática */
+  --ring: rgba(13, 110, 253, 0.18);
+  --card: #ffffff;
+  --muted: #6c757d;
+}
+
+@media (prefers-color-scheme: dark) {
+  :host {
+    --card: #17181b;
+    --muted: #adb5bd;
+    --ring: rgba(13, 110, 253, 0.28);
+  }
+}
+
+/* título */
+h2 {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  margin: 1.25rem 0 0.75rem;
+  animation: fadeIn 0.35s ease-out both;
+}
+
+/* toolbar (tu div con d-flex/gap-2) */
+h2 + div {
+  display: flex;
+  gap: 0.75rem !important;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+/* caja “hero” para que el panel no quede vacío */
+.panel-hero {
+  background: radial-gradient(
+      1200px 200px at 0% -10%,
+      var(--ring),
+      transparent 60%
+    ),
+    radial-gradient(1200px 200px at 100% 110%, var(--ring), transparent 60%),
+    var(--card);
+  border: 1px solid rgba(108, 117, 125, 0.12);
+  border-radius: 16px;
+  padding: clamp(16px, 3vw, 24px);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.03), 0 10px 25px -20px var(--ring);
+  min-height: 38vh;
+  animation: slideUp 0.35s ease-out both;
+}
+
+/* botones */
+a.btn,
+button.btn {
+  border-radius: 12px !important;
+  padding: 0.6rem 1rem !important;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  transition: transform 0.15s ease, box-shadow 0.2s ease,
+    background-color 0.2s ease, color 0.2s ease;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02), 0 8px 20px -12px var(--ring);
+}
+
+a.btn:hover,
+button.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02), 0 14px 28px -10px var(--ring);
+}
+
+.btn-primary {
+  border: 0 !important;
+  background-image: linear-gradient(135deg, #0d6efd 0%, #5a65ff 100%);
+}
+
+.btn-outline-primary {
+  backdrop-filter: saturate(120%);
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: rgba(13, 110, 253, 0.08) !important;
+}
+
+/* helpers opcionales */
+.section {
+  display: grid;
+  gap: 1rem;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

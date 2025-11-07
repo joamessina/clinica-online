@@ -1,0 +1,54 @@
+/* perfil.component.scss */
+.profile-card {
+  .avatar {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+  }
+}
+
+.specialties {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.specialty-chip {
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px solid rgba(13, 110, 253, 0.25);
+  background: rgba(13, 110, 253, 0.1); /* azul suave */
+  color: #000000; /* texto azul */
+}
+
+@media (prefers-color-scheme: dark) {
+  .specialty-chip {
+    border-color: rgba(108, 117, 125, 0.5);
+    background: rgba(108, 117, 125, 0.25);
+    color: #e9ecef;
+  }
+}
+
+.badge.bg-outline {
+  border-radius: 9999px;
+  padding: 0.25rem 0.6rem;
+  font-weight: 500;
+
+  border-color: var(--bs-primary);
+  color: var(--bs-primary);
+  background-color: rgba(var(--bs-primary-rgb), 0.12);
+}
+
+@media (prefers-color-scheme: dark) {
+  .badge.bg-outline {
+    border-color: rgba(var(--bs-primary-rgb), 0.6);
+    color: #e9ecef;
+    background-color: rgba(var(--bs-primary-rgb), 0.85);
+  }
+}
+
+img.rounded-circle {
+  object-fit: cover;
+}

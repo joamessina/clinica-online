@@ -19,12 +19,15 @@
         class="btn btn-outline-primary btn-sm"
         *ngIf="profile()?.role === 'admin'"
         routerLink="/admin/usuarios"
-        >Usuarios</a
       >
+        Usuarios
+      </a>
 
-      <button class="btn btn-warning btn-sm ms-2" (click)="logout()">
-        Salir
-      </button>
+      <a class="btn btn-outline-secondary btn-sm" routerLink="/perfil">
+        <i class="bi bi-person-circle me-1"></i> Mi perfil
+      </a>
+
+      <button class="btn btn-warning btn-sm" (click)="logout()">Salir</button>
     </ng-container>
 
     <ng-template #loggedOut>

@@ -1,4 +1,9 @@
-<h3>Mis turnos</h3>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Mis turnos</h3>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <app-back-button></app-back-button>
+  </div>
+</div>
 
 <input
   class="form-control mb-3"
@@ -30,42 +35,49 @@
             t.estado
           }}</span>
         </td>
-        <td class="d-flex flex-wrap gap-1">
-          <button
-            class="btn btn-sm btn-primary"
-            *ngIf="canAccept(t)"
-            (click)="aceptar(t)"
-          >
-            Aceptar
-          </button>
-          <button
-            class="btn btn-sm btn-outline-danger"
-            *ngIf="canReject(t)"
-            (click)="rechazar(t)"
-          >
-            Rechazar
-          </button>
-          <button
-            class="btn btn-sm btn-outline-secondary"
-            *ngIf="canCancel(t)"
-            (click)="cancelar(t)"
-          >
-            Cancelar
-          </button>
-          <button
-            class="btn btn-sm btn-success"
-            *ngIf="canFinish(t)"
-            (click)="finalizar(t)"
-          >
-            Finalizar
-          </button>
-          <button
-            class="btn btn-sm btn-outline-dark"
-            *ngIf="hasResena(t)"
-            (click)="verResena(t)"
-          >
-            Ver reseña
-          </button>
+
+        <td>
+          <div class="actions">
+            <button
+              class="btn btn-sm btn-primary"
+              *ngIf="canAccept(t)"
+              (click)="aceptar(t)"
+            >
+              Aceptar
+            </button>
+
+            <button
+              class="btn btn-sm btn-outline-danger"
+              *ngIf="canReject(t)"
+              (click)="rechazar(t)"
+            >
+              Rechazar
+            </button>
+
+            <button
+              class="btn btn-sm btn-outline-secondary"
+              *ngIf="canCancel(t)"
+              (click)="cancelar(t)"
+            >
+              Cancelar
+            </button>
+
+            <button
+              class="btn btn-sm btn-success"
+              *ngIf="canFinish(t)"
+              (click)="finalizar(t)"
+            >
+              Finalizar
+            </button>
+
+            <button
+              class="btn btn-sm btn-outline-dark"
+              *ngIf="hasResena(t)"
+              (click)="verResena(t)"
+            >
+              Ver reseña
+            </button>
+          </div>
         </td>
       </tr>
     </tbody>

@@ -3,369 +3,396 @@
     <div class="d-flex align-items-center justify-content-between mb-3">
       <h2 class="h4 mb-0">Usuarios</h2>
 
-      <div class="d-flex gap-2">
-        <button class="btn btn-primary btn-sm" (click)="openCreate()">
-          <i class="bi bi-person-plus me-1"></i> Nuevo usuario
-        </button>
-        <button
-          class="btn btn-outline-secondary btn-sm"
-          (click)="load()"
-          [disabled]="loading()"
-        >
-          Actualizar
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div class="card shadow-sm">
-    <div class="card-body border-bottom">
-      <div class="row g-2 align-items-center">
-        <div class="col-12 col-md-5">
-          <div class="input-group">
-            <span class="input-group-text">Buscar</span>
-            <input
-              class="form-control"
-              type="search"
-              placeholder="nombre, email, DNI, obra social, rol…"
-              [value]="q()"
-              (input)="q.set($any($event.target).value)"
-            />
-          </div>
-        </div>
-        <div class="col-6 col-md-3">
-          <select
-            class="form-select"
-            [value]="role()"
-            (change)="role.set($any($event.target).value)"
-          >
-            <option value="all">Todos los roles</option>
-            <option value="admin">Admin</option>
-            <option value="especialista">Especialista</option>
-            <option value="paciente">Paciente</option>
-          </select>
-        </div>
-        <div class="col-6 col-md-3 form-check ps-5">
-          <input
-            id="onlyPending"
-            class="form-check-input"
-            type="checkbox"
-            [checked]="onlyPending()"
-            (change)="onlyPending.set($any($event.target).checked)"
-          />
-          <label for="onlyPending" class="form-check-label"
-            >Solo pendientes de aprobación</label
-          >
-        </div>
-      </div>
-    </div>
-
-    <!-- Tabla -->
-    <div class="table-responsive position-relative">
-      <!-- Spinner overlay -->
-      <div class="loading-overlay" *ngIf="loading()">
-        <div class="spinner-border" role="status" aria-label="Cargando"></div>
-      </div>
-
-      <table class="table table-hover align-middle mb-0">
-        <thead class="table-light table-sticky">
-          <tr>
-            <th>Foto</th>
-            <th>Nombre</th>
-            <th>Role</th>
-            <th>Email</th>
-            <th>DNI</th>
-            <th>Obra Social</th>
-            <th>Especialidad</th>
-            <th>Aprobado</th>
-            <th class="text-end">Acciones</th>
-          </tr>
-        </thead>
-        <tbody *ngIf="!loading() && filtered().length; else emptyState">
-          <tr *ngFor="let r of filtered()">
-            <!-- FOTO -->
-            <td class="text-center">
-              <img
-                img
-                [src]="r.avatar_url || placeholderUrl"
-                alt="avatar"
-                style="
-                  width: 36px;
-                  height: 36px;
-                  object-fit: cover;
-                  border-radius: 50%;
-                  border: 1px solid #ddd;
-                "
-                (error)="imgFallback($event)"
-              />
-            </td>
-
-            <!-- NOMBRE -->
-            <td class="fw-medium">
-              {{ nameOf(r) }}
-              <div class="text-muted small" *ngIf="!r.nombre && !r.apellido">
-                Sin nombre
-              </div>
-            </td>
-
-            <!-- ROL -->
-            <td>
-              <span
-                class="badge"
-                [class.bg-dark]="r.role === 'admin'"
-                [class.bg-primary]="r.role === 'especialista'"
-                [class.bg-secondary]="r.role === 'paciente'"
-              >
-                {{ r.role }}
-              </span>
-            </td>
-
-            <!-- EMAIL -->
-            <td>
-              <a *ngIf="r.email" [href]="'mailto:' + r.email">{{ r.email }}</a>
-              <span *ngIf="!r.email">—</span>
-            </td>
-
-            <!-- DNI -->
-            <td>{{ r.dni || "—" }}</td>
-
-            <!-- OBRA SOCIAL -->
-            <td>{{ r.obra_social || "—" }}</td>
-
-            <!-- ESPECIALIDAD -->
-            <td>
-              <ng-container *ngIf="r.role === 'especialista'; else guion">
-                {{ r.specialtyName || "—" }}
-              </ng-container>
-              <ng-template #guion>—</ng-template>
-            </td>
-
-            <!-- APROBADO -->
-            <td>
-              <span
-                class="badge"
-                [class.bg-success]="r.is_approved"
-                [class.bg-warning]="!r.is_approved"
-              >
-                {{ r.is_approved ? "Sí" : "Pendiente" }}
-              </span>
-            </td>
-
-            <!-- ACCIONES -->
-            <td class="text-end">
-              <div class="btn-group btn-group-sm">
-                <button
-                  class="btn btn-outline-success"
-                  (click)="toggleApprove(r)"
-                >
-                  {{ r.is_approved ? "Desaprobar" : "Aprobar" }}
-                </button>
-                <button
-                  class="btn btn-outline-secondary dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                >
-                  Rol
-                </button>
-                <ul class="dropdown-menu dropdown-menu-end">
-                  <li>
-                    <button class="dropdown-item" (click)="setRole(r, 'admin')">
-                      Admin
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      class="dropdown-item"
-                      (click)="setRole(r, 'especialista')"
-                    >
-                      Especialista
-                    </button>
-                  </li>
-                  <li>
-                    <button
-                      class="dropdown-item"
-                      (click)="setRole(r, 'paciente')"
-                    >
-                      Paciente
-                    </button>
-                  </li>
-                </ul>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <ng-template #emptyState>
-        <div class="p-4 text-center text-muted">
-          <div class="mb-2">No hay usuarios que coincidan con el filtro.</div>
-          <div class="small">
-            Cambiá la búsqueda o los filtros para ver resultados.
-          </div>
-        </div>
-      </ng-template>
-    </div>
-  </div>
-</div>
-
-<div class="modal fade show d-block" tabindex="-1" *ngIf="showCreate()">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">
-          <i class="bi bi-person-plus me-2"></i>Crear usuario
-        </h5>
+      <div class="d-flex gap-2 mb-3">
         <button
           type="button"
-          class="btn-close"
-          (click)="closeCreate()"
-        ></button>
+          class="btn btn-primary"
+          [routerLink]="['/admin/turnos']"
+        >
+          <i class="bi bi-calendar-event me-1"></i> Ver turnos
+        </button>
+
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary btn-sm" (click)="openCreate()">
+            <i class="bi bi-person-plus me-1"></i> Nuevo usuario
+          </button>
+          <button
+            class="btn btn-outline-secondary btn-sm"
+            (click)="load()"
+            [disabled]="loading()"
+          >
+            Actualizar
+          </button>
+        </div>
       </div>
+    </div>
 
-      <form (ngSubmit)="createUser()">
-        <div class="modal-body">
-          <div class="row g-3">
-            <!-- Rol -->
-            <div class="col-12">
-              <label class="form-label fw-semibold">Rol</label>
-              <div class="btn-group" role="group">
-                <input
-                  type="radio"
-                  class="btn-check"
-                  id="nu-rol-pac"
-                  [value]="'paciente'"
-                  [(ngModel)]="newUser().role"
-                  name="nu_role"
-                />
-                <label class="btn btn-outline-primary" for="nu-rol-pac"
-                  >Paciente</label
-                >
-
-                <input
-                  type="radio"
-                  class="btn-check"
-                  id="nu-rol-esp"
-                  [value]="'especialista'"
-                  [(ngModel)]="newUser().role"
-                  name="nu_role"
-                />
-                <label class="btn btn-outline-primary" for="nu-rol-esp"
-                  >Especialista</label
-                >
-
-                <input
-                  type="radio"
-                  class="btn-check"
-                  id="nu-rol-adm"
-                  [value]="'admin'"
-                  [(ngModel)]="newUser().role"
-                  name="nu_role"
-                />
-                <label class="btn btn-outline-dark" for="nu-rol-adm"
-                  >Admin</label
-                >
-              </div>
-            </div>
-
-            <!-- Nombre / Apellido -->
-            <div class="col-md-6">
-              <label class="form-label">Nombre</label>
+    <div class="card shadow-sm">
+      <div class="card-body border-bottom">
+        <div class="row g-2 align-items-center">
+          <div class="col-12 col-md-5">
+            <div class="input-group">
+              <span class="input-group-text">Buscar</span>
               <input
                 class="form-control"
-                [class.is-invalid]="submitted() && !newUser().nombre"
-                [(ngModel)]="newUser().nombre"
-                name="nu_nombre"
+                type="search"
+                placeholder="nombre, email, DNI, obra social, rol…"
+                [value]="q()"
+                (input)="q.set($any($event.target).value)"
               />
-              <div class="invalid-feedback">Requerido.</div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Apellido</label>
-              <input
-                class="form-control"
-                [(ngModel)]="newUser().apellido"
-                name="nu_apellido"
-              />
-            </div>
-
-            <!-- Edad / DNI -->
-            <div class="col-md-4">
-              <label class="form-label">Edad</label>
-              <input
-                type="number"
-                class="form-control"
-                [(ngModel)]="newUser().edad"
-                name="nu_edad"
-                min="0"
-              />
-            </div>
-            <div class="col-md-4">
-              <label class="form-label">DNI</label>
-              <input
-                class="form-control"
-                [(ngModel)]="newUser().dni"
-                name="nu_dni"
-              />
-            </div>
-
-            <!-- Obra social solo paciente -->
-            <div class="col-md-4" *ngIf="newUser().role === 'paciente'">
-              <label class="form-label">Obra Social</label>
-              <input
-                class="form-control"
-                [class.is-invalid]="submitted() && !newUser().obra_social"
-                [(ngModel)]="newUser().obra_social"
-                name="nu_obra"
-              />
-              <div class="invalid-feedback">Requerida para paciente.</div>
-            </div>
-
-            <div class="col-md-6">
-              <label class="form-label">Email</label>
-              <input
-                type="email"
-                class="form-control"
-                [class.is-invalid]="submitted() && !newUser().email"
-                [(ngModel)]="newUser().email"
-                name="nu_email"
-              />
-              <div class="invalid-feedback">Requerido.</div>
-            </div>
-            <div class="col-md-6">
-              <label class="form-label">Contraseña</label>
-              <input
-                type="password"
-                class="form-control"
-                [class.is-invalid]="submitted() && !newUser().password"
-                [(ngModel)]="newUser().password"
-                name="nu_pass"
-              />
-              <div class="invalid-feedback">Requerida.</div>
-              <div class="form-text">
-                Se enviará email de confirmación si está habilitado.
-              </div>
             </div>
           </div>
+          <div class="col-6 col-md-3">
+            <select
+              class="form-select"
+              [value]="role()"
+              (change)="role.set($any($event.target).value)"
+            >
+              <option value="all">Todos los roles</option>
+              <option value="admin">Admin</option>
+              <option value="especialista">Especialista</option>
+              <option value="paciente">Paciente</option>
+            </select>
+          </div>
+          <div class="col-6 col-md-3 form-check ps-5">
+            <input
+              id="onlyPending"
+              class="form-check-input"
+              type="checkbox"
+              [checked]="onlyPending()"
+              (change)="onlyPending.set($any($event.target).checked)"
+            />
+            <label for="onlyPending" class="form-check-label"
+              >Solo pendientes de aprobación</label
+            >
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="table-responsive position-relative">
+        <!-- Spinner overlay -->
+        <div class="loading-overlay" *ngIf="loading()">
+          <div class="spinner-border" role="status" aria-label="Cargando"></div>
         </div>
 
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-outline-secondary"
-            (click)="closeCreate()"
-          >
-            Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary" [disabled]="creating()">
-            <span
-              class="spinner-border spinner-border-sm me-2"
-              *ngIf="creating()"
-            ></span>
-            Crear
-          </button>
-        </div>
-      </form>
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light table-sticky">
+            <tr>
+              <th>Foto</th>
+              <th>Nombre</th>
+              <th>Role</th>
+              <th>Email</th>
+              <th>DNI</th>
+              <th>Obra Social</th>
+              <th>Especialidad</th>
+              <th>Aprobado</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+          <tbody *ngIf="!loading() && filtered().length; else emptyState">
+            <tr *ngFor="let r of filtered()">
+              <!-- FOTO -->
+              <td class="text-center">
+                <img
+                  img
+                  [src]="r.avatar_url || placeholderUrl"
+                  alt="avatar"
+                  style="
+                    width: 36px;
+                    height: 36px;
+                    object-fit: cover;
+                    border-radius: 50%;
+                    border: 1px solid #ddd;
+                  "
+                  (error)="imgFallback($event)"
+                />
+              </td>
+
+              <!-- NOMBRE -->
+              <td class="fw-medium">
+                {{ nameOf(r) }}
+                <div class="text-muted small" *ngIf="!r.nombre && !r.apellido">
+                  Sin nombre
+                </div>
+              </td>
+
+              <!-- ROL -->
+              <td>
+                <span
+                  class="badge"
+                  [class.bg-dark]="r.role === 'admin'"
+                  [class.bg-primary]="r.role === 'especialista'"
+                  [class.bg-secondary]="r.role === 'paciente'"
+                >
+                  {{ r.role }}
+                </span>
+              </td>
+
+              <!-- EMAIL -->
+              <td>
+                <a *ngIf="r.email" [href]="'mailto:' + r.email">{{
+                  r.email
+                }}</a>
+                <span *ngIf="!r.email">—</span>
+              </td>
+
+              <!-- DNI -->
+              <td>{{ r.dni || "—" }}</td>
+
+              <!-- OBRA SOCIAL -->
+              <td>{{ r.obra_social || "—" }}</td>
+
+              <!-- ESPECIALIDAD -->
+              <td>
+                <ng-container *ngIf="r.role === 'especialista'; else guion">
+                  <ng-container *ngIf="r.specialties?.length; else noSpecs">
+                    <span
+                      class="badge rounded-pill text-bg-light me-1"
+                      *ngFor="let s of r.specialties"
+                    >
+                      {{ s }}
+                    </span>
+                  </ng-container>
+                  <ng-template #noSpecs>—</ng-template>
+                </ng-container>
+                <ng-template #guion>—</ng-template>
+              </td>
+
+              <!-- APROBADO -->
+              <td>
+                <span
+                  class="badge"
+                  [class.bg-success]="r.is_approved"
+                  [class.bg-warning]="!r.is_approved"
+                >
+                  {{ r.is_approved ? "Sí" : "Pendiente" }}
+                </span>
+              </td>
+
+              <!-- ACCIONES -->
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <button
+                    class="btn btn-outline-success"
+                    (click)="toggleApprove(r)"
+                  >
+                    {{ r.is_approved ? "Desaprobar" : "Aprobar" }}
+                  </button>
+                  <button
+                    class="btn btn-outline-secondary dropdown-toggle"
+                    data-bs-toggle="dropdown"
+                  >
+                    Rol
+                  </button>
+                  <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                      <button
+                        class="dropdown-item"
+                        (click)="setRole(r, 'admin')"
+                      >
+                        Admin
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        class="dropdown-item"
+                        (click)="setRole(r, 'especialista')"
+                      >
+                        Especialista
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        class="dropdown-item"
+                        (click)="setRole(r, 'paciente')"
+                      >
+                        Paciente
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <ng-template #emptyState>
+          <div class="p-4 text-center text-muted">
+            <div class="mb-2">No hay usuarios que coincidan con el filtro.</div>
+            <div class="small">
+              Cambiá la búsqueda o los filtros para ver resultados.
+            </div>
+          </div>
+        </ng-template>
+      </div>
     </div>
   </div>
 
-  <!-- backdrop -->
-  <div class="modal-backdrop-custom"></div>
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="showCreate()">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="bi bi-person-plus me-2"></i>Crear usuario
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeCreate()"
+          ></button>
+        </div>
+
+        <form (ngSubmit)="createUser()">
+          <div class="modal-body">
+            <div class="row g-3">
+              <!-- Rol -->
+              <div class="col-12">
+                <label class="form-label fw-semibold">Rol</label>
+                <div class="btn-group" role="group">
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    id="nu-rol-pac"
+                    [value]="'paciente'"
+                    [(ngModel)]="newUser().role"
+                    name="nu_role"
+                  />
+                  <label class="btn btn-outline-primary" for="nu-rol-pac"
+                    >Paciente</label
+                  >
+
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    id="nu-rol-esp"
+                    [value]="'especialista'"
+                    [(ngModel)]="newUser().role"
+                    name="nu_role"
+                  />
+                  <label class="btn btn-outline-primary" for="nu-rol-esp"
+                    >Especialista</label
+                  >
+
+                  <input
+                    type="radio"
+                    class="btn-check"
+                    id="nu-rol-adm"
+                    [value]="'admin'"
+                    [(ngModel)]="newUser().role"
+                    name="nu_role"
+                  />
+                  <label class="btn btn-outline-dark" for="nu-rol-adm"
+                    >Admin</label
+                  >
+                </div>
+              </div>
+
+              <!-- Nombre / Apellido -->
+              <div class="col-md-6">
+                <label class="form-label">Nombre</label>
+                <input
+                  class="form-control"
+                  [class.is-invalid]="submitted() && !newUser().nombre"
+                  [(ngModel)]="newUser().nombre"
+                  name="nu_nombre"
+                />
+                <div class="invalid-feedback">Requerido.</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Apellido</label>
+                <input
+                  class="form-control"
+                  [(ngModel)]="newUser().apellido"
+                  name="nu_apellido"
+                />
+              </div>
+
+              <!-- Edad / DNI -->
+              <div class="col-md-4">
+                <label class="form-label">Edad</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  [(ngModel)]="newUser().edad"
+                  name="nu_edad"
+                  min="0"
+                />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">DNI</label>
+                <input
+                  class="form-control"
+                  [(ngModel)]="newUser().dni"
+                  name="nu_dni"
+                />
+              </div>
+
+              <!-- Obra social solo paciente -->
+              <div class="col-md-4" *ngIf="newUser().role === 'paciente'">
+                <label class="form-label">Obra Social</label>
+                <input
+                  class="form-control"
+                  [class.is-invalid]="submitted() && !newUser().obra_social"
+                  [(ngModel)]="newUser().obra_social"
+                  name="nu_obra"
+                />
+                <div class="invalid-feedback">Requerida para paciente.</div>
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  [class.is-invalid]="submitted() && !newUser().email"
+                  [(ngModel)]="newUser().email"
+                  name="nu_email"
+                />
+                <div class="invalid-feedback">Requerido.</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Contraseña</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  [class.is-invalid]="submitted() && !newUser().password"
+                  [(ngModel)]="newUser().password"
+                  name="nu_pass"
+                />
+                <div class="invalid-feedback">Requerida.</div>
+                <div class="form-text">
+                  Se enviará email de confirmación si está habilitado.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              (click)="closeCreate()"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="creating()"
+            >
+              <span
+                class="spinner-border spinner-border-sm me-2"
+                *ngIf="creating()"
+              ></span>
+              Crear
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- backdrop -->
+    <div class="modal-backdrop-custom"></div>
+  </div>
 </div>

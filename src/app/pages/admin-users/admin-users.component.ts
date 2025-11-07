@@ -2,6 +2,7 @@ import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseClientService } from '../../core/supabase/supabase-client.service';
+import { RouterLink } from '@angular/router';
 
 type Role = 'admin' | 'especialista' | 'paciente';
 
@@ -15,13 +16,13 @@ interface AdminUser {
   role: Role;
   is_approved: boolean;
   avatar_url?: string | null;
-  specialtyName?: string | null;
+  specialties?: string[];
 }
 
 @Component({
   standalone: true,
   selector: 'app-admin-users',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './admin-users.component.html',
   styleUrls: ['./admin-users.component.scss'],
 })
@@ -136,6 +137,7 @@ export class AdminUsersComponent implements OnInit {
           r.dni ?? '',
           r.obra_social ?? '',
           r.role,
+          ...(r.specialties ?? []),
         ]
           .join(' ')
           .toLowerCase();
@@ -164,10 +166,16 @@ export class AdminUsersComponent implements OnInit {
 
   async load() {
     this.loading.set(true);
+
     const { data, error } = await this.sb
       .from('profiles')
       .select(
-        'id,nombre,apellido,email,dni,obra_social,role,is_approved,avatar_url,profile_specialty:profile_specialty (specialties:specialties ( nombre ))'
+        `
+      id,nombre,apellido,email,dni,obra_social,role,is_approved,avatar_url,
+      profile_specialty:profile_specialty (
+        specialties:specialties ( nombre )
+      )
+    `
       )
       .order('created_at', { ascending: false });
 
@@ -175,8 +183,13 @@ export class AdminUsersComponent implements OnInit {
       console.error('[admin/users] load error', error);
       this.rows.set([]);
     } else {
-      const mapped = (data ?? []).map((r: any) => {
-        const row: AdminUser = {
+      const mapped = (data ?? []).map((r: any): AdminUser => {
+        const specialties: string[] =
+          r.profile_specialty
+            ?.map((ps: any) => ps?.specialties?.nombre)
+            .filter(Boolean) ?? [];
+
+        return {
           id: r.id,
           nombre: r.nombre,
           apellido: r.apellido,
@@ -186,10 +199,10 @@ export class AdminUsersComponent implements OnInit {
           role: r.role,
           is_approved: r.is_approved,
           avatar_url: this.normalizeAvatar(r.avatar_url ?? null),
-          specialtyName: r.profile_specialty?.[0]?.specialties?.nombre ?? null,
+          specialties, // <— ahora es array
         };
-        return row;
       });
+
       this.rows.set(mapped);
     }
     this.loading.set(false);

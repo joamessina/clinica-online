@@ -7,6 +7,7 @@ import {
 } from '../../core/services/appointments.service';
 import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
+import { BackButtonComponent } from '../../shared/back-button/back-button.component';
 
 type Especialidad = { id: string; nombre: string };
 type Especialista = { id: string; nombre: string; apellido: string };
@@ -14,7 +15,7 @@ type Especialista = { id: string; nombre: string; apellido: string };
 @Component({
   standalone: true,
   selector: 'app-solicitar-turno',
-  imports: [CommonModule],
+  imports: [CommonModule, BackButtonComponent],
   templateUrl: './solicitar-turno.component.html',
 })
 export class SolicitarTurnoComponent implements OnInit {

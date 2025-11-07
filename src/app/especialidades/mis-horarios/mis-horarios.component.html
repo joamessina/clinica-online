@@ -1,13 +1,18 @@
-<h3>Mis horarios</h3>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">Mis Horarios</h3>
+  <app-back-button></app-back-button>
+</div>
 
 <div class="row g-3">
   <div class="col-md-4">
     <label class="form-label">Especialidad</label>
     <div class="d-flex flex-wrap gap-2">
-      <button class="btn btn-outline-primary"
-              *ngFor="let s of specialties"
-              [class.active]="form.specialty===s.id"
-              (click)="form.specialty=s.id">
+      <button
+        class="btn btn-outline-primary"
+        *ngFor="let s of specialties"
+        [class.active]="form.specialty === s.id"
+        (click)="form.specialty = s.id"
+      >
         {{ s.nombre }}
       </button>
     </div>
@@ -17,23 +22,42 @@
       <div class="col-3">
         <label class="form-label">Día</label>
         <select class="form-select" [(ngModel)]="form.weekday" name="wd">
-          <option [ngValue]="0">Dom</option><option [ngValue]="1">Lun</option>
-          <option [ngValue]="2">Mar</option><option [ngValue]="3">Mié</option>
-          <option [ngValue]="4">Jue</option><option [ngValue]="5">Vie</option>
+          <option [ngValue]="0">Dom</option>
+          <option [ngValue]="1">Lun</option>
+          <option [ngValue]="2">Mar</option>
+          <option [ngValue]="3">Mié</option>
+          <option [ngValue]="4">Jue</option>
+          <option [ngValue]="5">Vie</option>
           <option [ngValue]="6">Sáb</option>
         </select>
       </div>
       <div class="col-3">
         <label class="form-label">Desde</label>
-        <input class="form-control" [(ngModel)]="form.desde" name="desde" placeholder="HH:mm" />
+        <input
+          class="form-control"
+          [(ngModel)]="form.desde"
+          name="desde"
+          placeholder="HH:mm"
+        />
       </div>
       <div class="col-3">
         <label class="form-label">Hasta</label>
-        <input class="form-control" [(ngModel)]="form.hasta" name="hasta" placeholder="HH:mm" />
+        <input
+          class="form-control"
+          [(ngModel)]="form.hasta"
+          name="hasta"
+          placeholder="HH:mm"
+        />
       </div>
       <div class="col-2">
         <label class="form-label">Slot</label>
-        <input type="number" class="form-control" [(ngModel)]="form.slot" name="slot" min="10"/>
+        <input
+          type="number"
+          class="form-control"
+          [(ngModel)]="form.slot"
+          name="slot"
+          min="10"
+        />
       </div>
       <div class="col-1">
         <button class="btn btn-primary w-100" (click)="add()">Agregar</button>
@@ -42,16 +66,24 @@
   </div>
 </div>
 
-<hr>
+<hr />
 
 <h5>Tramos cargados</h5>
 <div class="table-responsive">
   <table class="table">
-    <thead><tr><th>Día</th><th>Especialidad</th><th>Desde</th><th>Hasta</th><th>Slot</th></tr></thead>
+    <thead>
+      <tr>
+        <th>Día</th>
+        <th>Especialidad</th>
+        <th>Desde</th>
+        <th>Hasta</th>
+        <th>Slot</th>
+      </tr>
+    </thead>
     <tbody>
       <tr *ngFor="let a of avail">
         <td>{{ a.weekday }}</td>
-        <td>{{ a.specialty_id }}</td>
+        <td>{{ a.specialty_name }}</td>
         <td>{{ a.hora_desde }}</td>
         <td>{{ a.hora_hasta }}</td>
         <td>{{ a.slot_minutes }}m</td>
