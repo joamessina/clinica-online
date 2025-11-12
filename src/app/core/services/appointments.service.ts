@@ -1,4 +1,3 @@
-// src/app/core/services/appointments.service.ts
 import { Injectable, inject } from '@angular/core';
 import { SupabaseClientService } from '../supabase/supabase-client.service';
 
@@ -11,16 +10,14 @@ export type TurnoEstado =
 
 export interface Turno {
   id: string;
-  fecha: string; // 'YYYY-MM-DD'
-  hora: string; // 'HH:MM:SS'
+  fecha: string;
+  hora: string;
   estado: TurnoEstado;
 
-  // nombres amigables (las vistas v_appointments_* suelen traer esto)
   especialidad_nombre?: string | null;
   especialista_nombre?: string | null;
   paciente_nombre?: string | null;
 
-  // ids crudos (por si no venís desde la vista)
   specialty_id?: string;
   specialist_id?: string;
   patient_id?: string;
@@ -29,15 +26,14 @@ export interface Turno {
 }
 
 export interface Slot {
-  fecha: string; // 'YYYY-MM-DD'
-  hora: string; // 'HH:MM:SS'
+  fecha: string;
+  hora: string;
 }
 
 @Injectable({ providedIn: 'root' })
 export class AppointmentsService {
   private sb = inject(SupabaseClientService).client;
 
-  // ---------- Catálogos ----------
   async listSpecialties() {
     const { data, error } = await this.sb
       .from('specialties')
@@ -49,7 +45,6 @@ export class AppointmentsService {
   }
 
   async listSpecialistsBySpecialty(specialtyId: string) {
-    // perfiles aprobados + relación en profile_specialty
     const { data, error } = await this.sb
       .from('profiles')
       .select(
@@ -61,7 +56,6 @@ export class AppointmentsService {
       .order('nombre', { ascending: true });
     if (error) throw error;
 
-    // Normalizo salida
     return (data || []).map((p: any) => ({
       id: p.id as string,
       nombre: p.nombre as string,
@@ -69,16 +63,10 @@ export class AppointmentsService {
     }));
   }
 
-  // ---------- Slots disponibles (próximos 15 días) ----------
-  /**
-   * Calcula los turnos posibles a partir de specialist_availability y
-   * descarta los ya reservados en appointments para ese especialista/especialidad.
-   */
   async listAvailableSlotsLocal(
     specialistId: string,
     specialtyId: string
   ): Promise<Slot[]> {
-    // 1) Traigo disponibilidad del especialista para esa especialidad
     const { data: avail, error: aErr } = await this.sb
       .from('specialist_availability')
       .select('weekday, hora_desde, hora_hasta, slot_minutes, active')
@@ -88,7 +76,6 @@ export class AppointmentsService {
 
     if (aErr) throw aErr;
 
-    // 2) Traigo turnos ya reservados en los próximos 15 días
     const start = new Date();
     const end = new Date();
     end.setDate(start.getDate() + 15);
@@ -103,18 +90,16 @@ export class AppointmentsService {
       .eq('specialty_id', specialtyId)
       .gte('fecha', startStr)
       .lt('fecha', endStr)
-      .in('estado', ['PENDIENTE', 'ACEPTADO', 'REALIZADO']); // bloquea esos
+      .in('estado', ['PENDIENTE', 'ACEPTADO', 'REALIZADO']);
     if (tErr) throw tErr;
 
     const takenSet = new Set(
       (taken ?? []).map((r) => `${r.fecha}T${(r.hora as string).slice(0, 5)}`)
     );
 
-    // 3) Genero slots por cada día/semana configurado
     const slots: Slot[] = [];
     if (!avail || avail.length === 0) return slots;
 
-    // helper: día de semana numérico según Postgres/JS (0=Dom .. 6=Sáb)
     const dowFromText = (w: string) => {
       const s = w.toLowerCase();
       if (s.startsWith('dom')) return 0;
@@ -123,16 +108,15 @@ export class AppointmentsService {
       if (s.startsWith('mié') || s.startsWith('mie')) return 3;
       if (s.startsWith('jue')) return 4;
       if (s.startsWith('vie')) return 5;
-      return 6; // sáb
+      return 6;
     };
 
-    // recorro los próximos 15 días
     for (
       let d = new Date(start.getFullYear(), start.getMonth(), start.getDate());
       d < end;
       d.setDate(d.getDate() + 1)
     ) {
-      const dayDow = d.getDay(); // 0..6
+      const dayDow = d.getDay();
       const yyyy = d.getFullYear();
       const mm = String(d.getMonth() + 1).padStart(2, '0');
       const dd = String(d.getDate()).padStart(2, '0');
@@ -168,18 +152,46 @@ export class AppointmentsService {
       }
     }
 
-    // orden por fecha+hora
     slots.sort((a, b) => (a.fecha + a.hora).localeCompare(b.fecha + b.hora));
     return slots;
   }
 
-  // ---------- CRUD de turnos ----------
+  async listSpecialistsApproved(): Promise<
+    {
+      id: string;
+      nombre: string;
+      apellido: string;
+      avatar_url?: string | null;
+    }[]
+  > {
+    const { data, error } = await this.sb
+      .from('profiles')
+      .select('id,nombre,apellido,avatar_url')
+      .eq('role', 'especialista')
+      .eq('is_approved', true)
+      .order('apellido', { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  }
+
+  async listSpecialtiesBySpecialist(
+    profileId: string
+  ): Promise<{ id: string; nombre: string }[]> {
+    const { data, error } = await this.sb
+      .from('profile_specialty')
+      .select('specialties:specialties(id,nombre)')
+      .eq('profile_id', profileId);
+
+    if (error) throw error;
+    return (data ?? []).map((r: any) => r.specialties);
+  }
+
   async createAppointment(payload: {
     specialist_id: string;
     specialty_id: string;
     patient_id: string;
-    fecha: string; // 'YYYY-MM-DD'
-    hora: string; // 'HH:MM:SS'
+    fecha: string;
+    hora: string;
   }) {
     const { error } = await this.sb.from('appointments').insert({
       ...payload,
@@ -188,11 +200,9 @@ export class AppointmentsService {
     return { error };
   }
 
-  // Paciente
   async listPatient() {
     const { data: auth } = await this.sb.auth.getUser();
     const uid = auth.user?.id!;
-    // vista con campos lindos
     const { data, error } = await this.sb
       .from('v_appointments_patient')
       .select('*')
@@ -246,7 +256,6 @@ export class AppointmentsService {
     return { error };
   }
 
-  // Especialista
   async listSpecialist() {
     const { data: auth } = await this.sb.auth.getUser();
     const uid = auth.user?.id!;
@@ -320,7 +329,6 @@ export class AppointmentsService {
     return { error };
   }
 
-  // Admin
   async listAdmin() {
     const { data, error } = await this.sb
       .from('v_appointments_admin')
