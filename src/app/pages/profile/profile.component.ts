@@ -4,6 +4,10 @@ import { SupabaseClientService } from '../../core/supabase/supabase-client.servi
 import { AuthService } from '../../core/services/auth.service';
 import { RouterLink, Router } from '@angular/router';
 import { BackButtonComponent } from '../../shared/back-button/back-button.component';
+import {
+  HistoryService,
+  ClinicalHistory,
+} from '../../core/services/history.service';
 
 type Perfil = {
   id: string;
@@ -26,6 +30,10 @@ type Perfil = {
   styleUrls: ['./profile.component.scss'],
 })
 export class ProfileComponent implements OnInit {
+  private history = inject(HistoryService);
+
+  historial = signal<ClinicalHistory[]>([]);
+
   private sb = inject(SupabaseClientService).client;
   private auth = inject(AuthService);
 
@@ -36,7 +44,6 @@ export class ProfileComponent implements OnInit {
     const user = await this.auth.getCurrentUser();
     if (!user) return;
 
-    // perfil base
     const { data: p } = await this.sb
       .from('profiles')
       .select(
@@ -45,7 +52,6 @@ export class ProfileComponent implements OnInit {
       .eq('id', user.id)
       .maybeSingle();
 
-    // especialidades (si es especialista)
     let specs: { id: string; nombre: string }[] = [];
     if (p?.role === 'especialista') {
       const { data: rows } = await this.sb
@@ -67,6 +73,12 @@ export class ProfileComponent implements OnInit {
       avatar_url: avatar,
       specialties: specs,
     });
+
+    if (p?.role === 'paciente') {
+      const hist = await this.history.listForCurrentPatient();
+      this.historial.set(hist);
+    }
+
     this.loading.set(false);
   }
 }

@@ -1,15 +1,13 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h3 class="mb-0">Mis turnos</h3>
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <app-back-button></app-back-button>
-  </div>
+  <app-back-button></app-back-button>
 </div>
 
 <input
   class="form-control mb-3"
   [ngModel]="q()"
   (ngModelChange)="q.set($event)"
-  placeholder="Filtrar por especialidad o paciente..."
+  placeholder="Filtrar por especialidad, paciente, estado o reseña..."
 />
 
 <div class="table-responsive">
@@ -31,9 +29,9 @@
         <td>{{ t.especialidad_nombre }}</td>
         <td>{{ t.paciente_nombre }}</td>
         <td>
-          <span class="badge" [attr.data-status]="t.estado">{{
-            t.estado
-          }}</span>
+          <span class="badge" [attr.data-status]="t.estado">
+            {{ t.estado }}
+          </span>
         </td>
 
         <td>
@@ -65,9 +63,9 @@
             <button
               class="btn btn-sm btn-success"
               *ngIf="canFinish(t)"
-              (click)="finalizar(t)"
+              (click)="openHistoryModal(t)"
             >
-              Finalizar
+              Finalizar / Historia
             </button>
 
             <button
@@ -82,4 +80,124 @@
       </tr>
     </tbody>
   </table>
+</div>
+
+<!-- MODAL HISTORIA CLÍNICA -->
+<div
+  *ngIf="showHistoryModal"
+  class="modal-backdrop-custom"
+  style="
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+  "
+>
+  <div
+    class="card"
+    style="max-width: 600px; width: 100%; max-height: 90vh; overflow: auto"
+  >
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5 class="mb-0">Historia clínica</h5>
+      <button
+        type="button"
+        class="btn btn-sm btn-outline-secondary"
+        (click)="showHistoryModal = false"
+      >
+        Cerrar
+      </button>
+    </div>
+
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-6">
+          <label class="form-label">Altura (cm)</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="historyForm.altura"
+          />
+        </div>
+        <div class="col-6">
+          <label class="form-label">Peso (kg)</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="historyForm.peso"
+          />
+        </div>
+        <div class="col-6">
+          <label class="form-label">Temperatura (°C)</label>
+          <input
+            type="number"
+            step="0.1"
+            class="form-control"
+            [(ngModel)]="historyForm.temperatura"
+          />
+        </div>
+        <div class="col-6">
+          <label class="form-label">Presión</label>
+          <input
+            class="form-control"
+            placeholder="120/80"
+            [(ngModel)]="historyForm.presion"
+          />
+        </div>
+
+        <div class="col-12 mt-2">
+          <label class="form-label fw-semibold">Datos adicionales</label>
+        </div>
+
+        <div class="col-12" *ngFor="let e of historyForm.extras; index as i">
+          <div class="row g-2">
+            <div class="col-5">
+              <input
+                class="form-control"
+                placeholder="clave (ej: caries)"
+                [(ngModel)]="e.key"
+                name="extra_key_{{ i }}"
+              />
+            </div>
+            <div class="col-7">
+              <input
+                class="form-control"
+                placeholder="valor (ej: 4)"
+                [(ngModel)]="e.value"
+                name="extra_value_{{ i }}"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 mt-3">
+          <label class="form-label">Reseña / Notas</label>
+          <textarea
+            rows="3"
+            class="form-control"
+            [(ngModel)]="historyResena"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-footer d-flex justify-content-end gap-2">
+      <button
+        type="button"
+        class="btn btn-outline-secondary"
+        (click)="showHistoryModal = false"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="saveHistoryAndFinish()"
+      >
+        Guardar y finalizar turno
+      </button>
+    </div>
+  </div>
 </div>

@@ -23,6 +23,8 @@ export interface Turno {
   patient_id?: string;
 
   resena_especialista?: string | null;
+
+  historia_texto?: string;
 }
 
 export interface Slot {

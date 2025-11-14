@@ -64,3 +64,30 @@
     gap: 0.3rem;
   }
 }
+
+.badge[data-status="PENDIENTE"] {
+  background: #ffc10722;
+  color: #8a6d00;
+}
+.badge[data-status="ACEPTADO"] {
+  background: #0d6efd22;
+  color: #0d6efd;
+}
+.badge[data-status="RECHAZADO"] {
+  background: #6c757d22;
+  color: #6c757d;
+}
+.badge[data-status="CANCELADO"] {
+  background: #dc354522;
+  color: #dc3545;
+}
+.badge[data-status="REALIZADO"] {
+  background: #19875422;
+  color: #198754;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}

@@ -57,7 +57,6 @@
         </div>
       </div>
 
-      <!-- Solo especialistas: acceso directo a mis horarios -->
       <div class="mt-3" *ngIf="perfil()?.role === 'especialista'">
         <a
           class="btn btn-outline-primary"
@@ -68,6 +67,79 @@
       </div>
     </div>
   </div>
+</div>
+
+<div class="card mt-3" *ngIf="perfil()?.role === 'paciente'">
+  <div class="card-header">
+    <i class="bi bi-journal-medical me-1"></i> Historia clínica
+  </div>
+
+  <div class="card-body" *ngIf="historial().length; else sinHist">
+    <div class="accordion" id="historiaPaciente">
+      <div class="accordion-item" *ngFor="let h of historial(); let i = index">
+        <h2 class="accordion-header" [id]="'h-head-' + i">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            [attr.data-bs-target]="'#h-body-' + i"
+            aria-expanded="false"
+          >
+            <span class="me-2">
+              {{ h.fecha | date : "shortDate" }}
+              • {{ h.especialidad_nombre || "Sin especialidad" }}
+            </span>
+            <span class="text-muted small" *ngIf="h.especialista_nombre">
+              ({{ h.especialista_nombre }})
+            </span>
+          </button>
+        </h2>
+
+        <div
+          class="accordion-collapse collapse"
+          [id]="'h-body-' + i"
+          [attr.aria-labelledby]="'h-head-' + i"
+          data-bs-parent="#historiaPaciente"
+        >
+          <div class="accordion-body">
+            <div class="row mb-2">
+              <div class="col-6 col-md-3">
+                <strong>Altura:</strong> {{ h.altura || "—" }} cm
+              </div>
+              <div class="col-6 col-md-3">
+                <strong>Peso:</strong> {{ h.peso || "—" }} kg
+              </div>
+              <div class="col-6 col-md-3">
+                <strong>Temperatura:</strong> {{ h.temperatura || "—" }} °C
+              </div>
+              <div class="col-6 col-md-3">
+                <strong>Presión:</strong> {{ h.presion || "—" }}
+              </div>
+            </div>
+
+            <div *ngIf="h.extras.length; else sinExtras">
+              <strong>Datos adicionales:</strong>
+              <ul class="mb-0">
+                <li *ngFor="let e of h.extras">
+                  <span class="fw-semibold">{{ e.key }}:</span>
+                  {{ e.value }}
+                </li>
+              </ul>
+            </div>
+            <ng-template #sinExtras>
+              <div class="text-muted small">
+                Sin datos adicionales en esta atención.
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #sinHist>
+    <p class="text-muted mb-0">Todavía no tenés historia clínica cargada.</p>
+  </ng-template>
 </div>
 
 <ng-template #cargando>

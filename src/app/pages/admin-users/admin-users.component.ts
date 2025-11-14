@@ -3,6 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SupabaseClientService } from '../../core/supabase/supabase-client.service';
 import { RouterLink } from '@angular/router';
+import * as XLSX from 'xlsx';
+import {
+  HistoryService,
+  ClinicalHistory,
+} from '../../core/services/history.service';
 
 type Role = 'admin' | 'especialista' | 'paciente';
 
@@ -29,6 +34,7 @@ interface AdminUser {
 export class AdminUsersComponent implements OnInit {
   private sb = inject(SupabaseClientService).client;
   private avatarsBucket = this.sb.storage.from('avatars');
+  private history = inject(HistoryService);
 
   readonly placeholderUrl = this.avatarsBucket.getPublicUrl(
     'system/userPlaceholder.png'
@@ -40,6 +46,10 @@ export class AdminUsersComponent implements OnInit {
   onlyPending = signal(false);
 
   rows = signal<AdminUser[]>([]);
+  showHistory = signal(false);
+  historyLoading = signal(false);
+  historyRows = signal<ClinicalHistory[]>([]);
+  historyPatientName = signal('');
 
   showCreate = signal(false);
   creating = signal(false);
@@ -121,6 +131,38 @@ export class AdminUsersComponent implements OnInit {
     );
   }
 
+  exportExcel() {
+    const rows = this.rows();
+
+    if (!rows.length) {
+      alert('No hay usuarios para exportar.');
+      return;
+    }
+
+    const data = rows.map((r) => ({
+      Nombre: r.nombre ?? '',
+      Apellido: r.apellido ?? '',
+      Email: r.email ?? '',
+      DNI: r.dni ?? '',
+      'Obra social': r.obra_social ?? '',
+      Rol: r.role,
+      Aprobado: r.is_approved ? 'Sí' : 'No',
+      Especialidades: r.specialties?.join(', ') ?? '',
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Usuarios');
+
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const fileName = `usuarios_clinica_${yyyy}${mm}${dd}.xlsx`;
+
+    XLSX.writeFile(wb, fileName);
+  }
+
   filtered = computed(() => {
     const term = this.q().toLowerCase().trim();
     const role = this.role();
@@ -199,7 +241,7 @@ export class AdminUsersComponent implements OnInit {
           role: r.role,
           is_approved: r.is_approved,
           avatar_url: this.normalizeAvatar(r.avatar_url ?? null),
-          specialties, // <— ahora es array
+          specialties,
         };
       });
 
@@ -234,5 +276,35 @@ export class AdminUsersComponent implements OnInit {
     if (error) return alert('No se pudo actualizar el rol');
     r.role = role;
     this.rows.set([...this.rows()]);
+  }
+
+  async openHistory(r: AdminUser) {
+    if (r.role !== 'paciente') {
+      return;
+    }
+
+    this.historyPatientName.set(
+      `${(r.nombre || '').trim()} ${(r.apellido || '').trim()}`.trim() ||
+        r.email ||
+        'Paciente'
+    );
+    this.showHistory.set(true);
+    this.historyLoading.set(true);
+    this.historyRows.set([]);
+
+    try {
+      const rows = await this.history.listForPatientAdmin(r.id);
+      this.historyRows.set(rows);
+    } catch (e) {
+      console.error('[admin/users] history error', e);
+      alert('No se pudo cargar la historia clínica del paciente.');
+    } finally {
+      this.historyLoading.set(false);
+    }
+  }
+
+  closeHistory() {
+    this.showHistory.set(false);
+    this.historyRows.set([]);
   }
 }

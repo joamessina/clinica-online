@@ -23,6 +23,14 @@
           >
             Actualizar
           </button>
+          <button
+            type="button"
+            class="btn btn-success btn-sm"
+            (click)="exportExcel()"
+          >
+            <i class="bi bi-file-earmark-excel me-1"></i>
+            Descargar Excel
+          </button>
         </div>
       </div>
     </div>
@@ -212,6 +220,14 @@
                     </li>
                   </ul>
                 </div>
+
+                <button
+                  class="btn btn-sm btn-outline-primary ms-2"
+                  *ngIf="r.role === 'paciente'"
+                  (click)="openHistory(r)"
+                >
+                  Historia
+                </button>
               </td>
             </tr>
           </tbody>
@@ -392,7 +408,85 @@
       </div>
     </div>
 
-    <!-- backdrop -->
+    <div class="modal-backdrop-custom"></div>
+  </div>
+
+  <!-- MODAL HISTORIA CLÍNICA (ADMIN) -->
+  <div class="modal fade show d-block" tabindex="-1" *ngIf="showHistory()">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            Historia clínica – {{ historyPatientName() }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeHistory()"
+          ></button>
+        </div>
+
+        <div class="modal-body">
+          <div *ngIf="historyLoading()" class="text-muted">
+            Cargando historia clínica…
+          </div>
+
+          <div
+            *ngIf="!historyLoading() && !historyRows().length"
+            class="text-muted"
+          >
+            No hay historias clínicas cargadas para este paciente.
+          </div>
+
+          <div *ngIf="!historyLoading() && historyRows().length">
+            <div
+              *ngFor="let h of historyRows()"
+              class="border rounded p-3 mb-3 small"
+            >
+              <div class="fw-semibold mb-1">
+                {{ h.fecha | date : "d/MM/yyyy" }} – {{ h.hora?.slice(0, 5) }}
+              </div>
+              <div class="mb-1">
+                <strong>Especialista:</strong>
+                {{ h.especialista_nombre || "—" }}
+              </div>
+              <div class="mb-1">
+                <strong>Especialidad:</strong>
+                {{ h.especialidad_nombre || "—" }}
+              </div>
+
+              <div class="mb-1">
+                <strong>Altura:</strong> {{ h.altura || "—" }} ·
+                <strong>Peso:</strong> {{ h.peso || "—" }}
+              </div>
+              <div class="mb-1">
+                <strong>Temperatura:</strong> {{ h.temperatura || "—" }} ·
+                <strong>Presión:</strong> {{ h.presion || "—" }}
+              </div>
+
+              <div *ngIf="h.extras?.length">
+                <strong>Datos adicionales:</strong>
+                <ul class="mb-0">
+                  <li *ngFor="let e of h.extras">{{ e.key }}: {{ e.value }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            (click)="closeHistory()"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- backdrop para HISTORIA -->
     <div class="modal-backdrop-custom"></div>
   </div>
 </div>
