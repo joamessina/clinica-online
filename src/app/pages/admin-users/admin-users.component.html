@@ -103,16 +103,12 @@
               <!-- FOTO -->
               <td class="text-center">
                 <img
-                  img
+                  class="admin-avatar"
+                  [@avatarZoom]="hoveredId() === r.id ? 'zoom' : 'normal'"
+                  (mouseenter)="hoveredId.set(r.id)"
+                  (mouseleave)="hoveredId.set(null)"
                   [src]="r.avatar_url || placeholderUrl"
                   alt="avatar"
-                  style="
-                    width: 36px;
-                    height: 36px;
-                    object-fit: cover;
-                    border-radius: 50%;
-                    border: 1px solid #ddd;
-                  "
                   (error)="imgFallback($event)"
                 />
               </td>

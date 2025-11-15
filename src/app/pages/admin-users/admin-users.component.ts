@@ -8,6 +8,13 @@ import {
   HistoryService,
   ClinicalHistory,
 } from '../../core/services/history.service';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+} from '@angular/animations';
 
 type Role = 'admin' | 'especialista' | 'paciente';
 
@@ -30,6 +37,29 @@ interface AdminUser {
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './admin-users.component.html',
   styleUrls: ['./admin-users.component.scss'],
+  animations: [
+    trigger('avatarZoom', [
+      state(
+        'normal',
+        style({
+          transform: 'scale(1)',
+        })
+      ),
+      state(
+        'zoom',
+        style({
+          transform: 'scale(2.15)',
+        })
+      ),
+
+      transition('normal <=> zoom', [animate('200ms ease-out')]),
+
+      transition('void => normal', [
+        style({ transform: 'scale(0.8)', opacity: 0 }),
+        animate('200ms ease-out', style({ transform: 'scale(1)', opacity: 1 })),
+      ]),
+    ]),
+  ],
 })
 export class AdminUsersComponent implements OnInit {
   private sb = inject(SupabaseClientService).client;
@@ -42,6 +72,7 @@ export class AdminUsersComponent implements OnInit {
 
   loading = signal(true);
   q = signal('');
+  hoveredId = signal<string | null>(null);
   role = signal<'all' | Role>('all');
   onlyPending = signal(false);
 
