@@ -1,36 +1,12 @@
 <section class="hero d-flex align-items-center py-5 py-lg-6">
   <div class="container">
     <div class="row align-items-center g-4">
-      <!-- Sprint card: primero en mobile -->
-      <div class="col-12 col-lg-5 order-1 order-lg-2">
-        <div class="card glass border-0 shadow-sm">
-          <div class="card-body">
-            <h5 class="card-title mb-3 d-flex align-items-center gap-2">
-              <i class="bi bi-flag"></i> Sprint 1
-            </h5>
-            <ul class="list-unstyled small mb-0">
-              <li class="d-flex gap-2">
-                <i class="bi bi-check2-circle text-success"></i>
-                Login / Registro
-              </li>
-              <li class="d-flex gap-2">
-                <i class="bi bi-check2-circle text-success"></i>
-                Usuarios (aprobación de especialistas)
-              </li>
-              <li class="d-flex gap-2">
-                <i class="bi bi-check2-circle text-success"></i>
-                Loader global y estilos Bootstrap
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Título + CTA: segundo en mobile -->
-      <div class="col-12 col-lg-7 order-2 order-lg-1">
+      <!-- Título + CTA -->
+      <div class="col-12 col-lg-7">
         <h1 class="hero-title mb-3">Clínica Online</h1>
-        <p class="lead text-white-75 mb-4">
-          Gestión de pacientes y especialistas. Turnos, administración y más.
+        <p class="lead mb-4">
+          Plataforma centralizada para gestionar turnos, historias clínicas y la
+          agenda de tus profesionales desde cualquier dispositivo.
         </p>
 
         <div class="d-flex flex-wrap gap-2">
@@ -40,6 +16,149 @@
           <a routerLink="/registro" class="btn btn-outline-light btn-lg">
             <i class="bi bi-person-plus me-1"></i> Registrarse
           </a>
+        </div>
+
+        <p class="hero-subtext small mt-3">
+          Pensado para instituciones que necesitan ordenar turnos, reducir
+          tiempos administrativos y ofrecer una mejor experiencia a pacientes y
+          especialistas.
+        </p>
+      </div>
+
+      <!-- Tarjeta de features -->
+      <div class="col-12 col-lg-5">
+        <div class="card glass border-0 shadow-sm hero-card">
+          <div class="card-body">
+            <h5 class="card-title mb-3 d-flex align-items-center gap-2">
+              <i class="bi bi-heart-pulse text-primary"></i>
+              <span>Todo tu consultorio en un solo lugar</span>
+            </h5>
+
+            <ul class="list-unstyled mb-0">
+              <li class="d-flex gap-3 mb-2">
+                <i class="bi bi-calendar-check text-primary mt-1"></i>
+                <span>
+                  <strong>Turnos online</strong> con gestión por rol: pacientes,
+                  especialistas y administradores.
+                </span>
+              </li>
+              <li class="d-flex gap-3 mb-2">
+                <i class="bi bi-file-earmark-medical text-primary mt-1"></i>
+                <span>
+                  <strong>Historia clínica digital</strong> accesible para el
+                  profesional, con seguimiento de cada consulta.
+                </span>
+              </li>
+              <li class="d-flex gap-3">
+                <i class="bi bi-shield-check text-primary mt-1"></i>
+                <span>
+                  <strong>Accesos seguros</strong> y aprobación de especialistas
+                  para resguardar la información del paciente.
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Sección de introducción debajo del hero -->
+<section class="welcome-intro py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="card border-0 shadow-sm intro-card">
+          <div class="card-body">
+            <h2 class="h4 mb-3">
+              Una clínica moderna, centrada en el paciente
+            </h2>
+            <p class="mb-3">
+              Clínica Online integra en una única plataforma la administración
+              de turnos, la gestión de profesionales y el acceso a la historia
+              clínica digital. Cada usuario ingresa con su perfil y visualiza
+              únicamente la información que necesita.
+            </p>
+            <p class="mb-3">
+              Los administradores pueden aprobar especialistas, revisar
+              estadísticas y exportar datos; mientras que los pacientes
+              gestionan sus turnos y consultan sus atenciones sin depender de
+              llamados telefónicos.
+            </p>
+
+            <ul class="list-unstyled mb-0">
+              <li class="d-flex gap-3 mb-2">
+                <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                <span>
+                  <strong>Menos tareas manuales:</strong> automatizá la carga y
+                  el seguimiento de turnos.
+                </span>
+              </li>
+              <li class="d-flex gap-3 mb-2">
+                <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                <span>
+                  <strong>Mayor trazabilidad:</strong> cada consulta queda
+                  registrada en la historia clínica.
+                </span>
+              </li>
+              <li class="d-flex gap-3">
+                <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                <span>
+                  <strong>Experiencia unificada:</strong> pacientes, personal
+                  administrativo y especialistas trabajan sobre la misma
+                  información.
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-sm highlight-card">
+          <div class="card-body">
+            <h3 class="h6 text-muted text-uppercase mb-3">
+              Beneficios para tu institución
+            </h3>
+
+            <div class="d-flex flex-column gap-3">
+              <div
+                class="d-flex justify-content-between align-items-center metric-row"
+              >
+                <div>
+                  <div class="text-muted small">Gestión de agenda</div>
+                  <div class="fw-semibold">Turnos claros y ordenados</div>
+                </div>
+                <i class="bi bi-clock-history text-primary fs-3"></i>
+              </div>
+
+              <div
+                class="d-flex justify-content-between align-items-center metric-row"
+              >
+                <div>
+                  <div class="text-muted small">Pacientes informados</div>
+                  <div class="fw-semibold">Menos llamadas y consultas</div>
+                </div>
+                <i class="bi bi-people-fill text-primary fs-3"></i>
+              </div>
+
+              <div
+                class="d-flex justify-content-between align-items-center metric-row"
+              >
+                <div>
+                  <div class="text-muted small">Información centralizada</div>
+                  <div class="fw-semibold">Datos siempre disponibles</div>
+                </div>
+                <i class="bi bi-hdd-network text-primary fs-3"></i>
+              </div>
+            </div>
+
+            <p class="small text-muted mt-3 mb-0">
+              Esta instancia de Clínica Online se utiliza con fines académicos,
+              simulando el flujo real de una institución sanitaria moderna.
+            </p>
+          </div>
         </div>
       </div>
     </div>

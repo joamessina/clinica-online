@@ -1,79 +1,405 @@
-<!-- Encabezado -->
-<div class="d-flex align-items-center justify-content-between mb-3">
-  <h3 class="mb-0">Mis turnos</h3>
-
-  <!-- botón volver a la derecha -->
-  <app-back-button variant="outline-secondary" size="sm" label="Volver">
-  </app-back-button>
-</div>
-
-<input
-  class="form-control mb-3"
-  [ngModel]="q()"
-  (ngModelChange)="q.set($event)"
-  placeholder="Filtrar por especialidad o especialista..."
-/>
-
-<div class="table-responsive">
-  <table class="table align-middle">
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Hora</th>
-        <th>Especialidad</th>
-        <th>Especialista</th>
-        <th>Estado</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let t of filtered()">
-        <td>{{ t.fecha | date : "d/MM" }}</td>
-        <td>{{ t.hora?.slice(0, 5) }}</td>
-        <td>{{ t.especialidad_nombre }}</td>
-        <td>{{ t.especialista_nombre }}</td>
-        <td>
-          <span class="badge" [attr.data-status]="t.estado">{{
-            t.estado
-          }}</span>
-        </td>
-
-        <td class="actions">
-          <div class="btn-group btn-group-sm flex-wrap">
-            <button
-              class="btn btn-outline-danger"
-              *ngIf="canCancel(t)"
-              (click)="cancelar(t)"
-            >
-              Cancelar
-            </button>
-
-            <button
-              class="btn btn-outline-secondary"
-              *ngIf="hasResena(t)"
-              (click)="verResena(t)"
-            >
-              Ver reseña
-            </button>
-
-            <button
-              class="btn btn-outline-primary"
-              *ngIf="canSurvey(t)"
-              (click)="abrirEncuesta(t)"
-            >
-              Completar encuesta
-            </button>
-
-            <button
-              class="btn btn-success"
-              *ngIf="canFeedback(t)"
-              (click)="feedback(t)"
-            >
-              Calificar atención
-            </button>
+<section class="patient-turnos py-4">
+  <div class="container">
+    <div class="card shadow-sm border-0 turnos-card">
+      <div class="card-header bg-white border-0 pb-0">
+        <div
+          class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3"
+        >
+          <div>
+            <h3 class="h5 mb-1 d-flex align-items-center gap-2">
+              <i class="bi bi-calendar-check text-primary fs-5"></i>
+              <span>Mis turnossss</span>
+            </h3>
+            <p class="text-muted small mb-0">
+              Revisá el estado de tus consultas y gestioná tus próximos turnos.
+            </p>
           </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+
+          <!-- botón volver a la derecha -->
+          <app-back-button
+            variant="outline-secondary"
+            size="sm"
+            label="Volver"
+          ></app-back-button>
+        </div>
+
+        <!-- Filtro -->
+        <div class="row">
+          <div class="col-12 col-md-6 col-lg-4">
+            <div class="input-group mb-3">
+              <span class="input-group-text">
+                <i class="bi bi-search"></i>
+              </span>
+              <input
+                class="form-control"
+                [ngModel]="q()"
+                (ngModelChange)="q.set($event)"
+                placeholder="Filtrar por especialidad o especialista..."
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body pt-0">
+        <div class="table-responsive position-relative">
+          <table class="table table-hover align-middle mb-0 turnos-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Especialidad</th>
+                <th>Especialista</th>
+                <th>Estado</th>
+                <th class="text-end">Acciones</th>
+              </tr>
+            </thead>
+            <tbody *ngIf="filtered().length; else emptyState">
+              <tr *ngFor="let t of filtered()">
+                <td>{{ t.fecha | date : "d/MM" }}</td>
+                <td>{{ t.hora?.slice(0, 5) }}</td>
+                <td>{{ t.especialidad_nombre }}</td>
+                <td>{{ t.especialista_nombre }}</td>
+                <td>
+                  <span class="badge" [attr.data-status]="t.estado">
+                    {{ t.estado }}
+                  </span>
+                </td>
+
+                <td class="actions text-end">
+                  <div class="btn-group btn-group-sm flex-wrap">
+                    <button
+                      class="btn btn-outline-danger"
+                      *ngIf="canCancel(t)"
+                      (click)="cancelar(t)"
+                    >
+                      Cancelar
+                    </button>
+
+                    <button
+                      class="btn btn-outline-secondary"
+                      *ngIf="hasResena(t)"
+                      (click)="verResena(t)"
+                    >
+                      Ver reseña
+                    </button>
+
+                    <button
+                      class="btn btn-outline-primary"
+                      *ngIf="canSurvey(t)"
+                      (click)="abrirEncuesta(t)"
+                    >
+                      Completar encuesta
+                    </button>
+
+                    <button
+                      class="btn btn-success"
+                      *ngIf="canFeedback(t)"
+                      (click)="feedback(t)"
+                    >
+                      Calificar atención
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- estado vacío -->
+          <ng-template #emptyState>
+            <div class="turnos-empty text-center text-muted py-4">
+              <i class="bi bi-calendar-x fs-2 mb-2 d-block"></i>
+              <div class="fw-semibold mb-1">No se encontraron turnos.</div>
+              <div class="small">
+                Probá quitar filtros o
+                <a routerLink="/turnos/solicitar">solicitá un nuevo turno</a>.
+              </div>
+            </div>
+          </ng-template>
+        </div>
+        <!-- MODAL: Ver reseña -->
+        <div class="modal-backdrop-blur" *ngIf="showReviewModal()">
+          <div class="modal-card turno-modal">
+            <div class="modal-card__header">
+              <h5 class="modal-card__title mb-0">Reseña de la atención</h5>
+              <button
+                type="button"
+                class="modal-card__close"
+                (click)="closeReviewModal()"
+                aria-label="Cerrar"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-card__body">
+              <p class="mb-0" *ngIf="reviewText(); else noReview">
+                {{ reviewText() }}
+              </p>
+              <ng-template #noReview>
+                <p class="mb-0 text-muted">
+                  Este turno todavía no tiene una reseña cargada.
+                </p>
+              </ng-template>
+            </div>
+
+            <div class="modal-card__footer">
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="closeReviewModal()"
+              >
+                Cerrar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODAL: Cancelar turno -->
+        <div class="modal-backdrop-blur" *ngIf="showCancelModal()">
+          <div class="modal-card turno-modal">
+            <div class="modal-card__header">
+              <h5 class="modal-card__title mb-0">Cancelar turno</h5>
+              <button
+                type="button"
+                class="modal-card__close"
+                (click)="closeCancelModal()"
+                aria-label="Cerrar"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-card__body">
+              <p class="small text-muted mb-2">
+                ¿Querés cancelar el turno
+                <strong>{{ selectedTurno()?.fecha | date : "d/MM" }}</strong>
+                a las
+                <strong>{{ selectedTurno()?.hora?.slice(0, 5) }}</strong>
+                con
+                <strong>{{ selectedTurno()?.especialista_nombre }}</strong
+                >?
+              </p>
+
+              <div class="mb-0">
+                <label class="form-label small mb-1"
+                  >Motivo de cancelación</label
+                >
+                <textarea
+                  class="form-control form-control-sm"
+                  rows="3"
+                  [ngModel]="cancelReason()"
+                  (ngModelChange)="cancelReason.set($event)"
+                ></textarea>
+                <small class="text-muted">
+                  Este motivo será visible para el especialista.
+                </small>
+              </div>
+            </div>
+
+            <div class="modal-card__footer">
+              <button
+                type="button"
+                class="btn btn-outline-light me-2"
+                (click)="closeCancelModal()"
+              >
+                Volver
+              </button>
+              <button
+                type="button"
+                class="btn btn-danger"
+                (click)="submitCancelModal()"
+              >
+                Confirmar cancelación
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODAL: Calificar atención -->
+        <div class="modal-backdrop-blur" *ngIf="showFeedbackModal()">
+          <div class="modal-card turno-modal">
+            <div class="modal-card__header">
+              <h5 class="modal-card__title mb-0">Calificar atención</h5>
+              <button
+                type="button"
+                class="modal-card__close"
+                (click)="closeFeedbackModal()"
+                aria-label="Cerrar"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-card__body">
+              <p class="small text-muted mb-2">
+                Valorá la atención recibida en este turno (1 = muy mala, 5 =
+                excelente).
+              </p>
+
+              <div class="rating-pill-group mb-3">
+                <button
+                  type="button"
+                  class="rating-pill"
+                  *ngFor="let n of [1, 2, 3, 4, 5]"
+                  [class.active]="feedbackRating() === n"
+                  (click)="feedbackRating.set(n)"
+                >
+                  {{ n }}
+                </button>
+              </div>
+
+              <div class="mb-0">
+                <label class="form-label small mb-1"
+                  >Comentario (opcional)</label
+                >
+                <textarea
+                  class="form-control form-control-sm"
+                  rows="3"
+                  [ngModel]="feedbackComment()"
+                  (ngModelChange)="feedbackComment.set($event)"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="modal-card__footer">
+              <button
+                type="button"
+                class="btn btn-outline-light me-2"
+                (click)="closeFeedbackModal()"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                class="btn btn-success"
+                (click)="submitFeedbackModal()"
+              >
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MODAL: Encuesta de atención -->
+        <div class="modal-backdrop-blur" *ngIf="showSurveyModal()">
+          <div class="modal-card modal-card--wide turno-modal">
+            <div class="modal-card__header">
+              <h5 class="modal-card__title mb-0">Encuesta de atención</h5>
+              <button
+                type="button"
+                class="modal-card__close"
+                (click)="closeSurveyModal()"
+                aria-label="Cerrar"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+
+            <div class="modal-card__body">
+              <p class="small text-muted mb-3">
+                Ayudanos a mejorar respondiendo estas preguntas sobre el turno
+                con
+                <strong>{{ selectedTurno()?.especialista_nombre }}</strong
+                >.
+              </p>
+
+              <div class="mb-3">
+                <label class="form-label small d-block mb-1"
+                  >¿Te atendieron a horario?</label
+                >
+                <div class="btn-group" role="group">
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    [ngClass]="
+                      surveyP1() === 'si'
+                        ? 'btn-primary'
+                        : 'btn-outline-primary'
+                    "
+                    (click)="surveyP1.set('si')"
+                  >
+                    Sí
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    [ngClass]="
+                      surveyP1() === 'no'
+                        ? 'btn-primary'
+                        : 'btn-outline-primary'
+                    "
+                    (click)="surveyP1.set('no')"
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small d-block mb-1"
+                  >¿Recomendarías al especialista?</label
+                >
+                <div class="btn-group" role="group">
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    [ngClass]="
+                      surveyP2() === 'si'
+                        ? 'btn-primary'
+                        : 'btn-outline-primary'
+                    "
+                    (click)="surveyP2.set('si')"
+                  >
+                    Sí
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    [ngClass]="
+                      surveyP2() === 'no'
+                        ? 'btn-primary'
+                        : 'btn-outline-primary'
+                    "
+                    (click)="surveyP2.set('no')"
+                  >
+                    No
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label class="form-label small mb-1"
+                  >Comentario (opcional)</label
+                >
+                <textarea
+                  class="form-control form-control-sm"
+                  rows="3"
+                  [ngModel]="surveyComment()"
+                  (ngModelChange)="surveyComment.set($event)"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="modal-card__footer">
+              <button
+                type="button"
+                class="btn btn-outline-light me-2"
+                (click)="closeSurveyModal()"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                (click)="submitSurveyModal()"
+              >
+                Enviar encuesta
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

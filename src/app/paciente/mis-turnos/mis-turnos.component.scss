@@ -1,4 +1,40 @@
-/* Badges de estado (ya los tenías) */
+:host {
+  display: block;
+}
+
+.patient-turnos {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+  .patient-turnos {
+    align-items: center;
+  }
+}
+
+/* Card contenedora */
+.turnos-card {
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(6px);
+}
+
+/* Tabla */
+.turnos-table thead th {
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #6b7280;
+  border-bottom-width: 1px;
+}
+
+.turnos-table tbody td {
+  font-size: 0.95rem;
+}
+
+/* Badges de estado */
 .badge[data-status="PENDIENTE"] {
   background: #ffc10722;
   color: #8a6d00;
@@ -20,6 +56,7 @@
   color: #198754;
 }
 
+/* Columna acciones */
 td.actions {
   width: 1%;
   white-space: nowrap;
@@ -35,8 +72,208 @@ td.actions .btn {
   padding: 0.25rem 0.5rem;
 }
 
+/* Estado vacío */
+.turnos-empty i {
+  color: #9ca3af;
+}
+
 @media (max-width: 768px) {
   td.actions {
     white-space: normal;
   }
+}
+
+/* ---------- Modales custom ---------- */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.modal-dialog-custom {
+  max-width: 480px;
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.modal-content-custom {
+  background: #111827;
+  color: #e5e7eb;
+  border-radius: 0.9rem;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.6);
+}
+
+.modal-header-custom,
+.modal-footer-custom {
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid rgba(55, 65, 81, 0.8);
+}
+
+.modal-footer-custom {
+  border-top: 1px solid rgba(55, 65, 81, 0.8);
+  border-bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.modal-body-custom {
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.modal-header-custom .modal-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.modal-header-custom .btn-close {
+  filter: invert(1);
+}
+
+/* Rating pills */
+.rating-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.rating-pill {
+  border-radius: 999px;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid #4b5563;
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease,
+    transform 0.12s ease;
+}
+
+.rating-pill:hover {
+  transform: translateY(-1px);
+  border-color: #60a5fa;
+}
+
+.rating-pill.active {
+  background: #22c55e;
+  border-color: #22c55e;
+  color: #111827;
+}
+/* ===== Overlay y modales (reseña / feedback / cancelar / encuesta) ===== */
+
+.modal-backdrop-blur {
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 16, 31, 0.65);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.modal-card {
+  background: #1f2430;
+  color: #f8f9fa;
+  border-radius: 16px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+  width: min(460px, 90vw);
+  overflow: hidden;
+}
+
+.modal-card--wide {
+  width: min(520px, 95vw);
+}
+
+.modal-card__header {
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.modal-card__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.modal-card__close {
+  border: 0;
+  background: transparent;
+  color: #adb5bd;
+  font-size: 1.3rem;
+  line-height: 1;
+  padding: 0;
+  cursor: pointer;
+}
+
+.modal-card__close:hover {
+  color: #ffffff;
+}
+
+.modal-card__body {
+  padding: 1.25rem;
+  background: #151924;
+}
+
+.modal-card__footer {
+  padding: 0.85rem 1.25rem 1.1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: #151924;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Botones de rating (1-5) */
+.rating-pill-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.rating-pill {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: transparent;
+  color: #f8f9fa;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.rating-pill.active {
+  background: #ffc107;
+  border-color: #ffc107;
+  color: #212529;
+}
+
+/* Ajuste para btn-outline-light sobre fondo oscuro */
+.modal-card .btn-outline-light {
+  --bs-btn-color: #f8f9fa;
+  --bs-btn-border-color: rgba(248, 249, 250, 0.5);
+  --bs-btn-hover-bg: rgba(248, 249, 250, 0.1);
+  --bs-btn-hover-border-color: #f8f9fa;
+}
+
+/* === Forzar textos claros dentro de los modales de turnos === */
+.turno-modal,
+.turno-modal p,
+.turno-modal label,
+.turno-modal span,
+.turno-modal small,
+.turno-modal .survey-subtitle,
+.turno-modal .cancel-text {
+  color: #ffffff !important;
 }

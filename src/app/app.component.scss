@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.app-main {
+  min-height: 100vh;
+  /* Fondo global con mosaic */
+  background: #eef2f7 url("../assets/mosaic.jpg") repeat;
+  background-size: 360px 360px;
+}
+
+/* Navbar tipo “glass” */
+.navbar {
+  backdrop-filter: blur(10px);
+  background-color: rgba(255, 255, 255, 0.9) !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+}
+
+.navbar-brand {
+  font-weight: 600;
+}
+
+.navbar .btn {
+  border-radius: 999px;
+  padding-inline: 1rem;
+}

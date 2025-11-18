@@ -2,6 +2,7 @@
   display: block;
 }
 
+/* HERO CON FONDO DE MÉDICOS */
 .hero {
   position: relative;
   min-height: clamp(420px, 60vh, 700px);
@@ -14,10 +15,10 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    90deg,
-    rgba(6, 12, 20, 0.65) 0%,
-    rgba(6, 12, 20, 0.45) 55%,
-    rgba(6, 12, 20, 0.2) 100%
+    110deg,
+    rgba(6, 12, 20, 0.82) 0%,
+    rgba(6, 12, 20, 0.6) 55%,
+    rgba(6, 12, 20, 0.25) 100%
   );
 }
 
@@ -30,22 +31,63 @@
   color: #fff;
   font-weight: 800;
   font-size: clamp(2rem, 1.2rem + 2.5vw, 3.2rem);
+  letter-spacing: 0.03em;
 }
 
 .lead {
-  color: rgba(255, 255, 255, 0.88);
+  color: rgba(255, 255, 255, 0.9);
 }
 
+.hero-subtext {
+  color: rgba(229, 231, 235, 0.9);
+}
+
+/* Botones */
 .btn-outline-light {
   --bs-btn-color: #fff;
   --bs-btn-border-color: #fff;
   --bs-btn-hover-bg: #fff;
   --bs-btn-hover-color: #0d6efd;
+  --bs-btn-hover-border-color: #fff;
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.85);
+/* Tarjeta de la derecha */
+.glass.hero-card {
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(6px);
+  border-radius: 1rem;
+
+  .card-title {
+    font-weight: 600;
+  }
+}
+
+/* Sección de introducción debajo del hero */
+.welcome-intro {
+  /* acá ya se ve el fondo mosaic definido en app-main */
+}
+
+.intro-card,
+.highlight-card {
+  border-radius: 1rem;
+}
+
+.intro-card .card-body {
+  padding: 1.75rem;
+}
+
+.highlight-card .card-body {
+  padding: 1.5rem 1.75rem;
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.metric-row {
+  padding: 0.75rem 0;
+  border-bottom: 1px dashed #e5e7eb;
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 @media (max-width: 576px) {
@@ -53,7 +95,8 @@
     background-attachment: scroll;
     padding-block: 2rem;
   }
-  .glass {
-    background: rgba(255, 255, 255, 0.92);
+
+  .glass.hero-card {
+    background: rgba(255, 255, 255, 0.96);
   }
 }

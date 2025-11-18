@@ -1,63 +1,198 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="mb-0">Solicitar Turnos</h3>
-  <app-back-button></app-back-button>
-</div>
+<section class="turno-request py-4">
+  <div class="container">
+    <div class="card turno-card shadow-sm border-0">
+      <!-- HEADER -->
+      <div class="card-header bg-white border-0 pb-0">
+        <div
+          class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3"
+        >
+          <div>
+            <h3 class="h5 mb-1 d-flex align-items-center gap-2">
+              <i class="bi bi-calendar-plus text-primary fs-5"></i>
+              <span>Solicitar turno</span>
+            </h3>
+            <p class="text-muted small mb-0">
+              Elegí un profesional, la especialidad y el horario que mejor se
+              adapte a vos.
+            </p>
+          </div>
 
-<!-- 1) ESPECIALISTAS -->
-<p class="text-muted">Elegí un especialista:</p>
-<div class="wrap gap-2 mb-4">
-  <button
-    class="pro-card"
-    *ngFor="let p of specialists"
-    [class.active]="selectedSpecialistId === p.id"
-    (click)="onPickSpecialist(p.id)"
-    title="{{ p.nombre }} {{ p.apellido }}"
-  >
-    <img [src]="avatarUrl(p)" alt="profesional" />
-    <span class="name">{{ p.nombre }} {{ p.apellido }}</span>
-  </button>
-</div>
+          <app-back-button
+            variant="outline-secondary"
+            size="sm"
+            label="Volver"
+          ></app-back-button>
+        </div>
 
-<!-- 2) ESPECIALIDADES -->
-<div *ngIf="selectedSpecialistId">
-  <p class="text-muted">Elegí una especialidad:</p>
-  <div class="wrap gap-2 mb-4">
-    <button
-      class="spec-pill"
-      *ngFor="let s of specialties"
-      [class.active]="selectedSpecialtyId === s.id"
-      (click)="onPickSpecialty(s.id)"
-      title="{{ s.nombre }}"
-    >
-      <img [src]="specialtyIcon()" alt="especialidad" />
-      <span>{{ s.nombre }}</span>
-    </button>
+        <!-- PASOS -->
+        <div class="turno-steps mb-3">
+          <div
+            class="step"
+            [class.is-active]="true"
+            [class.is-complete]="!!selectedSpecialistId"
+          >
+            <span class="step-number">1</span>
+            <span class="step-label">Especialista</span>
+          </div>
+          <div
+            class="step"
+            [class.is-disabled]="!selectedSpecialistId"
+            [class.is-active]="selectedSpecialistId && !selectedSpecialtyId"
+            [class.is-complete]="!!selectedSpecialtyId"
+          >
+            <span class="step-number">2</span>
+            <span class="step-label">Especialidad</span>
+          </div>
+          <div
+            class="step"
+            [class.is-disabled]="!selectedSpecialtyId"
+            [class.is-active]="selectedSpecialtyId && !selectedDay"
+            [class.is-complete]="!!selectedDay"
+          >
+            <span class="step-number">3</span>
+            <span class="step-label">Día</span>
+          </div>
+          <div
+            class="step"
+            [class.is-disabled]="!selectedDay"
+            [class.is-active]="selectedDay"
+          >
+            <span class="step-number">4</span>
+            <span class="step-label">Horario</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="card-body pt-0">
+        <!-- 1) ESPECIALISTAS -->
+        <div class="mb-4">
+          <div class="section-title">
+            <span class="badge rounded-pill bg-primary-subtle text-primary me-2"
+              >1</span
+            >
+            <div>
+              <div class="fw-semibold">Elegí un especialista</div>
+              <small class="text-muted"
+                >Mostramos solo especialistas habilitados para turnos.</small
+              >
+            </div>
+          </div>
+
+          <div class="wrap mt-3">
+            <button
+              type="button"
+              class="pro-card"
+              *ngFor="let p of specialists"
+              [class.active]="selectedSpecialistId === p.id"
+              (click)="onPickSpecialist(p.id)"
+              [title]="p.nombre + ' ' + p.apellido"
+            >
+              <img [src]="avatarUrl(p)" alt="profesional" />
+              <span class="name">{{ p.nombre }} {{ p.apellido }}</span>
+            </button>
+          </div>
+
+          <div
+            *ngIf="!specialists?.length"
+            class="text-muted small mt-2 fst-italic"
+          >
+            No hay especialistas disponibles por el momento.
+          </div>
+        </div>
+
+        <!-- 2) ESPECIALIDADES -->
+        <div class="mb-4" *ngIf="selectedSpecialistId">
+          <div class="section-title">
+            <span class="badge rounded-pill bg-primary-subtle text-primary me-2"
+              >2</span
+            >
+            <div>
+              <div class="fw-semibold">Elegí una especialidad</div>
+              <small class="text-muted"
+                >Podés ver qué práctica ofrece el profesional.</small
+              >
+            </div>
+          </div>
+
+          <div class="wrap mt-3">
+            <button
+              type="button"
+              class="spec-pill"
+              *ngFor="let s of specialties"
+              [class.active]="selectedSpecialtyId === s.id"
+              (click)="onPickSpecialty(s.id)"
+              [title]="s.nombre"
+            >
+              <img [src]="specialtyIcon()" alt="especialidad" />
+              <span>{{ s.nombre }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- 3) DÍAS -->
+        <div class="mb-4" *ngIf="selectedSpecialtyId">
+          <div class="section-title">
+            <span class="badge rounded-pill bg-primary-subtle text-primary me-2"
+              >3</span
+            >
+            <div>
+              <div class="fw-semibold">Elegí un día</div>
+              <small class="text-muted"
+                >Solo se muestran fechas con turnos disponibles.</small
+              >
+            </div>
+          </div>
+
+          <div class="wrap mt-3">
+            <button
+              type="button"
+              class="day-rect"
+              *ngFor="let d of days"
+              [class.active]="selectedDay === d"
+              (click)="onPickDay(d)"
+            >
+              {{ d }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 4) HORARIOS -->
+        <div *ngIf="selectedDay">
+          <div class="section-title">
+            <span class="badge rounded-pill bg-primary-subtle text-primary me-2"
+              >4</span
+            >
+            <div>
+              <div class="fw-semibold">Elegí un horario</div>
+              <small class="text-muted"
+                >Confirmá el turno haciendo clic en el horario que
+                prefieras.</small
+              >
+            </div>
+          </div>
+
+          <div class="wrap mt-3">
+            <button
+              type="button"
+              class="hour-sq"
+              *ngFor="let h of hours"
+              (click)="reservarTurno(h)"
+            >
+              {{ h }}
+            </button>
+          </div>
+        </div>
+
+        <!-- LOADING -->
+        <div *ngIf="loading" class="text-muted small mt-3 d-flex gap-2">
+          <div
+            class="spinner-border spinner-border-sm text-primary"
+            role="status"
+          ></div>
+          <span>Cargando disponibilidad…</span>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-
-<!-- 3) DÍAS -->
-<div *ngIf="selectedSpecialtyId">
-  <p class="text-muted">Elegí un día:</p>
-  <div class="wrap gap-2 mb-4">
-    <button
-      class="day-rect"
-      *ngFor="let d of days"
-      [class.active]="selectedDay === d"
-      (click)="onPickDay(d)"
-    >
-      {{ d }}
-    </button>
-  </div>
-</div>
-
-<!-- 4) HORARIOS -->
-<div *ngIf="selectedDay">
-  <p class="text-muted">Elegí un horario:</p>
-  <div class="wrap gap-2">
-    <button class="hour-sq" *ngFor="let h of hours" (click)="reservarTurno(h)">
-      {{ h }}
-    </button>
-  </div>
-</div>
-
-<div *ngIf="loading" class="text-muted small mt-3">Cargando…</div>
+</section>

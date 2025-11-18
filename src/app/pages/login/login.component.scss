@@ -1,8 +1,38 @@
-.quick-access {
-  display: flex;
-  justify-content: center;
+:host {
+  display: block;
 }
 
+/* Layout general */
+.login-page {
+  min-height: calc(100vh - 70px);
+  display: flex;
+  align-items: flex-start;
+}
+
+@media (min-width: 768px) {
+  .login-page {
+    align-items: center;
+  }
+}
+
+/* Accesos rápidos */
+.quick-access {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 0.9rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.quick-title {
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Lista de accesos rápidos */
 .qa-list {
   display: flex;
   flex-wrap: wrap;
@@ -10,29 +40,34 @@
   justify-content: center;
 }
 
+/* Botón de acceso rápido (requerido rectangular 16:9) */
 .qa-btn {
-  width: 168px;               /* rectangular */
+  width: 168px; /* rectangular */
   aspect-ratio: 16 / 9;
   border: 1px solid var(--bs-border-color);
-  border-radius: .5rem;
-  background: #fff;
+  border-radius: 0.5rem;
+  background: #f9fafb;
   padding: 10px;
   display: flex;
   align-items: center;
   gap: 10px;
-  transition: transform .12s ease, box-shadow .12s ease;
+  transition: transform 0.12s ease, box-shadow 0.12s ease,
+    border-color 0.12s ease, background-color 0.12s ease;
+  cursor: pointer;
 }
 
 .qa-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.08);
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18);
+  border-color: #2563eb;
+  background-color: #ffffff;
 }
 
 .qa-btn img {
   width: 48px;
   height: 48px;
   object-fit: cover;
-  border-radius: .5rem;
+  border-radius: 0.5rem;
 }
 
 .qa-text {
@@ -48,4 +83,40 @@
 .qa-role {
   text-transform: capitalize;
   color: #6c757d;
+}
+
+/* Card de login */
+.login-card {
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(8px);
+}
+
+.login-card .form-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.login-card .form-control {
+  border-radius: 0.6rem;
+}
+
+/* Iconito arriba del título */
+.login-icon {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  font-size: 1.4rem;
+}
+
+/* Mobile tweaks */
+@media (max-width: 576px) {
+  .quick-access {
+    padding-inline: 0.75rem;
+  }
+
+  .qa-btn {
+    width: 150px;
+  }
 }

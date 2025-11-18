@@ -1,4 +1,50 @@
-/* Card/table polish */
+.admin-users-page {
+  min-height: 100vh;
+
+  .page-title-bar h1 {
+    font-weight: 600;
+  }
+
+  .page-title-bar p {
+    font-size: 0.8rem;
+  }
+}
+
+/* Card de filtros */
+.filters-card {
+  border: none;
+  border-radius: 0.8rem;
+
+  .card-body {
+    background: #f8fafc;
+  }
+}
+
+/* Card de tabla principal */
+.users-table-card {
+  border-radius: 0.8rem;
+}
+
+/* Tabla */
+.users-table thead th {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+  background-color: #f9fafb;
+  border-bottom-color: #e5e7eb;
+}
+
+.users-table tbody tr.user-row {
+  position: relative;
+  transition: background-color 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+
+.users-table tbody tr.user-row:hover {
+  background-color: #f9fafb;
+}
+
+/* Sticky header */
 .table-sticky thead th {
   position: sticky;
   top: 0;
@@ -21,16 +67,96 @@
   vertical-align: middle;
 }
 
-/* Small fix so dropdown aligns within table on small screens */
+/* Dropdown más compacto en la tabla */
 .dropdown-menu {
   font-size: 0.9rem;
 }
+
+.avatar-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  overflow: hidden; // 👈 el zoom se recorta dentro del círculo, no en la fila
+}
+
 .admin-avatar {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
   border-radius: 50%;
-  border: 1px solid #ddd;
+  border: 1px solid #e5e7eb;
   display: inline-block;
   transform-origin: center;
+  box-shadow: 0 0 0 2px #fff;
+
+  position: relative; // 👈
+  z-index: 5; // 👈 para quedar por encima de la fila de arriba
+}
+
+/* Badges de rol */
+.role-badge {
+  border-radius: 999px;
+  font-size: 0.75rem;
+  padding-inline: 0.75rem;
+  padding-block: 0.25rem;
+  text-transform: capitalize;
+}
+
+.role-admin {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+.role-especialista {
+  background-color: #2563eb;
+  color: #eff6ff;
+}
+
+.role-paciente {
+  background-color: #6b7280;
+  color: #f9fafb;
+}
+
+/* Badges de estado */
+.status-badge {
+  border-radius: 999px;
+  font-size: 0.75rem;
+  padding-inline: 0.75rem;
+  padding-block: 0.25rem;
+}
+
+.status-ok {
+  background-color: #16a34a;
+  color: #ecfdf3;
+}
+
+.status-pending {
+  background-color: #facc15;
+  color: #78350f;
+}
+
+/* Pill de especialidad */
+.speciality-pill {
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+/* Mobile tweaks */
+@media (max-width: 768px) {
+  .page-title-bar {
+    text-align: left;
+  }
+
+  .users-table thead {
+    font-size: 0.7rem;
+  }
+
+  .users-table td {
+    font-size: 0.85rem;
+  }
 }

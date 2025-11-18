@@ -1,9 +1,79 @@
-<h2 class="mb-3">Panel Paciente</h2>
-<div class="d-flex flex-wrap gap-2">
-  <a class="btn btn-primary" routerLink="/paciente/mis-turnos">
-    <i class="bi bi-calendar-check me-1"></i> Mis turnos
-  </a>
-  <a class="btn btn-outline-primary" routerLink="/turnos/solicitar">
-    <i class="bi bi-plus-square me-1"></i> Solicitar turno
-  </a>
-</div>
+<section class="patient-dashboard py-4">
+  <div class="container">
+    <div class="row g-4 justify-content-center">
+      <!-- Card principal con acciones -->
+      <div class="col-12 col-lg-7">
+        <div class="card shadow-sm border-0 pd-main-card">
+          <div class="card-body">
+            <h2 class="h4 mb-2 d-flex align-items-center gap-2">
+              <i class="bi bi-person-heart text-primary fs-4"></i>
+              <span>Panel paciente</span>
+            </h2>
+            <p class="text-muted mb-4">
+              Desde aquí podés consultar tus turnos agendados y solicitar nuevos
+              turnos con los especialistas disponibles.
+            </p>
+
+            <div class="d-grid gap-3 pd-actions">
+              <a
+                class="btn btn-primary btn-lg d-flex align-items-center justify-content-center gap-2"
+                routerLink="/paciente/mis-turnos"
+              >
+                <i class="bi bi-calendar-check"></i>
+                <span>Mis turnos</span>
+              </a>
+
+              <a
+                class="btn btn-outline-primary btn-lg d-flex align-items-center justify-content-center gap-2"
+                routerLink="/turnos/solicitar"
+              >
+                <i class="bi bi-plus-square"></i>
+                <span>Solicitar turno</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card secundaria con info -->
+      <div class="col-12 col-lg-5">
+        <div class="card shadow-sm border-0 pd-side-card">
+          <div class="card-body">
+            <h3 class="h6 text-muted text-uppercase mb-3">
+              ¿Qué podés hacer desde este panel?
+            </h3>
+
+            <ul class="list-unstyled small mb-3">
+              <li class="d-flex gap-2 mb-2">
+                <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                <span>
+                  Ver el detalle de tus próximos turnos y su estado (pendiente,
+                  confirmado, cancelado).
+                </span>
+              </li>
+              <li class="d-flex gap-2 mb-2">
+                <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                <span>
+                  Solicitar nuevos turnos seleccionando especialidad, día y
+                  horario disponibles.
+                </span>
+              </li>
+              <li class="d-flex gap-2">
+                <i class="bi bi-check-circle-fill text-success mt-1"></i>
+                <span>
+                  Mantener un historial organizado de tus atenciones dentro de
+                  la clínica.
+                </span>
+              </li>
+            </ul>
+
+            <p class="small text-muted mb-0">
+              Te recomendamos revisar <strong>“Mis turnos”</strong> antes de
+              generar uno nuevo, para evitar solapamientos en tu agenda.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
