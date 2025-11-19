@@ -24,6 +24,7 @@ export interface ClinicalHistory {
   especialista_nombre?: string | null;
 
   extras: ClinicalHistoryExtra[];
+  detalle?: string | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -82,10 +83,11 @@ export class HistoryService {
     const uid = auth.user?.id;
     if (!uid) return [];
 
+    // 👇 ahora también traemos el JSONB extras
     const { data: hist, error: hErr } = await this.sb
       .from('clinical_history')
       .select(
-        'id, appointment_id, patient_id, specialist_id, created_at, altura, peso, temperatura, presion'
+        'id, appointment_id, patient_id, specialist_id, created_at, altura, peso, temperatura, presion, extras'
       )
       .eq('patient_id', uid)
       .order('created_at', { ascending: false });
@@ -100,7 +102,9 @@ export class HistoryService {
 
     const { data: apps, error: aErr } = await this.sb
       .from('v_appointments_patient')
-      .select('id, fecha, hora, especialidad_nombre, especialista_nombre')
+      .select(
+        'id, fecha, hora, especialidad_nombre, especialista_nombre, resena_especialista'
+      )
       .in('id', appointmentIds);
 
     if (aErr) throw aErr;
@@ -122,8 +126,20 @@ export class HistoryService {
       extrasMap.set(e.history_id, list);
     });
 
-    return histories.map((h) => {
+    return histories.map((h: any) => {
       const app = appMap.get(h.appointment_id);
+
+      let extrasFinal: ClinicalHistoryExtra[] = extrasMap.get(h.id) ?? [];
+
+      if (!extrasFinal.length && Array.isArray(h.extras)) {
+        extrasFinal = (h.extras as any[])
+          .map((e) => ({
+            key: String(e.key ?? '').trim(),
+            value: String(e.value ?? '').trim(),
+          }))
+          .filter((e) => e.key && e.value);
+      }
+
       return {
         id: h.id,
         appointment_id: h.appointment_id,
@@ -138,7 +154,8 @@ export class HistoryService {
         hora: app?.hora ?? null,
         especialidad_nombre: app?.especialidad_nombre ?? null,
         especialista_nombre: app?.especialista_nombre ?? null,
-        extras: extrasMap.get(h.id) ?? [],
+        extras: extrasFinal,
+        detalle: app?.resena_especialista ?? null,
       } as ClinicalHistory;
     });
   }

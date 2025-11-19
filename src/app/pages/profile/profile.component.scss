@@ -1,11 +1,79 @@
-/* perfil.component.scss */
+/* Card de perfil */
 .profile-card {
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(6px);
+
   .avatar {
-    width: 72px;
-    height: 72px;
+    width: 96px;
+    height: 96px;
     object-fit: cover;
   }
 }
+
+/* Historia clínica */
+.history-card {
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(6px);
+}
+
+.history-card .card-header {
+  font-weight: 600;
+}
+
+.history-card .accordion-button {
+  background-color: #f8fafc;
+  font-size: 0.95rem;
+}
+
+.history-card .accordion-button:not(.collapsed) {
+  background-color: #e9f2ff;
+}
+
+/* VITALS */
+.history-vitals .label {
+  display: block;
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.history-vitals .value {
+  color: #111827;
+}
+
+/* Extras dinámicos */
+.history-extras-list {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.history-extra-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 9999px;
+  background: #e0f2fe;
+  color: #0f172a;
+  font-size: 0.8rem;
+}
+
+.history-extra-pill .key {
+  font-weight: 600;
+}
+
+/* Detalle del profesional */
+.history-detail {
+  font-size: 0.9rem;
+  color: #4b5563;
+  white-space: pre-line; /* respeta saltos de línea del médico */
+}
+
+/* --------- estilos previos que ya tenías --------- */
 
 .specialties {
   display: flex;
@@ -19,8 +87,8 @@
   font-size: 0.85rem;
   font-weight: 500;
   border: 1px solid rgba(13, 110, 253, 0.25);
-  background: rgba(13, 110, 253, 0.1); /* azul suave */
-  color: #000000; /* texto azul */
+  background: rgba(13, 110, 253, 0.1);
+  color: #000000;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -35,7 +103,6 @@
   border-radius: 9999px;
   padding: 0.25rem 0.6rem;
   font-weight: 500;
-
   border-color: var(--bs-primary);
   color: var(--bs-primary);
   background-color: rgba(var(--bs-primary-rgb), 0.12);
@@ -49,6 +116,17 @@
   }
 }
 
-img.rounded-circle {
-  object-fit: cover;
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.page-header app-back-button {
+  flex-shrink: 0;
+  white-space: nowrap; // para que no se corte "Volver"
+}
+
+.page-header app-back-button .btn {
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
 }

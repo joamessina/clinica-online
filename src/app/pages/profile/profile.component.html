@@ -1,17 +1,19 @@
-<!-- Encabezado -->
-<div class="d-flex align-items-center justify-content-between mb-3">
-  <!-- botón volver a la derecha -->
-  <app-back-button variant="outline-secondary" size="sm" label="Volver">
-  </app-back-button>
-</div>
 <div class="container py-4" *ngIf="!loading(); else cargando">
-  <h2 class="mb-3">Mi perfil</h2>
+  <div class="page-header d-flex align-items-center mb-3">
+    <app-back-button
+      variant="secondary"
+      size="sm"
+      label="Volver"
+    ></app-back-button>
 
-  <div class="card shadow-sm">
+    <h2 class="mb-0 ms-2">Mi perfil</h2>
+  </div>
+
+  <div class="card shadow-sm profile-card">
     <div class="card-body d-flex gap-3 align-items-center">
       <img
         [src]="perfil()?.avatar_url"
-        class="rounded-circle"
+        class="rounded-circle avatar"
         width="96"
         height="96"
         alt="Avatar"
@@ -21,9 +23,9 @@
           {{ perfil()?.nombre }} {{ perfil()?.apellido }}
         </div>
         <div class="text-muted">
-          <span class="badge bg-secondary me-2 text-uppercase">{{
-            perfil()?.role
-          }}</span>
+          <span class="badge bg-secondary me-2 text-uppercase">
+            {{ perfil()?.role }}
+          </span>
           {{ perfil()?.email }}
         </div>
       </div>
@@ -47,7 +49,7 @@
             *ngIf="(perfil()?.specialties?.length || 0) > 0; else noSpec"
           >
             <span
-              class="badge bg-outline border me-2"
+              class="badge bg-outline me-2"
               *ngFor="let s of perfil()?.specialties"
             >
               {{ s.nombre }}
@@ -67,79 +69,114 @@
       </div>
     </div>
   </div>
-</div>
 
-<div class="card mt-3" *ngIf="perfil()?.role === 'paciente'">
-  <div class="card-header">
-    <i class="bi bi-journal-medical me-1"></i> Historia clínica
-  </div>
+  <!-- HISTORIA CLÍNICA (solo paciente) -->
+  <div class="card mt-3 history-card" *ngIf="perfil()?.role === 'paciente'">
+    <div class="card-header">
+      <i class="bi bi-journal-medical me-1"></i> Historia clínica
+    </div>
 
-  <div class="card-body" *ngIf="historial().length; else sinHist">
-    <div class="accordion" id="historiaPaciente">
-      <div class="accordion-item" *ngFor="let h of historial(); let i = index">
-        <h2 class="accordion-header" [id]="'h-head-' + i">
-          <button
-            class="accordion-button collapsed"
-            type="button"
-            data-bs-toggle="collapse"
-            [attr.data-bs-target]="'#h-body-' + i"
-            aria-expanded="false"
-          >
-            <span class="me-2">
-              {{ h.fecha | date : "shortDate" }}
-              • {{ h.especialidad_nombre || "Sin especialidad" }}
-            </span>
-            <span class="text-muted small" *ngIf="h.especialista_nombre">
-              ({{ h.especialista_nombre }})
-            </span>
-          </button>
-        </h2>
-
+    <div class="card-body" *ngIf="historial().length; else sinHist">
+      <div class="accordion" id="historiaPaciente">
         <div
-          class="accordion-collapse collapse"
-          [id]="'h-body-' + i"
-          [attr.aria-labelledby]="'h-head-' + i"
-          data-bs-parent="#historiaPaciente"
+          class="accordion-item"
+          *ngFor="let h of historial(); let i = index"
         >
-          <div class="accordion-body">
-            <div class="row mb-2">
-              <div class="col-6 col-md-3">
-                <strong>Altura:</strong> {{ h.altura || "—" }} cm
-              </div>
-              <div class="col-6 col-md-3">
-                <strong>Peso:</strong> {{ h.peso || "—" }} kg
-              </div>
-              <div class="col-6 col-md-3">
-                <strong>Temperatura:</strong> {{ h.temperatura || "—" }} °C
-              </div>
-              <div class="col-6 col-md-3">
-                <strong>Presión:</strong> {{ h.presion || "—" }}
-              </div>
-            </div>
+          <h2 class="accordion-header" [id]="'h-head-' + i">
+            <button
+              class="accordion-button collapsed"
+              type="button"
+              data-bs-toggle="collapse"
+              [attr.data-bs-target]="'#h-body-' + i"
+              aria-expanded="false"
+            >
+              <span class="me-2">
+                {{ h.fecha | date : "shortDate" }}
+                • {{ h.especialidad_nombre || "Sin especialidad" }}
+              </span>
+              <span class="text-muted small" *ngIf="h.especialista_nombre">
+                ({{ h.especialista_nombre }})
+              </span>
+            </button>
+          </h2>
 
-            <div *ngIf="h.extras.length; else sinExtras">
-              <strong>Datos adicionales:</strong>
-              <ul class="mb-0">
-                <li *ngFor="let e of h.extras">
-                  <span class="fw-semibold">{{ e.key }}:</span>
-                  {{ e.value }}
-                </li>
-              </ul>
-            </div>
-            <ng-template #sinExtras>
-              <div class="text-muted small">
-                Sin datos adicionales en esta atención.
+          <div
+            class="accordion-collapse collapse"
+            [id]="'h-body-' + i"
+            [attr.aria-labelledby]="'h-head-' + i"
+            data-bs-parent="#historiaPaciente"
+          >
+            <div class="accordion-body">
+              <!-- VITALES -->
+              <div class="row mb-2 small history-vitals">
+                <div class="col-6 col-md-3">
+                  <span class="label">Altura</span>
+                  <span class="value">
+                    {{ h.altura || "—"
+                    }}<ng-container *ngIf="h.altura"> &nbsp;cm </ng-container>
+                  </span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="label">Peso</span>
+                  <span class="value">
+                    {{ h.peso || "—"
+                    }}<ng-container *ngIf="h.peso"> &nbsp;kg </ng-container>
+                  </span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="label">Temperatura</span>
+                  <span class="value">
+                    {{ h.temperatura || "—"
+                    }}<ng-container *ngIf="h.temperatura">
+                      &nbsp;°C
+                    </ng-container>
+                  </span>
+                </div>
+                <div class="col-6 col-md-3">
+                  <span class="label">Presión</span>
+                  <span class="value">{{ h.presion || "—" }}</span>
+                </div>
               </div>
-            </ng-template>
+
+              <!-- DATOS DINÁMICOS -->
+              <div class="mt-2" *ngIf="h.extras?.length; else sinExtras">
+                <div class="fw-semibold small mb-1">Datos adicionales</div>
+                <ul class="history-extras-list mb-2">
+                  <li *ngFor="let e of h.extras">
+                    <span class="history-extra-pill">
+                      <span class="key">{{ e.key }}:</span>
+                      <span class="val">{{ e.value }}</span>
+                    </span>
+                  </li>
+                </ul>
+              </div>
+              <ng-template #sinExtras>
+                <div class="text-muted small">
+                  Sin datos adicionales en esta atención.
+                </div>
+              </ng-template>
+
+              <!-- DETALLE DEL PROFESIONAL -->
+              <div class="mt-3" *ngIf="h.detalle">
+                <div class="fw-semibold small mb-1">
+                  Detalle del profesional
+                </div>
+                <p class="history-detail mb-0">
+                  {{ h.detalle }}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <ng-template #sinHist>
-    <p class="text-muted mb-0">Todavía no tenés historia clínica cargada.</p>
-  </ng-template>
+    <ng-template #sinHist>
+      <p class="text-muted mb-0 px-3 py-2">
+        Todavía no tenés historia clínica cargada.
+      </p>
+    </ng-template>
+  </div>
 </div>
 
 <ng-template #cargando>
