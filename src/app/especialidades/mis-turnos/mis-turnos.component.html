@@ -1,15 +1,34 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="mb-0">Mis turnos</h3>
-  <app-back-button></app-back-button>
+<div class="turnos-header mb-3">
+  <div class="d-flex align-items-center gap-2">
+    <app-back-button
+      variant="secondary"
+      size="sm"
+      label="Volver"
+    ></app-back-button>
+
+    <div class="header-text">
+      <h2 class="mb-0">Mis turnos</h2>
+      <p class="mb-0 small">
+        Administrá los turnos del día, cambiá su estado y completá la atención
+        de cada paciente.
+      </p>
+    </div>
+  </div>
 </div>
 
-<input
-  class="form-control mb-3"
-  [ngModel]="q()"
-  (ngModelChange)="q.set($event)"
-  placeholder="Filtrar por especialidad, paciente, estado o reseña..."
-/>
 
+<!-- BUSCADOR CON ICONO -->
+<div class="search-wrapper mb-3">
+  <i class="bi bi-search"></i>
+  <input
+    class="form-control search-input"
+    [ngModel]="q()"
+    (ngModelChange)="q.set($event)"
+    placeholder="Filtrar por especialidad, paciente, estado o reseña..."
+  />
+</div>
+
+<!-- TABLA -->
 <div class="table-responsive">
   <table class="table align-middle">
     <thead>

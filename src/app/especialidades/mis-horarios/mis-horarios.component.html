@@ -1,76 +1,110 @@
-<div class="d-flex justify-content-between align-items-center mb-3">
-  <h3 class="mb-0">Mis Horarios</h3>
-  <app-back-button></app-back-button>
-</div>
+<!-- HEADER EN FORMA DE PASTILLA -->
+<div class="horarios-header mb-3">
+  <div class="d-flex align-items-center gap-2">
+    <app-back-button
+      variant="secondary"
+      size="sm"
+      label="Volver"
+    ></app-back-button>
 
-<div class="row g-3">
-  <div class="col-md-4">
-    <label class="form-label">Especialidad</label>
-    <div class="d-flex flex-wrap gap-2">
-      <button
-        class="btn btn-outline-primary"
-        *ngFor="let s of specialties"
-        [class.active]="form.specialty === s.id"
-        (click)="form.specialty = s.id"
-      >
-        {{ s.nombre }}
-      </button>
-    </div>
-  </div>
-  <div class="col-md-8">
-    <div class="row g-2 align-items-end">
-      <div class="col-3">
-        <label class="form-label">Día</label>
-        <select class="form-select" [(ngModel)]="form.weekday" name="wd">
-          <option [ngValue]="0">Dom</option>
-          <option [ngValue]="1">Lun</option>
-          <option [ngValue]="2">Mar</option>
-          <option [ngValue]="3">Mié</option>
-          <option [ngValue]="4">Jue</option>
-          <option [ngValue]="5">Vie</option>
-          <option [ngValue]="6">Sáb</option>
-        </select>
-      </div>
-      <div class="col-3">
-        <label class="form-label">Desde</label>
-        <input
-          class="form-control"
-          [(ngModel)]="form.desde"
-          name="desde"
-          placeholder="HH:mm"
-        />
-      </div>
-      <div class="col-3">
-        <label class="form-label">Hasta</label>
-        <input
-          class="form-control"
-          [(ngModel)]="form.hasta"
-          name="hasta"
-          placeholder="HH:mm"
-        />
-      </div>
-      <div class="col-2">
-        <label class="form-label">Slot</label>
-        <input
-          type="number"
-          class="form-control"
-          [(ngModel)]="form.slot"
-          name="slot"
-          min="10"
-        />
-      </div>
-      <div class="col-1">
-        <button class="btn btn-primary w-100" (click)="add()">Agregar</button>
-      </div>
+    <div class="header-text">
+      <h2 class="mb-0">Mis horarios</h2>
+      <p class="mb-0">
+        Definí en qué días y horarios atendés, y cuánto duran tus turnos.
+      </p>
     </div>
   </div>
 </div>
 
-<hr />
+<!-- CARD DE CONFIGURACIÓN -->
+<div class="card config-card mb-3">
+  <div class="card-body">
+    <div class="row g-3 align-items-start">
+      <!-- ESPECIALIDADES -->
+      <div class="col-md-4">
+        <label class="form-label fw-semibold">Especialidad</label>
+        <div class="d-flex flex-wrap gap-2 specialty-chips">
+          <button
+            class="btn btn-outline-primary"
+            *ngFor="let s of specialties"
+            [class.active]="form.specialty === s.id"
+            (click)="form.specialty = s.id"
+          >
+            {{ s.nombre }}
+          </button>
+        </div>
+      </div>
 
-<h5>Tramos cargados</h5>
-<div class="table-responsive">
-  <table class="table">
+      <!-- DÍA / HORARIO / SLOT -->
+      <div class="col-md-8">
+        <label class="form-label fw-semibold d-block mb-1">
+          Nuevo tramo de atención
+        </label>
+        <div class="row g-2 align-items-end horarios-row">
+          <div class="col-6 col-md-3">
+            <label class="form-label">Día</label>
+            <select class="form-select" [(ngModel)]="form.weekday" name="wd">
+              <option [ngValue]="0">Dom</option>
+              <option [ngValue]="1">Lun</option>
+              <option [ngValue]="2">Mar</option>
+              <option [ngValue]="3">Mié</option>
+              <option [ngValue]="4">Jue</option>
+              <option [ngValue]="5">Vie</option>
+              <option [ngValue]="6">Sáb</option>
+            </select>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <label class="form-label">Desde</label>
+            <input
+              class="form-control"
+              [(ngModel)]="form.desde"
+              name="desde"
+              placeholder="HH:mm"
+            />
+          </div>
+
+          <div class="col-6 col-md-3">
+            <label class="form-label">Hasta</label>
+            <input
+              class="form-control"
+              [(ngModel)]="form.hasta"
+              name="hasta"
+              placeholder="HH:mm"
+            />
+          </div>
+
+          <div class="col-2">
+  <label class="form-label">Slot (min)</label>
+  <input
+    type="number"
+    class="form-control"
+    [(ngModel)]="form.slot"
+    name="slot"
+    min="30"
+    step="5"
+  />
+</div>
+
+
+          <div class="col-12 col-md-1">
+            <button
+              class="btn btn-primary w-100 add-slot-btn"
+              (click)="add()"
+            >
+              Agregar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABLA DE TRAMOS -->
+<h5 class="section-title">Tramos cargados</h5>
+<div class="table-responsive schedule-table">
+  <table class="table table-hover align-middle mb-0">
     <thead>
       <tr>
         <th>Día</th>

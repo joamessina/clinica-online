@@ -1,93 +1,229 @@
-/* Fija layout de tabla y alinea verticalmente */
+/* ---------- HEADER: título + volver sobre fondo blanco ---------- */
+
+.page-header {
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(15, 23, 42, 0.05);
+}
+
+.page-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.page-subtitle {
+  font-size: 0.9rem;
+  color: #4b5563;
+}
+
+.page-header app-back-button {
+  flex-shrink: 0;
+}
+
+/* ---------- Buscador ---------- */
+
+.search-wrapper {
+  position: relative;
+  max-width: 480px;
+}
+
+.search-wrapper i {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.search-input {
+  padding-left: 2.2rem;
+  border-radius: 9999px;
+  border-color: rgba(148, 163, 184, 0.7);
+  box-shadow: 0 12px 30px -22px rgba(15, 23, 42, 0.8);
+}
+
+.search-input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+}
+
+/* ---------- Tabla ---------- */
+
 .table {
   table-layout: fixed;
 }
+
 .table thead th,
 .table tbody td {
   vertical-align: middle;
 }
 
-/* Anchos sugeridos por columna (ajustá si querés) */
+/* Anchos sugeridos por columna */
 .table thead th:nth-child(1),
 .table tbody td:nth-child(1) {
   width: 90px;
-} /* Fecha  */
+} /* Fecha */
+
 .table thead th:nth-child(2),
 .table tbody td:nth-child(2) {
   width: 80px;
-} /* Hora   */
+} /* Hora */
+
 .table thead th:nth-child(3),
 .table tbody td:nth-child(3) {
   width: 170px;
-} /* Espec. */
+} /* Especialidad */
+
 .table thead th:nth-child(5),
 .table tbody td:nth-child(5) {
   width: 120px;
 } /* Estado */
+
 .table thead th:nth-child(6),
 .table tbody td:nth-child(6) {
   width: 340px;
 } /* Acciones */
 
+/* Acciones en fila */
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.25rem;
 }
 
-/* Badges por estado */
-.badge[data-status="PENDIENTE"] {
-  color: #664d03;
-  background: #fff3cd;
-}
-.badge[data-status="ACEPTADO"] {
-  color: #084298;
-  background: #cfe2ff;
-}
-.badge[data-status="REALIZADO"] {
-  color: #0f5132;
-  background: #d1e7dd;
-}
-.badge[data-status="RECHAZADO"],
-.badge[data-status="CANCELADO"] {
-  color: #842029;
-  background: #f8d7da;
+/* ---------- Badges por estado (estilo pills suaves) ---------- */
+
+.badge[data-status='PENDIENTE'] {
+  background: #ffc10722;
+  color: #8a6d00;
 }
 
-/* Responsive: apilá un poco en pantallas chicas */
+.badge[data-status='ACEPTADO'] {
+  background: #0d6efd22;
+  color: #0d6efd;
+}
+
+.badge[data-status='RECHAZADO'] {
+  background: #6c757d22;
+  color: #6c757d;
+}
+
+.badge[data-status='CANCELADO'] {
+  background: #dc354522;
+  color: #dc3545;
+}
+
+.badge[data-status='REALIZADO'] {
+  background: #19875422;
+  color: #198754;
+}
+
+/* ---------- Responsive ---------- */
+
 @media (max-width: 992px) {
   .table thead th:nth-child(6),
   .table tbody td:nth-child(6) {
     width: 100%;
   }
+
   .actions {
     gap: 0.3rem;
   }
+
+  .search-wrapper {
+    max-width: 100%;
+  }
 }
 
-.badge[data-status="PENDIENTE"] {
-  background: #ffc10722;
-  color: #8a6d00;
-}
-.badge[data-status="ACEPTADO"] {
-  background: #0d6efd22;
-  color: #0d6efd;
-}
-.badge[data-status="RECHAZADO"] {
-  background: #6c757d22;
-  color: #6c757d;
-}
-.badge[data-status="CANCELADO"] {
-  background: #dc354522;
-  color: #dc3545;
-}
-.badge[data-status="REALIZADO"] {
-  background: #19875422;
-  color: #198754;
+/* Header compacto de "Mis turnos" */
+.turnos-header {
+  display: inline-flex;              /* 🔹 deja de ocupar todo el ancho */
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(6px);
+  border-radius: 999px;              /* 🔹 forma de pastilla */
+  padding: 0.5rem 1rem;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  margin-bottom: 0.75rem;
 }
 
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
+/* Textos del header: más compactos */
+.turnos-header .header-text h2 {
+  font-size: 1.2rem;
+  line-height: 1.2;
+  margin-bottom: 0;
+}
+
+.turnos-header .header-text p {
+  font-size: 0.85rem;
+  margin-bottom: 0;
+  white-space: nowrap;              /* evita que se rompa raro en desktop */
+}
+
+/* Que el botón no se achique raro */
+.turnos-header app-back-button {
+  flex-shrink: 0;
+}
+
+@media (max-width: 576px) {
+  .turnos-header {
+    display: flex;                  /* en mobile que use todo el ancho */
+    border-radius: 12px;
+    flex-wrap: wrap;
+  }
+
+  .turnos-header .header-text p {
+    white-space: normal;           /* en mobile sí dejamos que haga salto */
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .turnos-header {
+    background: rgba(15, 23, 42, 0.96);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* -------- Ajustes visuales del header de "Mis turnos" -------- */
+
+/* Botón volver siempre un poco más pill / cómodo */
+.turnos-header app-back-button .btn {
+  border-radius: 9999px;
+  padding-inline: 0.9rem;
+  font-weight: 500;
+}
+
+/* Modo oscuro: header oscuro + textos claros + botón integrado */
+@media (prefers-color-scheme: dark) {
+  .turnos-header {
+    background: rgba(15, 23, 42, 0.96);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  }
+
+  /* título y subtítulo en blanco/ gris clarito */
+  .turnos-header .header-text h2 {
+    color: #f9fafb;           /* casi blanco */
+  }
+
+  .turnos-header .header-text p {
+    color: #e5e7eb;           /* gris muy claro */
+  }
+
+  /* Botón Volver sobre el header oscuro */
+  .turnos-header app-back-button .btn {
+    background: rgba(15, 23, 42, 0.2);
+    border-color: rgba(148, 163, 184, 0.9);
+    color: #e5e7eb;
+  }
+
+  .turnos-header app-back-button .btn:hover,
+  .turnos-header app-back-button .btn:focus {
+    background: rgba(37, 99, 235, 0.9);  /* azul sólido */
+    border-color: rgba(191, 219, 254, 1);
+    color: #f9fafb;
+  }
 }

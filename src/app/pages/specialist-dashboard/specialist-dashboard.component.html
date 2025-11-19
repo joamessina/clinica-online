@@ -1,9 +1,90 @@
-<h2>Panel Especialista</h2>
-<div class="d-flex flex-wrap gap-2">
-  <a class="btn btn-primary" routerLink="/especialista/mis-turnos"
-    >Mis turnos</a
+<div class="section">
+  <!-- Título + subtítulo arriba -->
+  <div
+    class="page-header d-flex flex-column flex-sm-row align-items-sm-center justify-content-between mb-3"
   >
-  <a class="btn btn-outline-primary" routerLink="/especialista/mis-horarios"
-    >Mis horarios</a
-  >
+    <div>
+      <h2 class="mb-1 d-flex align-items-center gap-2">
+        <i class="bi bi-clipboard2-pulse text-primary fs-4"></i>
+        <span>Panel Especialista</span>
+      </h2>
+      <p class="text-muted small mb-0">
+        Gestioná tus turnos y configurá tus horarios de atención.
+      </p>
+    </div>
+  </div>
+
+  <!-- Panel principal -->
+  <div class="panel-hero">
+    <!-- Header del panel: texto + acciones -->
+    <div class="row align-items-center hero-header">
+      <!-- Izquierda: icono + título + texto -->
+      <div
+        class="col-12 col-lg-6 d-flex align-items-center gap-3 mb-3 mb-lg-0"
+      >
+        <div class="hero-icon">
+          <i class="bi bi-heart-pulse"></i>
+        </div>
+        <div>
+          <h3 class="hero-title mb-1">Tu consultorio digital</h3>
+          <p class="hero-text mb-0">
+            Revisá tus turnos del día, completá la atención de cada paciente y
+            ajustá tus días y horarios disponibles.
+          </p>
+        </div>
+      </div>
+
+      <!-- Derecha: botones principales -->
+      <div
+        class="col-12 col-lg-6 d-flex flex-wrap justify-content-lg-end gap-2 hero-actions"
+      >
+        <a class="btn btn-primary" routerLink="/especialista/mis-turnos">
+          <i class="bi bi-calendar-check me-1"></i>
+          Mis turnos
+        </a>
+
+        <a
+          class="btn btn-outline-primary"
+          routerLink="/especialista/mis-horarios"
+        >
+          <i class="bi bi-clock-history me-1"></i>
+          Mis horarios
+        </a>
+      </div>
+    </div>
+
+    <!-- Bloques informativos -->
+    <div class="row g-3 small hero-body">
+      <div class="col-md-4">
+        <div class="hero-item">
+          <div class="hero-item-title">Mis turnos</div>
+          <p class="mb-0">
+            Consultá los turnos del día, cambiá su estado y completá la historia
+            clínica del paciente en pocos clics.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="hero-item">
+          <div class="hero-item-title">Mis horarios</div>
+          <p class="mb-0">
+            Definí qué días atendés, los bloques horarios y la duración estándar
+            de cada turno disponible.
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="hero-item">
+          <div class="hero-item-title">Próximos pasos</div>
+          <p class="mb-0">
+            Usá este panel como punto de entrada rápido: revisá primero
+            <strong>Mis turnos</strong> y luego ajustá
+            <strong>Mis horarios</strong> si necesitás cambiar tu agenda.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

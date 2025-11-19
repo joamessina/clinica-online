@@ -1,7 +1,8 @@
-/* specialist-dashboard.component.scss */
 :host {
   display: block;
-  padding-inline: clamp(12px, 3vw, 28px); /* era la línea problemática */
+  padding-inline: clamp(12px, 3vw, 28px);
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
   --ring: rgba(13, 110, 253, 0.18);
   --card: #ffffff;
   --muted: #6c757d;
@@ -9,55 +10,122 @@
 
 @media (prefers-color-scheme: dark) {
   :host {
-    --card: #17181b;
-    --muted: #adb5bd;
-    --ring: rgba(13, 110, 253, 0.28);
+    --card: #0b1120; 
+    --ring: rgba(59, 130, 246, 0.35);
+    --panel-text: #e5e7eb;
+    --panel-muted: #d1d5db;
+  }
+  .page-header {
+    background: rgba(15, 23, 42, 0.92);
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    box-shadow: 0 10px 30px -18px rgba(0, 0, 0, 0.9);
   }
 }
 
-/* título */
+.section {
+  display: grid;
+  gap: 1rem;
+}
+
 h2 {
   font-weight: 700;
   letter-spacing: 0.2px;
-  margin: 1.25rem 0 0.75rem;
+  margin: 0;
   animation: fadeIn 0.35s ease-out both;
 }
 
-/* toolbar (tu div con d-flex/gap-2) */
-h2 + div {
-  display: flex;
-  gap: 0.75rem !important;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 0.75rem;
+
+.page-header {
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;        
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 24px -16px rgba(15, 23, 42, 0.25);
+  max-width: 520px;             
 }
 
-/* caja “hero” para que el panel no quede vacío */
+
+
 .panel-hero {
-  background: radial-gradient(
-      1200px 200px at 0% -10%,
-      var(--ring),
-      transparent 60%
-    ),
+  background:
+    radial-gradient(1200px 200px at 0% -10%, var(--ring), transparent 60%),
     radial-gradient(1200px 200px at 100% 110%, var(--ring), transparent 60%),
     var(--card);
-  border: 1px solid rgba(108, 117, 125, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.35);
   border-radius: 16px;
   padding: clamp(16px, 3vw, 24px);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.03), 0 10px 25px -20px var(--ring);
-  min-height: 38vh;
+  color: var(--panel-text);
+  min-height: 32vh;
   animation: slideUp 0.35s ease-out both;
 }
 
-/* botones */
+/* header del panel */
+.hero-header {
+  border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.hero-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  background: rgba(13, 110, 253, 0.09);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #0d6efd;
+  font-size: 1.5rem;
+}
+
+.hero-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.hero-text {
+  font-size: 0.9rem;
+  color: var(--panel-muted);
+}
+
+/* acciones del header */
+.hero-actions .btn {
+  min-width: 140px;
+  text-align: center;
+}
+
+/* CUERPO DEL PANEL */
+.hero-body {
+  margin-top: 0.25rem;
+}
+
+.hero-item {
+  padding-top: 0.25rem;
+}
+
+.hero-item-title {
+  font-weight: 600;
+  margin-bottom: 0.15rem;
+}
+
+.hero-item p {
+  color: var(--panel-muted);
+}
+
+/* BOTONES */
 a.btn,
 button.btn {
   border-radius: 12px !important;
   padding: 0.6rem 1rem !important;
   font-weight: 600;
   letter-spacing: 0.2px;
-  transition: transform 0.15s ease, box-shadow 0.2s ease,
-    background-color 0.2s ease, color 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02), 0 8px 20px -12px var(--ring);
 }
 
@@ -72,20 +140,18 @@ button.btn:hover {
   background-image: linear-gradient(135deg, #0d6efd 0%, #5a65ff 100%);
 }
 
-.btn-outline-primary {
-  backdrop-filter: saturate(120%);
-}
-.btn-outline-primary:hover,
-.btn-outline-primary:focus {
-  background-color: rgba(13, 110, 253, 0.08) !important;
+/* outline dentro del panel, que se vea bien en claro y oscuro */
+.panel-hero .btn-outline-primary {
+  border-width: 1px;
+  background-color: rgba(13, 110, 253, 0.03);
 }
 
-/* helpers opcionales */
-.section {
-  display: grid;
-  gap: 1rem;
+.panel-hero .btn-outline-primary:hover,
+.panel-hero .btn-outline-primary:focus {
+  background-color: rgba(13, 110, 253, 0.12) !important;
 }
 
+/* ANIMACIONES */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -96,6 +162,7 @@ button.btn:hover {
     transform: translateY(0);
   }
 }
+
 @keyframes slideUp {
   from {
     opacity: 0;
