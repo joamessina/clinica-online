@@ -1,6 +1,6 @@
-<div class="admin-users-page container py-4">
+<div class="admin-users-page container-fluid px-4 py-4">
   <div class="row justify-content-center">
-    <div class="col-12 col-xl-11">
+    <div class="col-12">
       <!-- HEADER / ACCIONES -->
       <div
         class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 gap-2 page-title-bar"
@@ -110,6 +110,60 @@
                 </label>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD DE ACCESO RÁPIDO A EXCEL POR USUARIO -->
+      <div
+        class="card shadow-sm quick-export-card mb-3"
+        *ngIf="filtered().length"
+      >
+        <div class="card-body py-3">
+          <div
+            class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2"
+          >
+            <div class="d-flex align-items-center gap-2">
+              <span class="quick-pill-icon">
+                <i class="bi bi-stars"></i>
+              </span>
+              <div>
+                <div class="fw-semibold small text-uppercase text-muted">
+                  Descargar turnos por usuario
+                </div>
+                <div class="small text-muted d-md-none">
+                  Tocá un usuario para bajar sus turnos en Excel.
+                </div>
+              </div>
+            </div>
+
+            <div class="small text-muted d-none d-md-block">
+              Click en un usuario para bajar en Excel los turnos que tomó y con
+              quién.
+            </div>
+          </div>
+
+          <div class="quick-users-scroll">
+            <button
+              type="button"
+              class="fav-user"
+              *ngFor="let u of filtered()"
+              (click)="exportUserAppointments(u)"
+              [title]="nameOf(u)"
+            >
+              <div class="fav-avatar-wrapper">
+                <img
+                  [src]="u.avatar_url || placeholderUrl"
+                  class="fav-avatar"
+                  (error)="imgFallback($event)"
+                  alt="avatar"
+                />
+                <span class="fav-star">
+                  <i class="bi bi-file-earmark-excel-fill"></i>
+                </span>
+              </div>
+              <span class="fav-name">{{ nameOf(u) }}</span>
+            </button>
           </div>
         </div>
       </div>

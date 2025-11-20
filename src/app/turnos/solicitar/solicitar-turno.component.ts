@@ -126,12 +126,17 @@ export class SolicitarTurnoComponent implements OnInit {
       this.toast.error('Sesión expirada. Volvé a iniciar sesión.');
       return;
     }
+
     if (
       !this.selectedSpecialistId ||
       !this.selectedSpecialtyId ||
       !this.selectedDay
-    )
+    ) {
       return;
+    }
+
+    // guardamos el día actual para poder re-seleccionarlo luego del refresh
+    const currentDay = this.selectedDay;
 
     const { error } = await this.svc.createAppointment({
       specialist_id: this.selectedSpecialistId,
@@ -143,11 +148,32 @@ export class SolicitarTurnoComponent implements OnInit {
 
     if (error) {
       console.warn(error);
+
+      // choque con el índice UNIQUE (otro paciente se adelantó)
+      if ((error as any).code === '23505') {
+        this.toast.error(
+          'Ese horario justo acaba de ser tomado por otro paciente. Probá con otro turno.'
+        );
+
+        // refrescamos los slots para que desaparezca el horario ocupado
+        await this.onPickSpecialty(this.selectedSpecialtyId!);
+        if (currentDay) {
+          this.onPickDay(currentDay);
+        }
+        return;
+      }
+
       this.toast.error('No se pudo reservar el turno');
-    } else {
-      this.toast.success('Turno reservado');
-      await this.onPickSpecialty(this.selectedSpecialtyId);
-      this.onPickDay(this.selectedDay);
+      return;
+    }
+
+    // caso OK
+    this.toast.success('Turno reservado');
+
+    // recargamos la disponibilidad y mantenemos el mismo día seleccionado
+    await this.onPickSpecialty(this.selectedSpecialtyId);
+    if (currentDay) {
+      this.onPickDay(currentDay);
     }
   }
 }

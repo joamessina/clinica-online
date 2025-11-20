@@ -231,6 +231,79 @@ export class AdminUsersComponent implements OnInit {
     );
   }
 
+  async exportUserAppointments(u: AdminUser) {
+    // para admin puro no tiene sentido, no tiene turnos asociados
+    if (u.role === 'admin') {
+      alert(
+        'El usuario con rol admin no tiene turnos asociados para exportar.'
+      );
+      return;
+    }
+
+    const idField = u.role === 'paciente' ? 'patient_id' : 'specialist_id';
+
+    const { data, error } = await this.sb
+      .from('v_appointments_admin')
+      .select(
+        'fecha, hora, estado, especialidad_nombre, especialista_nombre, paciente_nombre'
+      )
+      .eq(idField, u.id)
+      .order('fecha', { ascending: true })
+      .order('hora', { ascending: true });
+
+    if (error) {
+      console.error('[admin/users] exportUserAppointments error', error);
+      alert('No se pudieron obtener los turnos de este usuario.');
+      return;
+    }
+
+    const rows = data ?? [];
+    if (!rows.length) {
+      alert('Este usuario todavía no tiene turnos registrados.');
+      return;
+    }
+
+    // Mapeo distinto según si es paciente o especialista
+    const mapped =
+      u.role === 'paciente'
+        ? rows.map((r: any) => ({
+            Fecha: r.fecha,
+            Hora: (r.hora ?? '').slice(0, 5),
+            Profesional: r.especialista_nombre ?? '',
+            Especialidad: r.especialidad_nombre ?? '',
+            Estado: r.estado ?? '',
+          }))
+        : rows.map((r: any) => ({
+            Fecha: r.fecha,
+            Hora: (r.hora ?? '').slice(0, 5),
+            Paciente: r.paciente_nombre ?? '',
+            Especialidad: r.especialidad_nombre ?? '',
+            Estado: r.estado ?? '',
+          }));
+
+    const ws = XLSX.utils.json_to_sheet(mapped);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Turnos');
+
+    // Nombre de archivo amigable
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+
+    const baseNameRaw = this.nameOf(u) || 'usuario';
+    const baseName = baseNameRaw
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]+/g, '_')
+      .replace(/^_+|_+$/g, '')
+      .toLowerCase();
+
+    const fileName = `turnos_${u.role}_${baseName}_${yyyy}${mm}${dd}.xlsx`;
+
+    XLSX.writeFile(wb, fileName);
+  }
+
   imgFallback(ev: Event) {
     const img = ev.target as HTMLImageElement;
     img.onerror = null;

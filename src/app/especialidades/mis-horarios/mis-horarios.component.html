@@ -1,3 +1,5 @@
+<!-- mis-horarios.component.html -->
+
 <!-- HEADER EN FORMA DE PASTILLA -->
 <div class="horarios-header mb-3">
   <div class="d-flex align-items-center gap-2">
@@ -75,23 +77,19 @@
           </div>
 
           <div class="col-2">
-  <label class="form-label">Slot (min)</label>
-  <input
-    type="number"
-    class="form-control"
-    [(ngModel)]="form.slot"
-    name="slot"
-    min="30"
-    step="5"
-  />
-</div>
-
+            <label class="form-label">Slot (min)</label>
+            <input
+              type="number"
+              class="form-control"
+              [(ngModel)]="form.slot"
+              name="slot"
+              min="30"
+              step="5"
+            />
+          </div>
 
           <div class="col-12 col-md-1">
-            <button
-              class="btn btn-primary w-100 add-slot-btn"
-              (click)="add()"
-            >
+            <button class="btn btn-primary w-100 add-slot-btn" (click)="add()">
               Agregar
             </button>
           </div>
@@ -115,8 +113,12 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let a of avail">
-        <td>{{ a.weekday }}</td>
+      <tr
+        *ngFor="let a of avail; let i = index"
+        [class.conflict]="i === conflictIndex"
+      >
+        <!-- nombre de día en vez de número -->
+        <td>{{ weekdayLabel(a.weekday) }}</td>
         <td>{{ a.specialty_name }}</td>
         <td>{{ a.hora_desde }}</td>
         <td>{{ a.hora_hasta }}</td>

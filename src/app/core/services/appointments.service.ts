@@ -77,7 +77,9 @@ export class AppointmentsService {
       .eq('active', true);
 
     if (aErr) throw aErr;
+    if (!avail || !avail.length) return [];
 
+    // ventana de 15 días hacia adelante
     const start = new Date();
     const end = new Date();
     end.setDate(start.getDate() + 15);
@@ -85,6 +87,7 @@ export class AppointmentsService {
     const startStr = start.toISOString().slice(0, 10);
     const endStr = end.toISOString().slice(0, 10);
 
+    // turnos ya tomados en esa ventana (PENDIENTE / ACEPTADO / REALIZADO)
     const { data: taken, error: tErr } = await this.sb
       .from('appointments')
       .select('fecha, hora, estado')
@@ -93,42 +96,33 @@ export class AppointmentsService {
       .gte('fecha', startStr)
       .lt('fecha', endStr)
       .in('estado', ['PENDIENTE', 'ACEPTADO', 'REALIZADO']);
+
     if (tErr) throw tErr;
 
+    // claves "YYYY-MM-DD HH:mm" de los horarios ocupados
     const takenSet = new Set(
-      (taken ?? []).map((r) => `${r.fecha}T${(r.hora as string).slice(0, 5)}`)
+      (taken ?? []).map((r) => `${r.fecha} ${(r.hora as string).slice(0, 5)}`)
     );
 
     const slots: Slot[] = [];
-    if (!avail || avail.length === 0) return slots;
-
-    const dowFromText = (w: string) => {
-      const s = w.toLowerCase();
-      if (s.startsWith('dom')) return 0;
-      if (s.startsWith('lun')) return 1;
-      if (s.startsWith('mar')) return 2;
-      if (s.startsWith('mié') || s.startsWith('mie')) return 3;
-      if (s.startsWith('jue')) return 4;
-      if (s.startsWith('vie')) return 5;
-      return 6;
-    };
 
     for (
       let d = new Date(start.getFullYear(), start.getMonth(), start.getDate());
       d < end;
       d.setDate(d.getDate() + 1)
     ) {
-      const dayDow = d.getDay();
+      const dayDow = d.getDay(); // 0..6
       const yyyy = d.getFullYear();
       const mm = String(d.getMonth() + 1).padStart(2, '0');
       const dd = String(d.getDate()).padStart(2, '0');
       const fechaStr = `${yyyy}-${mm}-${dd}`;
 
       for (const a of avail) {
-        const aDow = dowFromText(String(a.weekday ?? ''));
+        const aDow = Number(a.weekday); // viene 0..6 desde la BD
         if (aDow !== dayDow) continue;
 
         const slotMinutes = Number(a.slot_minutes ?? 30);
+
         const [hD, mD] = String(a.hora_desde)
           .split(':')
           .map((x) => parseInt(x, 10));
@@ -146,7 +140,9 @@ export class AppointmentsService {
         ) {
           const hh = String(t.getHours()).padStart(2, '0');
           const mi = String(t.getMinutes()).padStart(2, '0');
-          const key = `${fechaStr}T${hh}:${mi}`;
+          const key = `${fechaStr} ${hh}:${mi}`;
+
+          // si ya hay turno en ese horario, no agregamos el slot
           if (!takenSet.has(key)) {
             slots.push({ fecha: fechaStr, hora: `${hh}:${mi}:00` });
           }
@@ -154,6 +150,7 @@ export class AppointmentsService {
       }
     }
 
+    // ordenados por fecha+hora
     slots.sort((a, b) => (a.fecha + a.hora).localeCompare(b.fecha + b.hora));
     return slots;
   }

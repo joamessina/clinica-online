@@ -160,3 +160,109 @@
     font-size: 0.85rem;
   }
 }
+
+/* ---------- Card de exportación rápida por usuario ---------- */
+.quick-export-card {
+  border-radius: 0.8rem;
+
+  .card-body {
+    background: #ffffff;
+  }
+}
+
+.quick-pill-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(34, 197, 94, 0.12);
+  color: #16a34a;
+  font-size: 1rem;
+}
+
+/* Carrusel horizontal de usuarios */
+.quick-users-scroll {
+  display: flex;
+  gap: 0.75rem;
+  overflow-x: auto;
+  padding-top: 4px;
+  padding-bottom: 2px;
+}
+
+.quick-users-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.quick-users-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.quick-users-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.6);
+  border-radius: 999px;
+}
+
+/* Favbutton redondo con imagen + nombre */
+.fav-user {
+  border: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.fav-avatar-wrapper {
+  position: relative;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(13, 110, 253, 0.25);
+  background: #ffffff;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+.fav-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.fav-star {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #0d6efd;
+  color: #ffffff;
+  font-size: 0.7rem;
+  box-shadow: 0 0 0 2px #ffffff;
+}
+
+.fav-user:hover .fav-avatar-wrapper {
+  transform: translateY(-2px) scale(1.03);
+  border-color: #0d6efd;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+}
+
+.fav-name {
+  max-width: 92px;
+  font-size: 0.75rem;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
