@@ -1,0 +1,24 @@
+.admin-reports-page {
+  min-height: 100vh;
+}
+
+.report-card {
+  border-radius: 0.8rem;
+
+  .card-header {
+    background-color: #f9fafb;
+    border-bottom-color: #e5e7eb;
+  }
+}
+
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  min-height: 260px;
+}
+
+@media (max-width: 768px) {
+  .admin-reports-page {
+    padding-inline: 1rem;
+  }
+}

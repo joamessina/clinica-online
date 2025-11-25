@@ -1,0 +1,240 @@
+<div class="admin-reports-page container-fluid px-4 py-4">
+  <!-- HEADER -->
+  <div class="row mb-3">
+    <div
+      class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2"
+    >
+      <div>
+        <h1 class="h4 mb-1">Reportes y estadísticas</h1>
+        <p class="text-muted small mb-0">
+          Visualizá el log de ingresos al sistema y las estadísticas de turnos.
+        </p>
+      </div>
+
+      <div class="small text-muted" *ngIf="lastUpdated() as lu">
+        Última actualización: {{ lu | date : "short" }}
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div *ngIf="loading()" class="text-center text-muted py-5">
+    <div class="spinner-border text-primary mb-2" role="status"></div>
+    <div>Cargando reportes…</div>
+  </div>
+
+  <!-- CONTENIDO -->
+  <div *ngIf="!loading()">
+    <div class="row g-3">
+      <!-- LOG INGRESOS -->
+      <div class="col-12 col-xl-5">
+        <div class="card shadow-sm report-card h-100">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <div>
+              <div class="fw-semibold small text-uppercase text-muted">
+                Log de ingresos
+              </div>
+              <div class="small text-muted">
+                Últimos {{ loginLogs().length }} ingresos al sistema.
+              </div>
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button
+                class="btn btn-outline-secondary"
+                (click)="exportLoginsPdf()"
+              >
+                <i class="bi bi-file-earmark-pdf"></i>
+                PDF
+              </button>
+              <button
+                class="btn btn-outline-success"
+                (click)="exportLoginsExcel()"
+              >
+                <i class="bi bi-file-earmark-excel"></i>
+                Excel
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body p-0">
+            <div class="table-responsive small">
+              <table
+                class="table table-sm mb-0 align-middle table-striped table-hover"
+              >
+                <thead class="table-light">
+                  <tr>
+                    <th>Usuario</th>
+                    <th>Rol</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let l of loginLogs()">
+                    <td>{{ l.email }}</td>
+                    <td>{{ l.role || "—" }}</td>
+                    <td>{{ l.logged_at | date : "shortDate" }}</td>
+                    <td>{{ l.logged_at | date : "shortTime" }}</td>
+                  </tr>
+                  <tr *ngIf="!loginLogs().length">
+                    <td colspan="4" class="text-muted text-center py-3">
+                      No hay ingresos registrados todavía.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TURNOS POR ESPECIALIDAD -->
+      <div class="col-12 col-xl-7">
+        <div class="card shadow-sm report-card h-100">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <div>
+              <div class="fw-semibold small text-uppercase text-muted">
+                Turnos por especialidad
+              </div>
+              <div class="small text-muted">
+                Distribución de turnos en los últimos meses.
+              </div>
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button
+                class="btn btn-outline-secondary"
+                (click)="exportEspecialidadPdf()"
+              >
+                <i class="bi bi-file-earmark-pdf"></i>
+                PDF
+              </button>
+              <button
+                class="btn btn-outline-success"
+                (click)="exportEspecialidadExcel()"
+              >
+                <i class="bi bi-file-earmark-excel"></i>
+                Excel
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="chart-wrapper">
+              <canvas #especialidadChart></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TURNOS POR DÍA -->
+      <div class="col-12 col-xl-6">
+        <div class="card shadow-sm report-card h-100">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+          >
+            <div>
+              <div class="fw-semibold small text-uppercase text-muted">
+                Turnos por día
+              </div>
+              <div class="small text-muted">
+                Cantidad de turnos agendados por fecha.
+              </div>
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button
+                class="btn btn-outline-secondary"
+                (click)="exportDiaPdf()"
+              >
+                <i class="bi bi-file-earmark-pdf"></i>
+                PDF
+              </button>
+              <button
+                class="btn btn-outline-success"
+                (click)="exportDiaExcel()"
+              >
+                <i class="bi bi-file-earmark-excel"></i>
+                Excel
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="chart-wrapper">
+              <canvas #diaChart></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-xl-6">
+        <div class="card shadow-sm report-card h-100">
+          <div class="card-header">
+            <div
+              class="d-flex justify-content-between align-items-center mb-2 gap-2"
+            >
+              <div>
+                <div class="fw-semibold small text-uppercase text-muted">
+                  Turnos por médico
+                </div>
+                <div class="small text-muted">
+                  Solicitados vs finalizados en un rango de fechas.
+                </div>
+              </div>
+              <div class="btn-group btn-group-sm">
+                <button
+                  class="btn btn-outline-secondary"
+                  (click)="exportMedicoPdf()"
+                >
+                  <i class="bi bi-file-earmark-pdf"></i>
+                  PDF
+                </button>
+                <button
+                  class="btn btn-outline-success"
+                  (click)="exportMedicoExcel()"
+                >
+                  <i class="bi bi-file-earmark-excel"></i>
+                  Excel
+                </button>
+              </div>
+            </div>
+
+            <div class="row g-2 small">
+              <div class="col-6">
+                <label class="form-label mb-1">Desde</label>
+                <input
+                  type="date"
+                  class="form-control form-control-sm"
+                  [value]="rangeFrom()"
+                  (change)="onRangeChange($any($event.target).value, 'from')"
+                />
+              </div>
+              <div class="col-6">
+                <label class="form-label mb-1">Hasta</label>
+                <input
+                  type="date"
+                  class="form-control form-control-sm"
+                  [value]="rangeTo()"
+                  (change)="onRangeChange($any($event.target).value, 'to')"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="chart-wrapper">
+              <canvas #medicoChart></canvas>
+            </div>
+            <p class="small text-muted mt-2 mb-0">
+              Mostrando {{ medicoStats().length }} médico(s) con turnos en el
+              rango seleccionado.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

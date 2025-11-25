@@ -1,0 +1,178 @@
+.specialist-patients-page {
+  min-height: 100vh;
+}
+
+/* encabezado */
+.page-header h2 {
+  font-weight: 600;
+}
+
+.page-header .btn {
+  border-radius: 999px;
+}
+
+/* Card izquierda */
+.patients-card {
+  border-radius: 0.9rem;
+}
+
+.patient-list {
+  max-height: 450px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* favbutton redondo */
+.patient-pill {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.35rem 0.15rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease,
+    transform 0.12s ease;
+}
+
+.patient-pill .fav-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 2px solid rgba(13, 110, 253, 0.25);
+  background: #ffffff;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px #fff;
+}
+
+.patient-pill .fav-circle img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.patient-pill .patient-info .name {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.patient-pill .patient-info .meta {
+  font-size: 0.78rem;
+}
+
+.patient-pill:hover {
+  background: #e9f2ff;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15);
+  transform: translateY(-1px);
+}
+
+.patient-pill.active {
+  background: #e0edff;
+  box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.3);
+}
+
+/* Card derecha */
+.header-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 2px solid rgba(13, 110, 253, 0.25);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.header-avatar img {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* lista de consultas */
+.consultas-list {
+  margin-top: 0.25rem;
+}
+
+.consulta-item {
+  border: 0;
+  border-bottom: 1px solid #e5e7eb;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.consulta-item:last-child {
+  border-bottom: 0;
+}
+
+.estado-pill {
+  font-size: 0.7rem;
+}
+
+.resena-text {
+  white-space: pre-line;
+}
+
+/* responsive */
+@media (max-width: 768px) {
+  .patient-list {
+    max-height: 260px;
+  }
+
+  .consulta-item {
+    font-size: 0.9rem;
+  }
+}
+
+/* Pastilla del header sobre el fondo con dibujitos */
+.patients-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(6px);
+  box-shadow: 0 8px 24px -16px rgba(15, 23, 42, 0.25);
+  max-width: 540px;
+}
+
+.back-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+}
+
+.title-block {
+  min-width: 0;
+}
+
+.title-block .title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.title-block .subtitle {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0;
+}
+
+/* En móviles que no quede tan horizontal */
+@media (max-width: 576px) {
+  .patients-header {
+    border-radius: 16px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .back-btn {
+    box-shadow: none;
+  }
+}

@@ -2,7 +2,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { loginGuard } from './core/guards/login.guard';
-
+import { AdminReportsComponent } from './pages/admin-reports/admin-reports.component';
 export const routes: Routes = [
   // Home
   {
@@ -21,7 +21,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/login/login.component').then((m) => m.LoginComponent),
     canActivate: [loginGuard],
-    data: { animation: 'slideRight' }, // 👈 segunda animación
+    data: { animation: 'slideRight' },
   },
   {
     path: 'registro',
@@ -59,10 +59,13 @@ export const routes: Routes = [
         (m) => m.AdminUsersComponent
       ),
     canActivate: [authGuard],
-    data: { roles: ['admin'], animation: 'slideDown' }, // 👈 admin entra desde arriba
+    data: { roles: ['admin'], animation: 'slideDown' },
   },
 
-  // NUEVO — Sprint 2
+  {
+    path: 'admin/reportes',
+    component: AdminReportsComponent,
+  },
   {
     path: 'paciente/mis-turnos',
     loadComponent: () =>
@@ -99,6 +102,15 @@ export const routes: Routes = [
       ),
     canActivate: [authGuard],
     data: { roles: ['especialista'], animation: 'slideRight' },
+  },
+
+  {
+    path: 'especialista/mis-pacientes',
+    // mismo guard que uses para especialista
+    loadComponent: () =>
+      import(
+        './especialidades/specialist-patients/specialist-patients.component'
+      ).then((m) => m.SpecialistPatientsComponent),
   },
 
   {

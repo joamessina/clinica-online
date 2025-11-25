@@ -5,6 +5,26 @@ import { SupabaseClientService } from '../supabase/supabase-client.service';
 export class AuthService {
   private sb = inject(SupabaseClientService).client;
 
+  private async logLogin(
+    userId: string,
+    email: string | null,
+    role: string | null
+  ) {
+    try {
+      const { error } = await this.sb.from('login_logs').insert({
+        user_id: userId,
+        email,
+        role,
+      });
+
+      if (error) {
+        console.error('[auth] error guardando login_logs', error);
+      }
+    } catch (e) {
+      console.error('[auth] excepción guardando login_logs', e);
+    }
+  }
+
   signUpEmail(email: string, password: string) {
     return this.sb.auth.signUp({
       email,
@@ -35,6 +55,12 @@ export class AuthService {
       await this.sb.auth.signOut();
       return { ok: false, code: 'PENDIENTE' };
     }
+
+    await this.logLogin(
+      data.user.id,
+      data.user.email ?? null,
+      (prof as any)?.role ?? null
+    );
 
     return { ok: true };
   }

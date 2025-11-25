@@ -1,0 +1,187 @@
+<section class="specialist-patients-page container py-4">
+  <div class="patients-header mb-3">
+    <button
+      type="button"
+      class="btn btn-outline-secondary btn-sm back-btn"
+      routerLink="/especialista"
+    >
+      <i class="bi bi-arrow-left-short me-1"></i>
+      Volver al panel
+    </button>
+
+    <div class="title-block">
+      <h2 class="title mb-1">Mis pacientes</h2>
+      <p class="subtitle mb-0">
+        Pacientes que atendiste al menos una vez y reseñas de cada consulta.
+      </p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading()" class="text-center text-muted py-5">
+    <div class="spinner-border text-primary mb-2" role="status"></div>
+    <div>Cargando pacientes atendidos…</div>
+  </div>
+
+  <div *ngIf="!loading()" class="row g-3">
+    <!-- LISTA DE PACIENTES -->
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm patients-card h-100">
+        <div class="card-body">
+          <div
+            class="d-flex justify-content-between align-items-center mb-2 gap-2"
+          >
+            <div>
+              <div class="fw-semibold small text-uppercase text-muted">
+                Pacientes atendidos
+              </div>
+              <div class="small text-muted">
+                {{ pacientes().length || 0 }} paciente(s)
+              </div>
+            </div>
+
+            <div class="flex-grow-1 d-lg-none"></div>
+          </div>
+
+          <div class="mb-2">
+            <input
+              type="search"
+              class="form-control form-control-sm"
+              placeholder="Buscar por nombre, DNI, obra social…"
+              [value]="search()"
+              (input)="search.set($any($event.target).value)"
+            />
+          </div>
+
+          <div class="patient-list">
+            <button
+              type="button"
+              class="patient-pill"
+              *ngFor="let p of filteredPatients()"
+              [class.active]="selectedPatientId() === p.id"
+              (click)="seleccionarPaciente(p.id)"
+            >
+              <div class="fav-circle">
+                <img
+                  [src]="p.avatar_url"
+                  alt="avatar"
+                  (error)="imgFallback($event)"
+                />
+              </div>
+              <div class="patient-info">
+                <div class="name">{{ p.nombre }} {{ p.apellido }}</div>
+                <div class="meta small text-muted">
+                  {{ p.obra_social || "Sin obra social" }} ·
+                  {{ p.totalConsultas }} consulta(s)
+                </div>
+              </div>
+            </button>
+
+            <div
+              *ngIf="!filteredPatients().length"
+              class="text-muted small py-2"
+            >
+              No hay pacientes con ese filtro.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DETALLE DE CONSULTAS DEL PACIENTE -->
+    <div class="col-12 col-lg-8">
+      <div class="card shadow-sm h-100">
+        <div class="card-body" *ngIf="pacienteSeleccionado(); else noPaciente">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <div class="header-avatar">
+              <img
+                [src]="pacienteSeleccionado()!.avatar_url"
+                alt="avatar"
+                (error)="imgFallback($event)"
+              />
+            </div>
+            <div>
+              <div class="h6 mb-0">
+                {{ pacienteSeleccionado()!.nombre }}
+                {{ pacienteSeleccionado()!.apellido }}
+              </div>
+              <div class="small text-muted">
+                DNI:
+                {{ pacienteSeleccionado()!.dni || "—" }} · Obra social:
+                {{ pacienteSeleccionado()!.obra_social || "—" }}
+              </div>
+            </div>
+          </div>
+
+          <hr class="my-3" />
+
+          <div *ngIf="consultasSeleccionado().length; else sinConsultas">
+            <div class="small text-muted mb-2">
+              Consultas realizadas con este paciente:
+              {{ consultasSeleccionado().length }}
+            </div>
+
+            <div class="list-group list-group-flush consultas-list">
+              <div
+                class="list-group-item consulta-item"
+                *ngFor="let c of consultasSeleccionado()"
+              >
+                <div
+                  class="d-flex justify-content-between align-items-start gap-2"
+                >
+                  <div>
+                    <div class="fw-semibold">
+                      {{ c.fecha | date : "shortDate" }} ·
+                      {{ c.hora?.slice(0, 5) }}
+                    </div>
+                    <div class="small text-muted">
+                      {{ c.especialidad || "Sin especialidad" }}
+                    </div>
+                  </div>
+
+                  <span
+                    class="badge rounded-pill estado-pill"
+                    [ngClass]="{
+                      'bg-success-subtle text-success':
+                        c.estado === 'REALIZADO',
+                      'bg-secondary-subtle text-secondary':
+                        c.estado !== 'REALIZADO'
+                    }"
+                  >
+                    {{ c.estado }}
+                  </span>
+                </div>
+
+                <div class="mt-2 small">
+                  <strong>Reseña de la consulta:</strong>
+                  <ng-container *ngIf="c.resena_especialista; else sinResena">
+                    <p class="mb-0 resena-text">
+                      {{ c.resena_especialista }}
+                    </p>
+                  </ng-container>
+                  <ng-template #sinResena>
+                    <p class="mb-0 text-muted fst-italic">
+                      Sin reseña registrada para esta consulta.
+                    </p>
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #sinConsultas>
+            <p class="text-muted mb-0">
+              No encontramos consultas realizadas con este paciente.
+            </p>
+          </ng-template>
+        </div>
+
+        <ng-template #noPaciente>
+          <div class="p-4 text-muted text-center">
+            No hay pacientes con consultas realizadas todavía.
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</section>
