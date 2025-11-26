@@ -63,7 +63,7 @@
       </div>
 
       <!-- FILTROS -->
-      <div class="card shadow-sm mb-3 filters-card">
+      <div class="card shadow-sm mb-3 filters-card" appHoverElevate>
         <div class="card-body py-3">
           <div class="row g-2 align-items-center">
             <div class="col-12 col-lg-6">
@@ -127,6 +127,7 @@
       <div
         class="card shadow-sm quick-export-card mb-3"
         *ngIf="filtered().length"
+        appHoverElevate
       >
         <div class="card-body py-3">
           <div
@@ -171,14 +172,14 @@
                   <i class="bi bi-file-earmark-excel-fill"></i>
                 </span>
               </div>
-              <span class="fav-name">{{ nameOf(u) }}</span>
+              <span class="fav-name">{{ u | fullName }}</span>
             </button>
           </div>
         </div>
       </div>
 
       <!-- TABLA (CARD PRINCIPAL) -->
-      <div class="card shadow-sm users-table-card">
+      <div class="card shadow-sm users-table-card" appHoverElevate>
         <div class="card-body p-0">
           <div class="table-responsive position-relative">
             <!-- Spinner overlay -->
@@ -221,7 +222,7 @@
 
                   <!-- NOMBRE -->
                   <td class="fw-medium">
-                    <div>{{ nameOf(r) }}</div>
+                    <div>{{ r | fullName }}</div>
                     <div
                       class="text-muted small"
                       *ngIf="!r.nombre && !r.apellido"
@@ -238,7 +239,7 @@
                       [class.role-especialista]="r.role === 'especialista'"
                       [class.role-paciente]="r.role === 'paciente'"
                     >
-                      {{ r.role }}
+                      {{ r.role | roleLabel }}
                     </span>
                   </td>
 
@@ -279,7 +280,7 @@
                       [class.status-ok]="r.is_approved"
                       [class.status-pending]="!r.is_approved"
                     >
-                      {{ r.is_approved ? "Sí" : "Pendiente" }}
+                      {{ r.is_approved | yesNo : "Sí" : "Pendiente" }}
                     </span>
                   </td>
 

@@ -16,6 +16,14 @@ import {
   animate,
 } from '@angular/animations';
 
+import { FullNamePipe } from '../../shared/pipes/full-name.pipe';
+import { RoleLabelPipe } from '../../shared/pipes/role-label.pipe';
+import { YesNoPipe } from '../../shared/pipes/yes-no.pipe';
+
+import { HoverElevateDirective } from '../../shared/directives/hover-elevate.directive';
+import { RoleBadgeDirective } from '../../shared/directives/role-badge.directive';
+import { StatusBadgeDirective } from '../../shared/directives/status-badge.directive';
+
 type Role = 'admin' | 'especialista' | 'paciente';
 
 interface AdminUser {
@@ -34,7 +42,17 @@ interface AdminUser {
 @Component({
   standalone: true,
   selector: 'app-admin-users',
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    FullNamePipe,
+    RoleLabelPipe,
+    YesNoPipe,
+    HoverElevateDirective,
+    RoleBadgeDirective,
+    StatusBadgeDirective,
+  ],
   templateUrl: './admin-users.component.html',
   styleUrls: ['./admin-users.component.scss'],
   animations: [
