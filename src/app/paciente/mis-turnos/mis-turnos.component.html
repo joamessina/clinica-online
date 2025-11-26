@@ -8,7 +8,7 @@
           <div>
             <h3 class="h5 mb-1 d-flex align-items-center gap-2">
               <i class="bi bi-calendar-check text-primary fs-5"></i>
-              <span>Mis turnossss</span>
+              <span>Mis turnos</span>
             </h3>
             <p class="text-muted small mb-0">
               Revisá el estado de tus consultas y gestioná tus próximos turnos.
@@ -273,7 +273,8 @@
               <button
                 type="button"
                 class="btn btn-success"
-                (click)="submitFeedbackModal()"
+                [appCaptcha]="captchaEnabled"
+                (captchaPassed)="submitFeedbackModal()"
               >
                 Guardar
               </button>
@@ -392,7 +393,8 @@
               <button
                 type="button"
                 class="btn btn-primary"
-                (click)="submitSurveyModal()"
+                [appCaptcha]="captchaEnabled"
+                (captchaPassed)="submitSurveyModal()"
               >
                 Enviar encuesta
               </button>

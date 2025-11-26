@@ -29,8 +29,7 @@
             </button>
           </div>
 
-          <!-- Formulario solo cuando hay rol seleccionado -->
-          <form *ngIf="rol" #f="ngForm" (ngSubmit)="submit()" novalidate>
+          <form *ngIf="rol" #f="ngForm" novalidate>
             <!-- Datos personales -->
             <div class="row g-3">
               <div class="col-md-6">
@@ -210,7 +209,6 @@
               </div>
             </div>
 
-            <!-- Imagen + Especialidad (solo especialista) -->
             <div class="mt-4" *ngIf="rol === 'especialista'">
               <div class="row g-3">
                 <div class="col-md-6">
@@ -222,45 +220,93 @@
                     accept="image/*"
                   />
                 </div>
+
                 <div class="col-md-6">
-                  <label class="form-label">Especialidad existente</label>
-                  <select
-                    class="form-select"
-                    [(ngModel)]="selectedSpecialtyId"
-                    name="selEspecialidad"
-                  >
-                    <option [ngValue]="null">-- Seleccione --</option>
-                    <option value="-1">+ Nueva especialidad…</option>
-                    <option *ngFor="let s of specialties()" [ngValue]="s.id">
-                      {{ s.nombre }}
-                    </option>
-                  </select>
-                </div>
-                <div class="col-12" *ngIf="selectedSpecialtyId === '-1'">
-                  <div class="input-group">
-                    <input
-                      class="form-control"
-                      placeholder="Nombre de la nueva especialidad"
-                      [(ngModel)]="specialtyOther"
-                      name="espNueva"
-                    />
+                  <label class="form-label">Especialidades</label>
+
+                  <div class="specialty-multiselect">
                     <button
                       type="button"
-                      class="btn btn-outline-secondary"
-                      (click)="addSpecialty()"
+                      class="specialty-multiselect-toggle"
+                      [class.open]="specialtyDropdownOpen"
+                      (click)="toggleSpecialtyDropdown()"
                     >
-                      <i class="bi bi-plus-lg me-1"></i> Marcar como nueva
+                      <span
+                        *ngIf="
+                          selectedSpecialtiesLabels().length;
+                          else specialtiesPlaceholder
+                        "
+                      >
+                        {{ selectedSpecialtiesLabels().join(", ") }}
+                      </span>
+
+                      <ng-template #specialtiesPlaceholder>
+                        <span class="specialty-multiselect-placeholder">
+                          Seleccioná una o varias especialidades
+                        </span>
+                      </ng-template>
+
+                      <i
+                        class="bi bi-chevron-down ms-auto small text-muted"
+                      ></i>
                     </button>
+
+                    <div
+                      class="specialty-multiselect-dropdown"
+                      *ngIf="specialtyDropdownOpen"
+                    >
+                      <div
+                        class="specialty-option"
+                        *ngFor="let s of specialties()"
+                      >
+                        <label class="form-check-label">
+                          <input
+                            type="checkbox"
+                            class="form-check-input me-2"
+                            [checked]="isSpecialtySelected(s.id)"
+                            (change)="
+                              toggleSpecialty(s.id, $any($event.target).checked)
+                            "
+                          />
+                          <span>{{ s.nombre }}</span>
+                        </label>
+                      </div>
+
+                      <div class="specialty-multiselect-footer">
+                        <div class="input-group input-group-sm">
+                          <input
+                            class="form-control"
+                            placeholder="Agregar nueva especialidad"
+                            [(ngModel)]="specialtyOtherInput"
+                            name="espNueva"
+                          />
+                          <button
+                            type="button"
+                            class="btn btn-outline-secondary"
+                            (click)="addSpecialty()"
+                          >
+                            <i class="bi bi-plus-lg me-1"></i>
+                            Agregar
+                          </button>
+                        </div>
+                        <div class="form-text mt-1">
+                          Las especialidades nuevas se usan solo para este
+                          registro.
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <div class="form-text">
-                    Escribí el nombre de la especialidad.
+
+                  <div class="form-text mt-1">
+                    Podés seleccionar una o varias especialidades marcando las
+                    casillas.
                   </div>
                 </div>
               </div>
             </div>
 
             <hr class="my-4" />
-            <div class="mb-3">
+            <div class="mb-3" *ngIf="captchaEnabled">
               <label class="form-label">Captcha</label>
               <app-recaptcha
                 [siteKey]="siteKey"
@@ -271,7 +317,13 @@
 
             <!-- Submit -->
             <div class="d-grid mt-4">
-              <button type="submit" class="btn btn-primary btn-lg">
+              <button
+                type="button"
+                class="btn btn-primary btn-lg"
+                [appCaptcha]="captchaEnabled"
+                [persist]="false"
+                (captchaPassed)="submit()"
+              >
                 <span
                   class="spinner-border spinner-border-sm me-2"
                   *ngIf="loading"

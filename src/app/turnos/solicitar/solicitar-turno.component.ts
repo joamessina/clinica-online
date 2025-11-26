@@ -8,6 +8,8 @@ import { AuthService } from '../../core/services/auth.service';
 import { ToastService } from '../../core/services/toast.service';
 import { BackButtonComponent } from '../../shared/back-button/back-button.component';
 import { SupabaseClientService } from '../../core/supabase/supabase-client.service';
+import { CaptchaDirective } from '../../shared/directives/captcha.directive';
+import { environment } from '../../../environments/environment';
 
 type Especialidad = { id: string; nombre: string };
 type Especialista = {
@@ -20,7 +22,7 @@ type Especialista = {
 @Component({
   standalone: true,
   selector: 'app-solicitar-turno',
-  imports: [CommonModule, BackButtonComponent],
+  imports: [CommonModule, BackButtonComponent, CaptchaDirective],
   templateUrl: './solicitar-turno.component.html',
   styleUrls: ['./solicitar-turno.component.scss'],
 })
@@ -30,6 +32,7 @@ export class SolicitarTurnoComponent implements OnInit {
   private toast = inject(ToastService);
   private sb = inject(SupabaseClientService).client;
   private avatars = this.sb.storage.from('avatars');
+  captchaEnabled = environment.captchaEnabled;
 
   readonly defaultSpecialtyIcon = this.avatars.getPublicUrl(
     'system/especialidad.jpg'

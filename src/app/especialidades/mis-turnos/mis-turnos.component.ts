@@ -39,6 +39,10 @@ export class MisTurnosEspecialistaComponent implements OnInit {
       { key: '', value: '' },
       { key: '', value: '' },
     ] as ClinicalHistoryExtra[],
+
+    extraRango: 0 as number, // control de rango 0–100
+    extraNumero: null as number | null, // input numérico
+    extraSwitch: false as boolean, // switch Sí / No
   };
 
   showHistoryModal = false;
@@ -171,6 +175,9 @@ export class MisTurnosEspecialistaComponent implements OnInit {
         { key: '', value: '' },
         { key: '', value: '' },
       ],
+      extraRango: 0,
+      extraNumero: null,
+      extraSwitch: false,
     };
     this.historyResena = '';
 
@@ -187,6 +194,33 @@ export class MisTurnosEspecialistaComponent implements OnInit {
     }
 
     try {
+      const extrasLibres: ClinicalHistoryExtra[] = (
+        this.historyForm.extras ?? []
+      ).filter((e) => (e.key && e.key.trim()) || (e.value && e.value.trim()));
+
+      const extrasSprint: ClinicalHistoryExtra[] = [
+        {
+          key: 'Puntaje 0-100',
+          value:
+            this.historyForm.extraRango !== null
+              ? String(this.historyForm.extraRango)
+              : '',
+        },
+        {
+          key: 'Valor numérico adicional',
+          value:
+            this.historyForm.extraNumero !== null
+              ? String(this.historyForm.extraNumero)
+              : '',
+        },
+        {
+          key: 'Requiere seguimiento',
+          value: this.historyForm.extraSwitch ? 'Sí' : 'No',
+        },
+      ];
+
+      const extras: ClinicalHistoryExtra[] = [...extrasLibres, ...extrasSprint];
+
       await this.history.createForAppointment(this.historyAppointmentId!, {
         patient_id: this.historyPatientId!,
         specialist_id: this.historySpecialistId!,
@@ -194,7 +228,7 @@ export class MisTurnosEspecialistaComponent implements OnInit {
         peso: this.historyForm.peso,
         temperatura: this.historyForm.temperatura,
         presion: this.historyForm.presion || null,
-        extras: this.historyForm.extras,
+        extras,
       });
     } catch (hErr) {
       console.error(hErr);

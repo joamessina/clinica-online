@@ -16,7 +16,6 @@
   </div>
 </div>
 
-
 <!-- BUSCADOR CON ICONO -->
 <div class="search-wrapper mb-3">
   <i class="bi bi-search"></i>
@@ -188,6 +187,57 @@
                 name="extra_value_{{ i }}"
               />
             </div>
+          </div>
+        </div>
+        <!-- 1) CONTROL DE RANGO 0–100 -->
+        <div class="col-12">
+          <label class="form-label"
+            >Índice de severidad clínica (0 a 100)</label
+          >
+          <p class="form-text small mb-1">
+            0 = asintomático · 100 = máxima severidad reportada.
+          </p>
+          <div class="d-flex align-items-center gap-3">
+            <input
+              type="range"
+              min="0"
+              max="100"
+              class="form-range flex-grow-1"
+              [(ngModel)]="historyForm.extraRango"
+              name="extra_rango"
+            />
+            <span class="badge bg-primary-subtle text-primary">
+              {{ historyForm.extraRango ?? 0 }}
+            </span>
+          </div>
+        </div>
+
+        <!-- 2) CUADRO DE TEXTO NUMÉRICO -->
+        <div class="col-12">
+          <label class="form-label">Oxigeno en Sangre</label>
+          <input
+            type="number"
+            class="form-control"
+            [(ngModel)]="historyForm.extraNumero"
+            name="extra_numero"
+          />
+        </div>
+
+        <!-- 3) SWITCH “SI / NO” -->
+        <div class="col-12">
+          <label class="form-label d-block">¿Requiere seguimiento?</label>
+          <div class="form-check form-switch">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              role="switch"
+              id="extraSwitch"
+              [(ngModel)]="historyForm.extraSwitch"
+              name="extra_switch"
+            />
+            <label class="form-check-label" for="extraSwitch">
+              {{ historyForm.extraSwitch ? "Sí" : "No" }}
+            </label>
           </div>
         </div>
 

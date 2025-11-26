@@ -177,7 +177,9 @@
               type="button"
               class="hour-sq"
               *ngFor="let h of hours"
-              (click)="reservarTurno(h)"
+              [appCaptcha]="captchaEnabled"
+              [persist]="true"
+              (captchaPassed)="reservarTurno(h)"
             >
               {{ h }}
             </button>

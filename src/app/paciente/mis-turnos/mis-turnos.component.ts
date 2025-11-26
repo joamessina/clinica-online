@@ -7,18 +7,20 @@ import {
 } from '../../core/services/appointments.service';
 import { BackButtonComponent } from '../../shared/back-button/back-button.component';
 import { HistoryService } from '../../core/services/history.service';
+import { CaptchaDirective } from '../../shared/directives/captcha.directive';
+import { environment } from '../../../environments/environment';
 
 @Component({
   standalone: true,
   selector: 'app-mis-turnos-paciente',
-  imports: [CommonModule, FormsModule, BackButtonComponent],
+  imports: [CommonModule, FormsModule, BackButtonComponent, CaptchaDirective],
   templateUrl: './mis-turnos.component.html',
   styleUrls: ['./mis-turnos.component.scss'],
 })
 export class MisTurnosPacienteComponent implements OnInit {
   private history = inject(HistoryService);
   private svc = inject(AppointmentsService);
-
+  captchaEnabled = environment.captchaEnabled;
   turnos = signal<Turno[]>([]);
   q = signal('');
 

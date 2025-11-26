@@ -331,27 +331,96 @@ export class AdminUsersComponent implements OnInit {
   async load() {
     this.loading.set(true);
 
-    const { data, error } = await this.sb
-      .from('profiles')
-      .select(
-        `
-      id,nombre,apellido,email,dni,obra_social,role,is_approved,avatar_url,
-      profile_specialty:profile_specialty (
-        specialties:specialties ( nombre )
-      )
-    `
-      )
-      .order('created_at', { ascending: false });
+    try {
+      // 1) Perfiles
+      const { data: profileRows, error: profilesErr } = await this.sb
+        .from('profiles')
+        .select(
+          'id,nombre,apellido,email,dni,obra_social,role,is_approved,avatar_url,created_at'
+        )
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('[admin/users] load error', error);
-      this.rows.set([]);
-    } else {
-      const mapped = (data ?? []).map((r: any): AdminUser => {
-        const specialties: string[] =
-          r.profile_specialty
-            ?.map((ps: any) => ps?.specialties?.nombre)
-            .filter(Boolean) ?? [];
+      if (profilesErr) {
+        throw profilesErr;
+      }
+
+      // 2) Relaciones perfil–especialidad
+      const { data: linkRows, error: linksErr } = await this.sb
+        .from('profile_specialty')
+        .select('profile_id,specialty_id');
+
+      if (linksErr) {
+        throw linksErr;
+      }
+
+      // 3) Catálogo de especialidades
+      const { data: specRows, error: specsErr } = await this.sb
+        .from('specialties')
+        .select('id,nombre');
+
+      if (specsErr) {
+        throw specsErr;
+      }
+
+      // 4) Pendientes (para specialty_other del registro)
+      const { data: pendingRows, error: pendingErr } = await this.sb
+        .from('pending_profiles')
+        .select('email, rol, specialty_other');
+
+      if (pendingErr) {
+        console.warn('[admin/users] pending_profiles error', pendingErr);
+      }
+
+      // ---- Mapas auxiliares ----
+
+      // id de especialidad -> nombre
+      const specNameById = new Map<string, string>();
+      (specRows ?? []).forEach((s: any) => {
+        if (s.id && s.nombre) {
+          specNameById.set(s.id, s.nombre);
+        }
+      });
+
+      // profile_id -> [nombres de especialidades "normales"]
+      const specialtiesByProfile = new Map<string, string[]>();
+      (linkRows ?? []).forEach((l: any) => {
+        const name = specNameById.get(l.specialty_id);
+        if (!name) return;
+
+        const current = specialtiesByProfile.get(l.profile_id) ?? [];
+        if (!current.includes(name)) {
+          current.push(name);
+        }
+        specialtiesByProfile.set(l.profile_id, current);
+      });
+
+      // email -> [especialidades "otras" (texto libre)]
+      const specialtyOtherByEmail = new Map<string, string[]>();
+      (pendingRows ?? []).forEach((p: any) => {
+        if (p.rol !== 'especialista') return;
+        if (!p.email || !p.specialty_other) return;
+
+        const email = String(p.email).toLowerCase();
+        const extras = String(p.specialty_other)
+          .split(',')
+          .map((x) => x.trim())
+          .filter(Boolean);
+
+        if (extras.length) {
+          specialtyOtherByEmail.set(email, extras);
+        }
+      });
+
+      // ---- Mapeo final a AdminUser ----
+      const mapped = (profileRows ?? []).map((r: any): AdminUser => {
+        const baseSpecs = specialtiesByProfile.get(r.id) ?? [];
+
+        const extraSpecs =
+          r.email && typeof r.email === 'string'
+            ? specialtyOtherByEmail.get(r.email.toLowerCase()) ?? []
+            : [];
+
+        const allSpecs = [...baseSpecs, ...extraSpecs];
 
         return {
           id: r.id,
@@ -363,13 +432,17 @@ export class AdminUsersComponent implements OnInit {
           role: r.role,
           is_approved: r.is_approved,
           avatar_url: this.normalizeAvatar(r.avatar_url ?? null),
-          specialties,
+          specialties: allSpecs,
         };
       });
 
       this.rows.set(mapped);
+    } catch (err) {
+      console.error('[admin/users] load error', err);
+      this.rows.set([]);
+    } finally {
+      this.loading.set(false);
     }
-    this.loading.set(false);
   }
 
   nameOf(r: AdminUser) {
