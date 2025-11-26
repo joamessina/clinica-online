@@ -22,3 +22,48 @@
     padding-inline: 1rem;
   }
 }
+
+.hero-row {
+  margin-top: 0.5rem;
+}
+
+.hero-pill {
+  background: #e5f1ff;              // azul muy suave
+  border: 1px solid #c4ddff;        // borde azul clarito
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  max-width: 100%;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.06);
+}
+
+.hero-pill__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #1d4ed8;                   // azul un poco más fuerte
+}
+
+.hero-pill__value {
+  font-weight: 600;
+  color: #0f172a;                   // casi negro para el número
+}
+
+.hero-pill__hint {
+  font-size: 0.75rem;
+  color: #334155;                   // gris azulado
+}
+
+
+/* versión un poquito más chica para subtítulos / leyendas */
+.hero-pill--sm {
+  font-size: 0.8rem;
+  padding: 0.15rem 0.6rem;
+}
+
+/* que el texto interno no quede gris clarito */
+.hero-pill .text-muted {
+  color: #111827 !important;
+}

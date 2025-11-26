@@ -283,124 +283,222 @@
         </div>
 
         <!-- MODAL: Encuesta de atención -->
-        <div class="modal-backdrop-blur" *ngIf="showSurveyModal()">
-          <div class="modal-card modal-card--wide turno-modal">
-            <div class="modal-card__header">
-              <h5 class="modal-card__title mb-0">Encuesta de atención</h5>
-              <button
-                type="button"
-                class="modal-card__close"
-                (click)="closeSurveyModal()"
-                aria-label="Cerrar"
-              >
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
+<!-- MODAL: Encuesta de atención -->
+<div class="modal-backdrop-blur" *ngIf="showSurveyModal()">
+  <div class="modal-card modal-card--wide turno-modal">
+    <div class="modal-card__header">
+      <h5 class="modal-card__title mb-0">Encuesta de atención</h5>
+      <button
+        type="button"
+        class="modal-card__close"
+        (click)="closeSurveyModal()"
+        aria-label="Cerrar"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
 
-            <div class="modal-card__body">
-              <p class="small text-muted mb-3">
-                Ayudanos a mejorar respondiendo estas preguntas sobre el turno
-                con
-                <strong>{{ selectedTurno()?.especialista_nombre }}</strong
-                >.
-              </p>
+    <div class="modal-card__body">
+      <p class="small text-muted mb-3">
+        Ayudanos a mejorar respondiendo estas preguntas sobre el turno con
+        <strong>{{ selectedTurno()?.especialista_nombre }}</strong>.
+      </p>
 
-              <div class="mb-3">
-                <label class="form-label small d-block mb-1"
-                  >¿Te atendieron a horario?</label
-                >
-                <div class="btn-group" role="group">
-                  <button
-                    type="button"
-                    class="btn btn-sm"
-                    [ngClass]="
-                      surveyP1() === 'si'
-                        ? 'btn-primary'
-                        : 'btn-outline-primary'
-                    "
-                    (click)="surveyP1.set('si')"
-                  >
-                    Sí
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-sm"
-                    [ngClass]="
-                      surveyP1() === 'no'
-                        ? 'btn-primary'
-                        : 'btn-outline-primary'
-                    "
-                    (click)="surveyP1.set('no')"
-                  >
-                    No
-                  </button>
-                </div>
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label small d-block mb-1"
-                  >¿Recomendarías al especialista?</label
-                >
-                <div class="btn-group" role="group">
-                  <button
-                    type="button"
-                    class="btn btn-sm"
-                    [ngClass]="
-                      surveyP2() === 'si'
-                        ? 'btn-primary'
-                        : 'btn-outline-primary'
-                    "
-                    (click)="surveyP2.set('si')"
-                  >
-                    Sí
-                  </button>
-                  <button
-                    type="button"
-                    class="btn btn-sm"
-                    [ngClass]="
-                      surveyP2() === 'no'
-                        ? 'btn-primary'
-                        : 'btn-outline-primary'
-                    "
-                    (click)="surveyP2.set('no')"
-                  >
-                    No
-                  </button>
-                </div>
-              </div>
-
-              <div>
-                <label class="form-label small mb-1"
-                  >Comentario (opcional)</label
-                >
-                <textarea
-                  class="form-control form-control-sm"
-                  rows="3"
-                  [ngModel]="surveyComment()"
-                  (ngModelChange)="surveyComment.set($event)"
-                ></textarea>
-              </div>
-            </div>
-
-            <div class="modal-card__footer">
-              <button
-                type="button"
-                class="btn btn-outline-light me-2"
-                (click)="closeSurveyModal()"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                class="btn btn-primary"
-                [appCaptcha]="captchaEnabled"
-                (captchaPassed)="submitSurveyModal()"
-              >
-                Enviar encuesta
-              </button>
-            </div>
-          </div>
+      <!-- 1) Radio buttons: ¿te atendieron a horario? -->
+      <div class="mb-3">
+        <label class="form-label small d-block mb-1">
+          ¿Te atendieron a horario?
+        </label>
+        <div class="btn-group" role="group">
+          <button
+            type="button"
+            class="btn btn-sm"
+            [ngClass]="
+              surveyP1() === 'si' ? 'btn-primary' : 'btn-outline-primary'
+            "
+            (click)="surveyP1.set('si')"
+          >
+            Sí
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm"
+            [ngClass]="
+              surveyP1() === 'no' ? 'btn-primary' : 'btn-outline-primary'
+            "
+            (click)="surveyP1.set('no')"
+          >
+            No
+          </button>
         </div>
+      </div>
+
+      <!-- 2) Radio buttons: ¿recomendarías al especialista? -->
+      <div class="mb-3">
+        <label class="form-label small d-block mb-1">
+          ¿Recomendarías al especialista?
+        </label>
+        <div class="btn-group" role="group">
+          <button
+            type="button"
+            class="btn btn-sm"
+            [ngClass]="
+              surveyP2() === 'si' ? 'btn-primary' : 'btn-outline-primary'
+            "
+            (click)="surveyP2.set('si')"
+          >
+            Sí
+          </button>
+          <button
+            type="button"
+            class="btn btn-sm"
+            [ngClass]="
+              surveyP2() === 'no' ? 'btn-primary' : 'btn-outline-primary'
+            "
+            (click)="surveyP2.set('no')"
+          >
+            No
+          </button>
+        </div>
+      </div>
+
+      <!-- 3) Estrellas 1–5 -->
+      <div class="mb-3">
+        <label class="form-label small d-block mb-1">
+          Calificá la atención (1 = muy mala, 5 = excelente)
+        </label>
+        <div class="d-flex gap-1">
+          <button
+            type="button"
+            class="btn btn-sm btn-light border-0"
+            *ngFor="let n of [1, 2, 3, 4, 5]"
+            [class.text-warning]="surveyRating() >= n"
+            (click)="surveyRating.set(n)"
+          >
+            <i
+              class="bi"
+              [ngClass]="surveyRating() >= n ? 'bi-star-fill' : 'bi-star'"
+            ></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- 4) Checkboxes de aspectos -->
+      <div class="mb-3">
+        <label class="form-label small d-block mb-1">
+          ¿Qué aspectos destacarías de la atención? (podés elegir varios)
+        </label>
+        <div class="form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            id="chkPuntualidad"
+            [checked]="surveyPuntualidad()"
+            (change)="surveyPuntualidad.set($any($event.target).checked)"
+          />
+          <label class="form-check-label small" for="chkPuntualidad">
+            Puntualidad
+          </label>
+        </div>
+
+        <div class="form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            id="chkAtencion"
+            [checked]="surveyAtencion()"
+            (change)="surveyAtencion.set($any($event.target).checked)"
+          />
+          <label class="form-check-label small" for="chkAtencion">
+            Calidad de la atención
+          </label>
+        </div>
+
+        <div class="form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            id="chkInstalaciones"
+            [checked]="surveyInstalaciones()"
+            (change)="surveyInstalaciones.set($any($event.target).checked)"
+          />
+          <label class="form-check-label small" for="chkInstalaciones">
+            Instalaciones / comodidad
+          </label>
+        </div>
+
+        <div class="form-check">
+          <input
+            type="checkbox"
+            class="form-check-input"
+            id="chkOtro"
+            [checked]="surveyOtro()"
+            (change)="surveyOtro.set($any($event.target).checked)"
+          />
+          <label class="form-check-label small" for="chkOtro">
+            Otro aspecto
+          </label>
+        </div>
+      </div>
+
+      <!-- 5) Control de rango 1–10 -->
+      <div class="mb-3">
+        <label class="form-label small d-block mb-1">
+          En general, ¿qué tan satisfecho quedaste con la atención?
+          <span class="fw-semibold">
+            ({{ surveySatisfaction() }}/10)
+          </span>
+        </label>
+        <input
+          type="range"
+          class="form-range"
+          min="1"
+          max="10"
+          [ngModel]="surveySatisfaction()"
+          (ngModelChange)="surveySatisfaction.set($event)"
+        />
+        <div class="d-flex justify-content-between small text-muted mt-1">
+          <span>Poca satisfacción</span>
+          <span>Mucha satisfacción</span>
+        </div>
+      </div>
+
+      <!-- ÚNICO cuadro de texto -->
+      <div class="mb-0">
+        <label class="form-label small mb-1">
+          Comentario adicional (opcional)
+        </label>
+        <textarea
+          class="form-control form-control-sm"
+          rows="3"
+          [ngModel]="surveyComment()"
+          (ngModelChange)="surveyComment.set($event)"
+        ></textarea>
+      </div>
+    </div>
+
+    <div class="modal-card__footer">
+      <button
+        type="button"
+        class="btn btn-outline-light me-2"
+        (click)="closeSurveyModal()"
+      >
+        Cancelar
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        [appCaptcha]="captchaEnabled"
+        (captchaPassed)="submitSurveyModal()"
+      >
+        Enviar encuesta
+      </button>
+    </div>
+  </div>
+</div>
+
+
+
       </div>
     </div>
   </div>

@@ -15,7 +15,7 @@ import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
+import { Chart, ChartConfiguration, registerables } from 'chart.js';
 
 Chart.register(...registerables);
 
@@ -34,6 +34,13 @@ interface TurnoAdmin {
   especialidad_nombre: string | null;
   especialista_nombre: string | null;
   specialist_id: string | null;
+  patient_id: string | null;
+  specialty_id: string | null;
+}
+
+interface SurveyRow {
+  respuestas: any;
+  created_at: string;
 }
 
 @Component({
@@ -50,12 +57,36 @@ export class AdminReportsComponent implements OnInit, AfterViewInit {
   lastUpdated = signal<Date | null>(null);
 
   loginLogs = signal<LoginLog[]>([]);
-
   turnosRaw = signal<TurnoAdmin[]>([]);
+  surveyRows = signal<SurveyRow[]>([]);
 
   rangeFrom = signal<string>('');
   rangeTo = signal<string>('');
 
+  // === INDICADORES GENERALES ===
+  totalTurnos = computed(() => this.turnosRaw().length);
+
+  visitasRealizadas = computed(
+    () => this.turnosRaw().filter((t) => t.estado === 'REALIZADO').length
+  );
+
+  totalPacientesUnicos = computed(() => {
+    const s = new Set<string>();
+    for (const t of this.turnosRaw()) {
+      if (t.patient_id) s.add(t.patient_id);
+    }
+    return s.size;
+  });
+
+  totalMedicosUnicos = computed(() => {
+    const s = new Set<string>();
+    for (const t of this.turnosRaw()) {
+      if (t.specialist_id) s.add(t.specialist_id);
+    }
+    return s.size;
+  });
+
+  // === TURNOS POR ESPECIALIDAD / DÍA / MÉDICO ===
   turnosPorEspecialidad = computed(() => {
     const rows = this.turnosRaw();
     const map = new Map<string, number>();
@@ -108,6 +139,72 @@ export class AdminReportsComponent implements OnInit, AfterViewInit {
       .sort((a, b) => b.solicitados - a.solicitados);
   });
 
+  // === PACIENTES / MÉDICOS POR ESPECIALIDAD ===
+  pacientesPorEspecialidad = computed(() => {
+    const map = new Map<string, Set<string>>();
+
+    for (const t of this.turnosRaw()) {
+      const esp = t.especialidad_nombre || 'Sin especialidad';
+      const pid = t.patient_id;
+      if (!pid) continue;
+      if (!map.has(esp)) map.set(esp, new Set());
+      map.get(esp)!.add(pid);
+    }
+
+    return Array.from(map.entries())
+      .map(([label, set]) => ({ label, count: set.size }))
+      .sort((a, b) => b.count - a.count);
+  });
+
+  medicosPorEspecialidad = computed(() => {
+    const map = new Map<string, Set<string>>();
+
+    for (const t of this.turnosRaw()) {
+      const esp = t.especialidad_nombre || 'Sin especialidad';
+      const mid = t.specialist_id;
+      if (!mid) continue;
+      if (!map.has(esp)) map.set(esp, new Set());
+      map.get(esp)!.add(mid);
+    }
+
+    return Array.from(map.entries())
+      .map(([label, set]) => ({ label, count: set.size }))
+      .sort((a, b) => b.count - a.count);
+  });
+
+  // === ESTADÍSTICAS ENCUESTA DE ATENCIÓN (últimos 30 días) ===
+  surveyStats = computed(() => {
+    const rows = this.surveyRows();
+    let total = rows.length;
+    let p1Si = 0;
+    let p1No = 0;
+    let p2Si = 0;
+    let p2No = 0;
+    let ratingSum = 0;
+    let ratingCount = 0;
+
+    for (const r of rows) {
+      const resp = r.respuestas || {};
+      if (resp.p1 === 'si') p1Si++;
+      else if (resp.p1 === 'no') p1No++;
+
+      if (resp.p2 === 'si') p2Si++;
+      else if (resp.p2 === 'no') p2No++;
+
+      const rating = Number(resp.rating ?? resp.calificacion ?? 0);
+      if (!Number.isNaN(rating) && rating > 0) {
+        ratingSum += rating;
+        ratingCount++;
+      }
+    }
+
+    const avgRating =
+      ratingCount > 0 ? Number((ratingSum / ratingCount).toFixed(1)) : null;
+
+    return { total, p1Si, p1No, p2Si, p2No, avgRating };
+  });
+
+  // === VIEWCHILD DE GRÁFICOS ===
   @ViewChild('especialidadChart')
   especialidadChartRef?: ElementRef<HTMLCanvasElement>;
 
@@ -117,9 +214,21 @@ export class AdminReportsComponent implements OnInit, AfterViewInit {
   @ViewChild('medicoChart')
   medicoChartRef?: ElementRef<HTMLCanvasElement>;
 
+  @ViewChild('pacientesEspChart')
+  pacientesEspChartRef?: ElementRef<HTMLCanvasElement>;
+
+  @ViewChild('medicosEspChart')
+  medicosEspChartRef?: ElementRef<HTMLCanvasElement>;
+
+  @ViewChild('surveyChart')
+  surveyChartRef?: ElementRef<HTMLCanvasElement>;
+
   private especialidadChart?: Chart;
   private diaChart?: Chart;
   private medicoChart?: Chart;
+  private pacientesEspChart?: Chart;
+  private medicosEspChart?: Chart;
+  private surveyChart?: Chart;
 
   async ngOnInit() {
     this.initDefaultRange();
@@ -144,7 +253,11 @@ export class AdminReportsComponent implements OnInit, AfterViewInit {
 
   private async loadData() {
     try {
-      await Promise.all([this.loadLoginLogs(), this.loadAppointments()]);
+      await Promise.all([
+        this.loadLoginLogs(),
+        this.loadAppointments(),
+        this.loadSurveys(),
+      ]);
       this.lastUpdated.set(new Date());
     } finally {
       this.loading.set(false);
@@ -176,7 +289,7 @@ export class AdminReportsComponent implements OnInit, AfterViewInit {
     const { data, error } = await this.sb
       .from('v_appointments_admin')
       .select(
-        'fecha, hora, estado, especialidad_nombre, especialista_nombre, specialist_id'
+        'fecha, hora, estado, especialidad_nombre, especialista_nombre, specialist_id, patient_id, specialty_id'
       )
       .gte('fecha', fromStr)
       .order('fecha', { ascending: true })
@@ -191,6 +304,26 @@ export class AdminReportsComponent implements OnInit, AfterViewInit {
     this.turnosRaw.set((data ?? []) as TurnoAdmin[]);
   }
 
+  private async loadSurveys() {
+    const from = new Date();
+    from.setDate(from.getDate() - 30);
+    const fromStr = from.toISOString();
+
+    const { data, error } = await this.sb
+      .from('patient_survey')
+      .select('respuestas, created_at')
+      .gte('created_at', fromStr)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('[admin/reports] loadSurveys', error);
+      this.surveyRows.set([]);
+      return;
+    }
+
+    this.surveyRows.set((data ?? []) as SurveyRow[]);
+  }
+
   onRangeChange(value: string, which: 'from' | 'to') {
     if (which === 'from') this.rangeFrom.set(value);
     else this.rangeTo.set(value);
@@ -202,9 +335,13 @@ export class AdminReportsComponent implements OnInit, AfterViewInit {
       this.buildEspecialidadChart();
       this.buildDiaChart();
       this.buildMedicoChart();
+      this.buildPacientesEspChart();
+      this.buildMedicosEspChart();
+      this.buildSurveyChart();
     }, 0);
   }
 
+  // === BUILD CHARTS ===
   private buildEspecialidadChart() {
     const ref = this.especialidadChartRef;
     if (!ref) return;
@@ -232,14 +369,9 @@ export class AdminReportsComponent implements OnInit, AfterViewInit {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-        },
+        plugins: { legend: { display: false } },
         scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { precision: 0 },
-          },
+          y: { beginAtZero: true, ticks: { precision: 0 } },
         },
       },
     } as ChartConfiguration);
@@ -273,14 +405,9 @@ export class AdminReportsComponent implements OnInit, AfterViewInit {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-        },
+        plugins: { legend: { display: false } },
         scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { precision: 0 },
-          },
+          y: { beginAtZero: true, ticks: { precision: 0 } },
         },
       },
     } as ChartConfiguration);
@@ -305,29 +432,132 @@ export class AdminReportsComponent implements OnInit, AfterViewInit {
       data: {
         labels,
         datasets: [
-          {
-            label: 'Solicitados',
-            data: solicitados,
-          },
-          {
-            label: 'Finalizados',
-            data: finalizados,
-          },
+          { label: 'Solicitados', data: solicitados },
+          { label: 'Finalizados', data: finalizados },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          y: {
-            beginAtZero: true,
-            ticks: { precision: 0 },
-          },
+          y: { beginAtZero: true, ticks: { precision: 0 } },
         },
       },
     } as ChartConfiguration);
   }
 
+  private buildPacientesEspChart() {
+    const ref = this.pacientesEspChartRef;
+    if (!ref) return;
+
+    const ctx = ref.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const data = this.pacientesPorEspecialidad();
+    const labels = data.map((d) => d.label);
+    const values = data.map((d) => d.count);
+
+    if (this.pacientesEspChart) this.pacientesEspChart.destroy();
+
+    this.pacientesEspChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Pacientes',
+            data: values,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 } },
+        },
+      },
+    } as ChartConfiguration);
+  }
+
+  private buildMedicosEspChart() {
+    const ref = this.medicosEspChartRef;
+    if (!ref) return;
+
+    const ctx = ref.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const data = this.medicosPorEspecialidad();
+    const labels = data.map((d) => d.label);
+    const values = data.map((d) => d.count);
+
+    if (this.medicosEspChart) this.medicosEspChart.destroy();
+
+    this.medicosEspChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Médicos',
+            data: values,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 } },
+        },
+      },
+    } as ChartConfiguration);
+  }
+
+  private buildSurveyChart() {
+    const ref = this.surveyChartRef;
+    if (!ref) return;
+
+    const ctx = ref.nativeElement.getContext('2d');
+    if (!ctx) return;
+
+    const stats = this.surveyStats();
+    if (!stats.total) {
+      if (this.surveyChart) {
+        this.surveyChart.destroy();
+        this.surveyChart = undefined;
+      }
+      return;
+    }
+
+    const labels = ['¿A horario?', '¿Recomienda?'];
+    const dataSi = [stats.p1Si, stats.p2Si];
+    const dataNo = [stats.p1No, stats.p2No];
+
+    if (this.surveyChart) this.surveyChart.destroy();
+
+    this.surveyChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Sí', data: dataSi },
+          { label: 'No', data: dataNo },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { beginAtZero: true, ticks: { precision: 0 } },
+        },
+      },
+    } as ChartConfiguration);
+  }
+
+  // === EXPORTS TABLAS (EXCEL / PDF) – igual que antes ===
   exportLoginsExcel() {
     const rows = this.loginLogs();
 
@@ -508,6 +738,31 @@ export class AdminReportsComponent implements OnInit, AfterViewInit {
 
     const today = this.formatToday();
     doc.save(`turnos_por_medico_${today}.pdf`);
+  }
+
+  // === DESCARGA DE IMAGEN DE GRÁFICOS (PNG) ===
+  downloadPacientesEspPng() {
+    if (!this.pacientesEspChart) {
+      alert('No hay datos para el gráfico de pacientes por especialidad.');
+      return;
+    }
+    const url = this.pacientesEspChart.toBase64Image();
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pacientes_por_especialidad_${this.formatToday()}.png`;
+    a.click();
+  }
+
+  downloadMedicosEspPng() {
+    if (!this.medicosEspChart) {
+      alert('No hay datos para el gráfico de médicos por especialidad.');
+      return;
+    }
+    const url = this.medicosEspChart.toBase64Image();
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `medicos_por_especialidad_${this.formatToday()}.png`;
+    a.click();
   }
 
   private formatToday(): string {

@@ -3,20 +3,23 @@
     <div class="row align-items-center g-4">
       <!-- Título + CTA -->
       <div class="col-12 col-lg-7">
-        <h1 class="hero-title mb-3">Clínica Online</h1>
-        <p class="lead mb-4">
-          Plataforma centralizada para gestionar turnos, historias clínicas y la
-          agenda de tus profesionales desde cualquier dispositivo.
-        </p>
+        <h1 class="hero-title mb-3">
+  {{ 'home.welcomeTitle' | t }}
+</h1>
+<p class="lead mb-4">
+  {{ 'home.welcomeSubtitle' | t }}
+</p>
 
-        <div class="d-flex flex-wrap gap-2">
-          <a routerLink="/login" class="btn btn-primary btn-lg">
-            <i class="bi bi-box-arrow-in-right me-1"></i> Ingresar
-          </a>
-          <a routerLink="/registro" class="btn btn-outline-light btn-lg">
-            <i class="bi bi-person-plus me-1"></i> Registrarse
-          </a>
-        </div>
+<div class="d-flex flex-wrap gap-2">
+  <a routerLink="/login" class="btn btn-primary btn-lg">
+    <i class="bi bi-box-arrow-in-right me-1"></i>
+    {{ 'login.submit' | t }}
+  </a>
+  <a routerLink="/registro" class="btn btn-outline-light btn-lg">
+    <i class="bi bi-person-plus me-1"></i>
+    {{ 'nav.register' | t }}
+  </a>
+</div>
 
         <p class="hero-subtext small mt-3">
           Pensado para instituciones que necesitan ordenar turnos, reducir

@@ -20,6 +20,10 @@ import {
   animate,
   query,
 } from '@angular/animations';
+import { I18nService, Lang } from './core/i18n/i18n.service';
+import { TranslatePipe } from './shared/pipes/translate.pipe';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-root',
@@ -30,10 +34,12 @@ import {
     RouterLink,
     LoaderComponent,
     ToastsComponent,
+    TranslatePipe,
+    FormsModule,
   ],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
-  animations: [
+animations: [
     trigger('routeAnimations', [
       transition('* => slideDown', [
         query(
@@ -41,7 +47,7 @@ import {
           [
             style({ opacity: 0, transform: 'translateY(-40px)' }),
             animate(
-              '500ms ease-out',
+              '300ms ease-out',
               style({ opacity: 1, transform: 'translateY(0)' })
             ),
           ],
@@ -55,8 +61,61 @@ import {
           [
             style({ opacity: 0, transform: 'translateX(40px)' }),
             animate(
-              '500ms ease-out',
+              '300ms ease-out',
               style({ opacity: 1, transform: 'translateX(0)' })
+            ),
+          ],
+          { optional: true }
+        ),
+      ]),
+
+      transition('* => slideUp', [
+        query(
+          ':enter',
+          [
+            style({ opacity: 0, transform: 'translateY(40px)' }),
+            animate(
+              '300ms ease-out',
+              style({ opacity: 1, transform: 'translateY(0)' })
+            ),
+          ],
+          { optional: true }
+        ),
+      ]),
+
+      transition('* => slideLeft', [
+        query(
+          ':enter',
+          [
+            style({ opacity: 0, transform: 'translateX(-40px)' }),
+            animate(
+              '300ms ease-out',
+              style({ opacity: 1, transform: 'translateX(0)' })
+            ),
+          ],
+          { optional: true }
+        ),
+      ]),
+
+      transition('* => fade', [
+        query(
+          ':enter',
+          [
+            style({ opacity: 0 }),
+            animate('250ms ease-out', style({ opacity: 1 })),
+          ],
+          { optional: true }
+        ),
+      ]),
+
+      transition('* => zoom', [
+        query(
+          ':enter',
+          [
+            style({ opacity: 0, transform: 'scale(0.9)' }),
+            animate(
+              '250ms ease-out',
+              style({ opacity: 1, transform: 'scale(1)' })
             ),
           ],
           { optional: true }
@@ -65,10 +124,12 @@ import {
     ]),
   ],
 })
+
 export class AppComponent {
   private session = inject(SessionService);
   private router = inject(Router);
   loader = inject(LoaderService);
+  i18n = inject(I18nService);
 
   @ViewChild(RouterOutlet) outlet?: RouterOutlet;
 
@@ -78,6 +139,14 @@ export class AppComponent {
 
   prepareRoute() {
     return this.outlet?.activatedRouteData?.['animation'];
+  }
+
+  currentLang(): Lang {
+    return this.i18n.lang();
+  }
+
+changeLang(lang: string) {
+    this.i18n.setLang(lang as Lang);
   }
 
   constructor() {

@@ -8,6 +8,7 @@ import { SessionService } from '../../core/services/session.service';
 import { LoaderService } from '../../core/services/loader.service';
 import { SpecialtyService } from '../../core/services/specialty.service';
 import { SupabaseClientService } from '../../core/supabase/supabase-client.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 
 type QuickRole = 'paciente' | 'especialista' | 'admin';
@@ -23,7 +24,7 @@ interface QuickUser {
 @Component({
   standalone: true,
   selector: 'app-login',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,TranslatePipe],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })

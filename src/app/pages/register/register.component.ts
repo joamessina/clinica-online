@@ -11,13 +11,14 @@ import { ToastService } from '../../core/services/toast.service';
 import { RecaptchaComponent } from '../../shared/recaptcha/recaptcha.component';
 import { environment } from '../../../environments/environment';
 import { CaptchaDirective } from '../../shared/directives/captcha.directive';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 type Rol = 'paciente' | 'especialista';
 
 @Component({
   standalone: true,
   selector: 'app-register',
-  imports: [CommonModule, FormsModule, RecaptchaComponent, CaptchaDirective],
+  imports: [CommonModule, FormsModule, RecaptchaComponent, CaptchaDirective,TranslatePipe],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })

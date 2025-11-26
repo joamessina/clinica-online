@@ -1,10 +1,9 @@
-// src/app/app.routes.ts
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { loginGuard } from './core/guards/login.guard';
 import { AdminReportsComponent } from './pages/admin-reports/admin-reports.component';
+
 export const routes: Routes = [
-  // Home
   {
     path: '',
     loadComponent: () =>
@@ -12,16 +11,15 @@ export const routes: Routes = [
         (m) => m.WelcomeComponent
       ),
     pathMatch: 'full',
-    data: { animation: 'slideDown' }, // 👈 entra desde arriba
+    data: { animation: 'fade' }, 
   },
 
-  // Auth
   {
     path: 'login',
     loadComponent: () =>
       import('./pages/login/login.component').then((m) => m.LoginComponent),
     canActivate: [loginGuard],
-    data: { animation: 'slideRight' },
+    data: { animation: 'zoom' }, 
   },
   {
     path: 'registro',
@@ -30,10 +28,9 @@ export const routes: Routes = [
         (m) => m.RegisterComponent
       ),
     canActivate: [loginGuard],
-    data: { animation: 'slideRight' },
+    data: { animation: 'zoom' }, 
   },
 
-  // Dashboards
   {
     path: 'paciente',
     loadComponent: () =>
@@ -41,7 +38,7 @@ export const routes: Routes = [
         (m) => m.PatientDashboardComponent
       ),
     canActivate: [authGuard],
-    data: { animation: 'slideDown' },
+    data: { animation: 'slideDown' }, 
   },
   {
     path: 'especialista',
@@ -50,7 +47,7 @@ export const routes: Routes = [
         './pages/specialist-dashboard/specialist-dashboard.component'
       ).then((m) => m.SpecialistDashboardComponent),
     canActivate: [authGuard],
-    data: { roles: ['especialista'], animation: 'slideRight' },
+    data: { roles: ['especialista'], animation: 'slideLeft' }, 
   },
   {
     path: 'admin/usuarios',
@@ -59,13 +56,15 @@ export const routes: Routes = [
         (m) => m.AdminUsersComponent
       ),
     canActivate: [authGuard],
-    data: { roles: ['admin'], animation: 'slideDown' },
+    data: { roles: ['admin'], animation: 'slideDown' }, 
   },
 
   {
     path: 'admin/reportes',
     component: AdminReportsComponent,
+    data: { animation: 'fade' }, 
   },
+
   {
     path: 'paciente/mis-turnos',
     loadComponent: () =>
@@ -73,7 +72,7 @@ export const routes: Routes = [
         (m) => m.MisTurnosPacienteComponent
       ),
     canActivate: [authGuard],
-    data: { animation: 'slideRight' },
+    data: { animation: 'slideRight' }, 
   },
   {
     path: 'paciente/encuesta/:id',
@@ -82,7 +81,7 @@ export const routes: Routes = [
         (m) => m.EncuestaPacienteComponent
       ),
     canActivate: [authGuard],
-    data: { animation: 'slideRight' },
+    data: { animation: 'zoom' }, 
   },
 
   {
@@ -92,7 +91,7 @@ export const routes: Routes = [
         (m) => m.MisTurnosEspecialistaComponent
       ),
     canActivate: [authGuard],
-    data: { roles: ['especialista'], animation: 'slideRight' },
+    data: { roles: ['especialista'], animation: 'slideRight' }, 
   },
   {
     path: 'especialista/mis-horarios',
@@ -101,16 +100,16 @@ export const routes: Routes = [
         (m) => m.MisHorariosComponent
       ),
     canActivate: [authGuard],
-    data: { roles: ['especialista'], animation: 'slideRight' },
+    data: { roles: ['especialista'], animation: 'slideUp' }, 
   },
 
   {
     path: 'especialista/mis-pacientes',
-    // mismo guard que uses para especialista
     loadComponent: () =>
       import(
         './especialidades/specialist-patients/specialist-patients.component'
       ).then((m) => m.SpecialistPatientsComponent),
+    data: { animation: 'fade' }, 
   },
 
   {
@@ -120,7 +119,7 @@ export const routes: Routes = [
         (m) => m.TurnosAdminComponent
       ),
     canActivate: [authGuard],
-    data: { roles: ['admin'], animation: 'slideDown' },
+    data: { roles: ['admin'], animation: 'slideDown' }, 
   },
 
   {
@@ -130,7 +129,7 @@ export const routes: Routes = [
         (m) => m.SolicitarTurnoComponent
       ),
     canActivate: [authGuard],
-    data: { animation: 'slideRight' },
+    data: { animation: 'slideUp' }, 
   },
 
   {
@@ -140,7 +139,7 @@ export const routes: Routes = [
         (m) => m.ProfileComponent
       ),
     canActivate: [authGuard],
-    data: { animation: 'slideDown' },
+    data: { animation: 'zoom' }, 
   },
 
   // 404

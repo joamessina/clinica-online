@@ -24,27 +24,32 @@ export class MisTurnosPacienteComponent implements OnInit {
   turnos = signal<Turno[]>([]);
   q = signal('');
 
-  // turno actualmente seleccionado para cualquier modal
   selectedTurno = signal<Turno | null>(null);
 
-  // ----- MODAL RESEÑA -----
   showReviewModal = signal(false);
   reviewText = signal('');
 
-  // ----- MODAL CALIFICAR -----
   showFeedbackModal = signal(false);
   feedbackRating = signal<number | null>(5);
   feedbackComment = signal('');
 
-  // ----- MODAL CANCELAR -----
   showCancelModal = signal(false);
   cancelReason = signal('');
 
-  // ----- MODAL ENCUESTA -----
   showSurveyModal = signal(false);
   surveyP1 = signal<'si' | 'no' | ''>('');
   surveyP2 = signal<'si' | 'no' | ''>('');
   surveyComment = signal('');
+  surveyRating = signal<number>(3);
+
+  surveySatisfaction = signal<number>(5);
+
+  surveyPuntualidad = signal(false);
+  surveyAtencion = signal(false);
+  surveyInstalaciones = signal(false);
+  surveyOtro = signal(false);
+  surveyOtroTexto = signal('');
+
 
   async ngOnInit() {
     await this.load();
@@ -113,14 +118,12 @@ export class MisTurnosPacienteComponent implements OnInit {
     return t.estado === 'REALIZADO';
   }
   canSurvey(t: Turno) {
-    // mismo criterio que tenías antes
     return t.estado === 'REALIZADO' && !!t.resena_especialista;
   }
   hasResena(t: Turno) {
     return !!t.resena_especialista;
   }
 
-  // ===== RESEÑA =====
   verResena(t: Turno) {
     this.selectedTurno.set(t);
     this.reviewText.set(
@@ -135,7 +138,6 @@ export class MisTurnosPacienteComponent implements OnInit {
     this.reviewText.set('');
   }
 
-  // ===== CANCELAR TURNO =====
   cancelar(t: Turno) {
     this.selectedTurno.set(t);
     this.cancelReason.set('');
@@ -210,20 +212,38 @@ export class MisTurnosPacienteComponent implements OnInit {
   }
 
   // ===== ENCUESTA =====
-  abrirEncuesta(t: Turno) {
+abrirEncuesta(t: Turno) {
     this.selectedTurno.set(t);
+
     this.surveyP1.set('');
     this.surveyP2.set('');
     this.surveyComment.set('');
+    this.surveyRating.set(3);
+    this.surveySatisfaction.set(5);
+    this.surveyPuntualidad.set(false);
+    this.surveyAtencion.set(false);
+    this.surveyInstalaciones.set(false);
+    this.surveyOtro.set(false);
+    this.surveyOtroTexto.set('');
+
     this.showSurveyModal.set(true);
   }
 
-  closeSurveyModal() {
+
+ closeSurveyModal() {
     this.showSurveyModal.set(false);
     this.selectedTurno.set(null);
+
     this.surveyP1.set('');
     this.surveyP2.set('');
     this.surveyComment.set('');
+    this.surveyRating.set(3);
+    this.surveySatisfaction.set(5);
+    this.surveyPuntualidad.set(false);
+    this.surveyAtencion.set(false);
+    this.surveyInstalaciones.set(false);
+    this.surveyOtro.set(false);
+    this.surveyOtroTexto.set('');
   }
 
   async submitSurveyModal() {
@@ -231,6 +251,8 @@ export class MisTurnosPacienteComponent implements OnInit {
     const p1 = this.surveyP1();
     const p2 = this.surveyP2();
     const comentario = this.surveyComment().trim();
+    const rating = this.surveyRating();
+    const satisfaction = this.surveySatisfaction();
 
     if (!turno) return;
 
@@ -239,7 +261,25 @@ export class MisTurnosPacienteComponent implements OnInit {
       return;
     }
 
-    const payload = { p1, p2, comentario };
+    if (!rating || rating < 1 || rating > 5) {
+      alert('Seleccioná una calificación de 1 a 5 estrellas.');
+      return;
+    }
+
+    const payload = {
+      p1,
+      p2,
+      comentario,
+      rating, 
+      satisfaction, 
+      aspects: {
+        puntualidad: this.surveyPuntualidad(),
+        atencion: this.surveyAtencion(),
+        instalaciones: this.surveyInstalaciones(),
+        otro: this.surveyOtro(),
+        otroTexto: this.surveyOtroTexto().trim() || null,
+      },
+    };
 
     const { error } = await this.svc.sendSurvey(turno.id, payload);
     if (error) {
@@ -248,8 +288,7 @@ export class MisTurnosPacienteComponent implements OnInit {
       return;
     }
 
-    this.showSurveyModal.set(false);
-    this.selectedTurno.set(null);
+    this.closeSurveyModal();
     await this.load();
     alert('¡Encuesta enviada!');
   }

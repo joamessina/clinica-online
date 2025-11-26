@@ -37,7 +37,9 @@
                   >
                     <i class="bi bi-person-lock"></i>
                   </div>
-                  <h5 class="mb-1">Ingresar</h5>
+                  <h5 class="mb-1">
+  {{ 'login.title' | t }}
+</h5>
                   <p class="text-muted small mb-0">
                     Accedé a tu panel de paciente, especialista o administrador.
                   </p>
@@ -45,7 +47,9 @@
 
                 <form (ngSubmit)="submit()">
                   <div class="mb-3">
-                    <label class="form-label">Email</label>
+                    <label class="form-label">
+  {{ 'login.email' | t }}
+</label>
                     <input
                       [(ngModel)]="email"
                       name="email"
@@ -55,7 +59,9 @@
                     />
                   </div>
                   <div class="mb-3">
-                    <label class="form-label">Contraseña</label>
+                    <label class="form-label">
+  {{ 'login.password' | t }}
+</label>
                     <input
                       [(ngModel)]="password"
                       name="password"
@@ -64,9 +70,9 @@
                       required
                     />
                   </div>
-                  <button type="submit" class="btn btn-primary w-100">
-                    Entrar
-                  </button>
+<button type="submit" class="btn btn-primary w-100">
+  {{ 'login.submit' | t }}
+</button>
                 </form>
 
                 <p class="small text-muted text-center mt-3 mb-0">

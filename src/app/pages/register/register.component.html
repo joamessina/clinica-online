@@ -4,7 +4,10 @@
       <div class="card shadow-sm">
         <div class="card-header bg-light d-flex align-items-center gap-2">
           <i class="bi bi-person-plus"></i>
-          <h5 class="mb-0">Registro</h5>
+          <h5 class="mb-0">
+  {{ 'register.title' | t }}
+</h5>
+
         </div>
 
         <div class="card-body">
@@ -16,7 +19,7 @@
               (click)="chooseRole('paciente')"
             >
               <img [src]="patientImgUrl" alt="Paciente" />
-              <span>Paciente</span>
+<span>{{ 'register.patient' | t }}</span>
             </button>
 
             <button
@@ -24,8 +27,8 @@
               class="role-btn"
               (click)="chooseRole('especialista')"
             >
-              <img [src]="specialistImgUrl" alt="Especialista" />
-              <span>Especialista</span>
+<img [src]="specialistImgUrl" alt="Especialista" />
+<span>{{ 'register.specialist' | t }}</span>
             </button>
           </div>
 
@@ -33,7 +36,9 @@
             <!-- Datos personales -->
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label">Nombre</label>
+                <label class="form-label">
+  {{ 'register.name' | t }}
+</label>
                 <input
                   class="form-control"
                   name="nombre"
@@ -48,7 +53,9 @@
               </div>
 
               <div class="col-md-6">
-                <label class="form-label">Apellido</label>
+                <label class="form-label">
+  {{ 'register.lastname' | t }}
+</label>
                 <input
                   class="form-control"
                   name="apellido"
@@ -63,7 +70,9 @@
               </div>
 
               <div class="col-md-4">
-                <label class="form-label">Edad</label>
+               <label class="form-label">
+  {{ 'register.age' | t }}
+</label>
                 <input
                   type="number"
                   class="form-control"
@@ -87,7 +96,9 @@
               </div>
 
               <div class="col-md-4">
-                <label class="form-label">DNI</label>
+                <label class="form-label">
+  {{ 'register.dni' | t }}
+</label>
                 <input
                   class="form-control"
                   name="dni"
@@ -102,7 +113,9 @@
               </div>
 
               <div class="col-md-4" *ngIf="rol === 'paciente'">
-                <label class="form-label">Obra Social</label>
+                <label class="form-label" *ngIf="rol === 'paciente'">
+  {{ 'register.healthInsurance' | t }}
+</label>
                 <input
                   class="form-control"
                   name="obra"
@@ -122,7 +135,9 @@
             <!-- Credenciales -->
             <div class="row g-3">
               <div class="col-md-6">
-                <label class="form-label">Email</label>
+                <label class="form-label">
+  {{ 'register.email' | t }}
+</label>
                 <input
                   type="email"
                   class="form-control"
@@ -146,7 +161,9 @@
               </div>
 
               <div class="col-md-6">
-                <label class="form-label">Contraseña</label>
+                <label class="form-label">
+  {{ 'register.password' | t }}
+</label>
                 <div class="input-group">
                   <input
                     [type]="'password'"
