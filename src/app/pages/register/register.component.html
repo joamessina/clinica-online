@@ -5,9 +5,8 @@
         <div class="card-header bg-light d-flex align-items-center gap-2">
           <i class="bi bi-person-plus"></i>
           <h5 class="mb-0">
-  {{ 'register.title' | t }}
-</h5>
-
+            {{ "register.title" | t }}
+          </h5>
         </div>
 
         <div class="card-body">
@@ -18,8 +17,8 @@
               class="role-btn"
               (click)="chooseRole('paciente')"
             >
-              <img [src]="patientImgUrl" alt="Paciente" />
-<span>{{ 'register.patient' | t }}</span>
+              <img [src]="patientImgUrl" [attr.alt]="'register.patient' | t" />
+              <span>{{ "register.patient" | t }}</span>
             </button>
 
             <button
@@ -27,8 +26,11 @@
               class="role-btn"
               (click)="chooseRole('especialista')"
             >
-<img [src]="specialistImgUrl" alt="Especialista" />
-<span>{{ 'register.specialist' | t }}</span>
+              <img
+                [src]="specialistImgUrl"
+                [attr.alt]="'register.specialist' | t"
+              />
+              <span>{{ "register.specialist" | t }}</span>
             </button>
           </div>
 
@@ -37,8 +39,8 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label">
-  {{ 'register.name' | t }}
-</label>
+                  {{ "register.name" | t }}
+                </label>
                 <input
                   class="form-control"
                   name="nombre"
@@ -49,13 +51,15 @@
                     nombreNg.invalid && (nombreNg.touched || f.submitted)
                   "
                 />
-                <div class="invalid-feedback">Nombre obligatorio.</div>
+                <div class="invalid-feedback">
+                  {{ "register.invalid.name.required" | t }}
+                </div>
               </div>
 
               <div class="col-md-6">
                 <label class="form-label">
-  {{ 'register.lastname' | t }}
-</label>
+                  {{ "register.lastname" | t }}
+                </label>
                 <input
                   class="form-control"
                   name="apellido"
@@ -66,13 +70,15 @@
                     apellidoNg.invalid && (apellidoNg.touched || f.submitted)
                   "
                 />
-                <div class="invalid-feedback">Apellido obligatorio.</div>
+                <div class="invalid-feedback">
+                  {{ "register.invalid.lastname.required" | t }}
+                </div>
               </div>
 
               <div class="col-md-4">
-               <label class="form-label">
-  {{ 'register.age' | t }}
-</label>
+                <label class="form-label">
+                  {{ "register.age" | t }}
+                </label>
                 <input
                   type="number"
                   class="form-control"
@@ -86,19 +92,19 @@
                   "
                 />
                 <div class="invalid-feedback">
-                  <ng-container *ngIf="edadNg.errors?.['required']"
-                    >Edad obligatoria.</ng-container
-                  >
-                  <ng-container *ngIf="edadNg.errors?.['min']"
-                    >Debe ser mayor a 0.</ng-container
-                  >
+                  <ng-container *ngIf="edadNg.errors?.['required']">
+                    {{ "register.invalid.age.required" | t }}
+                  </ng-container>
+                  <ng-container *ngIf="edadNg.errors?.['min']">
+                    {{ "register.invalid.age.min" | t }}
+                  </ng-container>
                 </div>
               </div>
 
               <div class="col-md-4">
                 <label class="form-label">
-  {{ 'register.dni' | t }}
-</label>
+                  {{ "register.dni" | t }}
+                </label>
                 <input
                   class="form-control"
                   name="dni"
@@ -109,13 +115,15 @@
                     dniNg.invalid && (dniNg.touched || f.submitted)
                   "
                 />
-                <div class="invalid-feedback">DNI obligatorio.</div>
+                <div class="invalid-feedback">
+                  {{ "register.invalid.dni.required" | t }}
+                </div>
               </div>
 
               <div class="col-md-4" *ngIf="rol === 'paciente'">
                 <label class="form-label" *ngIf="rol === 'paciente'">
-  {{ 'register.healthInsurance' | t }}
-</label>
+                  {{ "register.healthInsurance" | t }}
+                </label>
                 <input
                   class="form-control"
                   name="obra"
@@ -126,7 +134,9 @@
                     obraNg.invalid && (obraNg.touched || f.submitted)
                   "
                 />
-                <div class="invalid-feedback">Obra social obligatoria.</div>
+                <div class="invalid-feedback">
+                  {{ "register.invalid.health.required" | t }}
+                </div>
               </div>
             </div>
 
@@ -136,8 +146,8 @@
             <div class="row g-3">
               <div class="col-md-6">
                 <label class="form-label">
-  {{ 'register.email' | t }}
-</label>
+                  {{ "register.email" | t }}
+                </label>
                 <input
                   type="email"
                   class="form-control"
@@ -151,19 +161,19 @@
                   "
                 />
                 <div class="invalid-feedback">
-                  <ng-container *ngIf="emailNg.errors?.['required']"
-                    >Email obligatorio.</ng-container
-                  >
-                  <ng-container *ngIf="emailNg.errors?.['email']"
-                    >Ingresá un email válido.</ng-container
-                  >
+                  <ng-container *ngIf="emailNg.errors?.['required']">
+                    {{ "register.invalid.email.required" | t }}
+                  </ng-container>
+                  <ng-container *ngIf="emailNg.errors?.['email']">
+                    {{ "register.invalid.email.format" | t }}
+                  </ng-container>
                 </div>
               </div>
 
               <div class="col-md-6">
                 <label class="form-label">
-  {{ 'register.password' | t }}
-</label>
+                  {{ "register.password" | t }}
+                </label>
                 <div class="input-group">
                   <input
                     [type]="'password'"
@@ -181,23 +191,25 @@
                     <i class="bi bi-shield-lock"></i>
                   </span>
                   <div class="invalid-feedback">
-                    <ng-container *ngIf="pwdNg.errors?.['required']"
-                      >Contraseña obligatoria.</ng-container
-                    >
-                    <ng-container *ngIf="pwdNg.errors?.['minlength']"
-                      >Mínimo 6 caracteres.</ng-container
-                    >
+                    <ng-container *ngIf="pwdNg.errors?.['required']">
+                      {{ "register.invalid.password.required" | t }}
+                    </ng-container>
+                    <ng-container *ngIf="pwdNg.errors?.['minlength']">
+                      {{ "register.invalid.password.min" | t }}
+                    </ng-container>
                   </div>
                 </div>
-                <div class="form-text">Mínimo 6–8 caracteres recomendados.</div>
+                <div class="form-text">
+                  {{ "register.helper.password" | t }}
+                </div>
               </div>
             </div>
 
             <!-- Imágenes paciente -->
             <div class="mt-4" *ngIf="rol === 'paciente'">
-              <label class="form-label fw-semibold"
-                >Imágenes de perfil (obligatorio)</label
-              >
+              <label class="form-label fw-semibold">
+                {{ "register.images.patient.title" | t }}
+              </label>
               <div class="row g-3">
                 <div class="col-md-6">
                   <input
@@ -208,8 +220,12 @@
                     accept="image/*"
                     [class.is-invalid]="f.submitted && !fileP1.value"
                   />
-                  <div class="form-text">Frente</div>
-                  <div class="invalid-feedback">Subí la imagen frontal.</div>
+                  <div class="form-text">
+                    {{ "register.images.patient.front" | t }}
+                  </div>
+                  <div class="invalid-feedback">
+                    {{ "register.images.patient.frontError" | t }}
+                  </div>
                 </div>
                 <div class="col-md-6">
                   <input
@@ -220,8 +236,12 @@
                     accept="image/*"
                     [class.is-invalid]="f.submitted && !fileP2.value"
                   />
-                  <div class="form-text">Perfil / adicional</div>
-                  <div class="invalid-feedback">Subí la imagen adicional.</div>
+                  <div class="form-text">
+                    {{ "register.images.patient.side" | t }}
+                  </div>
+                  <div class="invalid-feedback">
+                    {{ "register.images.patient.sideError" | t }}
+                  </div>
                 </div>
               </div>
             </div>
@@ -229,7 +249,9 @@
             <div class="mt-4" *ngIf="rol === 'especialista'">
               <div class="row g-3">
                 <div class="col-md-6">
-                  <label class="form-label">Imagen de perfil</label>
+                  <label class="form-label">
+                    {{ "register.images.specialist.title" | t }}
+                  </label>
                   <input
                     type="file"
                     class="form-control"
@@ -239,7 +261,9 @@
                 </div>
 
                 <div class="col-md-6">
-                  <label class="form-label">Especialidades</label>
+                  <label class="form-label">
+                    {{ "register.specialties.label" | t }}
+                  </label>
 
                   <div class="specialty-multiselect">
                     <button
@@ -259,7 +283,7 @@
 
                       <ng-template #specialtiesPlaceholder>
                         <span class="specialty-multiselect-placeholder">
-                          Seleccioná una o varias especialidades
+                          {{ "register.specialties.placeholder" | t }}
                         </span>
                       </ng-template>
 
@@ -293,7 +317,9 @@
                         <div class="input-group input-group-sm">
                           <input
                             class="form-control"
-                            placeholder="Agregar nueva especialidad"
+                            [placeholder]="
+                              'register.specialties.addPlaceholder' | t
+                            "
                             [(ngModel)]="specialtyOtherInput"
                             name="espNueva"
                           />
@@ -303,33 +329,36 @@
                             (click)="addSpecialty()"
                           >
                             <i class="bi bi-plus-lg me-1"></i>
-                            Agregar
+                            {{ "register.specialties.addButton" | t }}
                           </button>
                         </div>
                         <div class="form-text mt-1">
-                          Las especialidades nuevas se usan solo para este
-                          registro.
+                          {{ "register.specialties.helperOnce" | t }}
                         </div>
                       </div>
                     </div>
                   </div>
 
                   <div class="form-text mt-1">
-                    Podés seleccionar una o varias especialidades marcando las
-                    casillas.
+                    {{ "register.specialties.helperMulti" | t }}
                   </div>
                 </div>
               </div>
             </div>
 
             <hr class="my-4" />
+
             <div class="mb-3" *ngIf="captchaEnabled">
-              <label class="form-label">Captcha</label>
+              <label class="form-label">
+                {{ "register.captcha.label" | t }}
+              </label>
               <app-recaptcha
                 [siteKey]="siteKey"
                 (resolved)="onCaptchaResolved($event)"
               ></app-recaptcha>
-              <div class="form-text">Marcá la casilla "No soy un robot".</div>
+              <div class="form-text">
+                {{ "register.captcha.helper" | t }}
+              </div>
             </div>
 
             <!-- Submit -->
@@ -345,13 +374,12 @@
                   class="spinner-border spinner-border-sm me-2"
                   *ngIf="loading"
                 ></span>
-                Crear cuenta
+                {{ "register.submit" | t }}
               </button>
             </div>
 
             <p class="text-muted small mt-3 mb-0">
-              Al registrarte aceptás nuestros términos y el tratamiento de datos
-              personales.
+              {{ "register.footer" | t }}
             </p>
           </form>
         </div>

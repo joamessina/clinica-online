@@ -4,27 +4,26 @@
       <!-- Título + CTA -->
       <div class="col-12 col-lg-7">
         <h1 class="hero-title mb-3">
-  {{ 'home.welcomeTitle' | t }}
-</h1>
-<p class="lead mb-4">
-  {{ 'home.welcomeSubtitle' | t }}
-</p>
+          {{ t("welcome.hero.title") }}
+        </h1>
 
-<div class="d-flex flex-wrap gap-2">
-  <a routerLink="/login" class="btn btn-primary btn-lg">
-    <i class="bi bi-box-arrow-in-right me-1"></i>
-    {{ 'login.submit' | t }}
-  </a>
-  <a routerLink="/registro" class="btn btn-outline-light btn-lg">
-    <i class="bi bi-person-plus me-1"></i>
-    {{ 'nav.register' | t }}
-  </a>
-</div>
+        <p class="lead mb-4">
+          {{ t("welcome.hero.subtitle") }}
+        </p>
+
+        <div class="d-flex flex-wrap gap-2">
+          <a routerLink="/login" class="btn btn-primary btn-lg">
+            <i class="bi bi-box-arrow-in-right me-1"></i>
+            {{ t("welcome.hero.login") }}
+          </a>
+          <a routerLink="/registro" class="btn btn-outline-light btn-lg">
+            <i class="bi bi-person-plus me-1"></i>
+            {{ t("welcome.hero.register") }}
+          </a>
+        </div>
 
         <p class="hero-subtext small mt-3">
-          Pensado para instituciones que necesitan ordenar turnos, reducir
-          tiempos administrativos y ofrecer una mejor experiencia a pacientes y
-          especialistas.
+          {{ t("welcome.hero.subtext") }}
         </p>
       </div>
 
@@ -34,29 +33,29 @@
           <div class="card-body">
             <h5 class="card-title mb-3 d-flex align-items-center gap-2">
               <i class="bi bi-heart-pulse text-primary"></i>
-              <span>Todo tu consultorio en un solo lugar</span>
+              <span>{{ t("welcome.features.title") }}</span>
             </h5>
 
             <ul class="list-unstyled mb-0">
               <li class="d-flex gap-3 mb-2">
                 <i class="bi bi-calendar-check text-primary mt-1"></i>
                 <span>
-                  <strong>Turnos online</strong> con gestión por rol: pacientes,
-                  especialistas y administradores.
+                  <strong>{{ t("welcome.features.item1.title") }}</strong>
+                  {{ t("welcome.features.item1.text") }}
                 </span>
               </li>
               <li class="d-flex gap-3 mb-2">
                 <i class="bi bi-file-earmark-medical text-primary mt-1"></i>
                 <span>
-                  <strong>Historia clínica digital</strong> accesible para el
-                  profesional, con seguimiento de cada consulta.
+                  <strong>{{ t("welcome.features.item2.title") }}</strong>
+                  {{ t("welcome.features.item2.text") }}
                 </span>
               </li>
               <li class="d-flex gap-3">
                 <i class="bi bi-shield-check text-primary mt-1"></i>
                 <span>
-                  <strong>Accesos seguros</strong> y aprobación de especialistas
-                  para resguardar la información del paciente.
+                  <strong>{{ t("welcome.features.item3.title") }}</strong>
+                  {{ t("welcome.features.item3.text") }}
                 </span>
               </li>
             </ul>
@@ -75,42 +74,36 @@
         <div class="card border-0 shadow-sm intro-card">
           <div class="card-body">
             <h2 class="h4 mb-3">
-              Una clínica moderna, centrada en el paciente
+              {{ t("welcome.intro.title") }}
             </h2>
+
             <p class="mb-3">
-              Clínica Online integra en una única plataforma la administración
-              de turnos, la gestión de profesionales y el acceso a la historia
-              clínica digital. Cada usuario ingresa con su perfil y visualiza
-              únicamente la información que necesita.
+              {{ t("welcome.intro.p1") }}
             </p>
             <p class="mb-3">
-              Los administradores pueden aprobar especialistas, revisar
-              estadísticas y exportar datos; mientras que los pacientes
-              gestionan sus turnos y consultan sus atenciones sin depender de
-              llamados telefónicos.
+              {{ t("welcome.intro.p2") }}
             </p>
 
             <ul class="list-unstyled mb-0">
               <li class="d-flex gap-3 mb-2">
                 <i class="bi bi-check-circle-fill text-success mt-1"></i>
                 <span>
-                  <strong>Menos tareas manuales:</strong> automatizá la carga y
-                  el seguimiento de turnos.
+                  <strong>{{ t("welcome.intro.list1.title") }}</strong>
+                  {{ t("welcome.intro.list1.text") }}
                 </span>
               </li>
               <li class="d-flex gap-3 mb-2">
                 <i class="bi bi-check-circle-fill text-success mt-1"></i>
                 <span>
-                  <strong>Mayor trazabilidad:</strong> cada consulta queda
-                  registrada en la historia clínica.
+                  <strong>{{ t("welcome.intro.list2.title") }}</strong>
+                  {{ t("welcome.intro.list2.text") }}
                 </span>
               </li>
               <li class="d-flex gap-3">
                 <i class="bi bi-check-circle-fill text-success mt-1"></i>
                 <span>
-                  <strong>Experiencia unificada:</strong> pacientes, personal
-                  administrativo y especialistas trabajan sobre la misma
-                  información.
+                  <strong>{{ t("welcome.intro.list3.title") }}</strong>
+                  {{ t("welcome.intro.list3.text") }}
                 </span>
               </li>
             </ul>
@@ -122,7 +115,7 @@
         <div class="card border-0 shadow-sm highlight-card">
           <div class="card-body">
             <h3 class="h6 text-muted text-uppercase mb-3">
-              Beneficios para tu institución
+              {{ t("welcome.benefits.title") }}
             </h3>
 
             <div class="d-flex flex-column gap-3">
@@ -130,8 +123,12 @@
                 class="d-flex justify-content-between align-items-center metric-row"
               >
                 <div>
-                  <div class="text-muted small">Gestión de agenda</div>
-                  <div class="fw-semibold">Turnos claros y ordenados</div>
+                  <div class="text-muted small">
+                    {{ t("welcome.benefits.metric1.label") }}
+                  </div>
+                  <div class="fw-semibold">
+                    {{ t("welcome.benefits.metric1.value") }}
+                  </div>
                 </div>
                 <i class="bi bi-clock-history text-primary fs-3"></i>
               </div>
@@ -140,8 +137,12 @@
                 class="d-flex justify-content-between align-items-center metric-row"
               >
                 <div>
-                  <div class="text-muted small">Pacientes informados</div>
-                  <div class="fw-semibold">Menos llamadas y consultas</div>
+                  <div class="text-muted small">
+                    {{ t("welcome.benefits.metric2.label") }}
+                  </div>
+                  <div class="fw-semibold">
+                    {{ t("welcome.benefits.metric2.value") }}
+                  </div>
                 </div>
                 <i class="bi bi-people-fill text-primary fs-3"></i>
               </div>
@@ -150,16 +151,19 @@
                 class="d-flex justify-content-between align-items-center metric-row"
               >
                 <div>
-                  <div class="text-muted small">Información centralizada</div>
-                  <div class="fw-semibold">Datos siempre disponibles</div>
+                  <div class="text-muted small">
+                    {{ t("welcome.benefits.metric3.label") }}
+                  </div>
+                  <div class="fw-semibold">
+                    {{ t("welcome.benefits.metric3.value") }}
+                  </div>
                 </div>
                 <i class="bi bi-hdd-network text-primary fs-3"></i>
               </div>
             </div>
 
             <p class="small text-muted mt-3 mb-0">
-              Esta instancia de Clínica Online se utiliza con fines académicos,
-              simulando el flujo real de una institución sanitaria moderna.
+              {{ t("welcome.benefits.footer") }}
             </p>
           </div>
         </div>

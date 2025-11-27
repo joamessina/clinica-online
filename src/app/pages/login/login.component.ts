@@ -9,22 +9,22 @@ import { LoaderService } from '../../core/services/loader.service';
 import { SpecialtyService } from '../../core/services/specialty.service';
 import { SupabaseClientService } from '../../core/supabase/supabase-client.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-
+import { I18nService } from '../../core/i18n/i18n.service';
 
 type QuickRole = 'paciente' | 'especialista' | 'admin';
 
 interface QuickUser {
   label: string;
   role: QuickRole;
-  email: string;    
-  password: string; 
+  email: string;
+  password: string;
   avatar: string;
 }
 
 @Component({
   standalone: true,
   selector: 'app-login',
-  imports: [CommonModule, FormsModule,TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
@@ -35,23 +35,63 @@ export class LoginComponent {
   private loader = inject(LoaderService);
   private sb = inject(SupabaseClientService).client;
   private specialtySvc = inject(SpecialtyService);
+  private i18n = inject(I18nService);
 
-  
   private avatars = {
-    paciente: this.sb.storage.from('avatars').getPublicUrl('system/user.jpg').data.publicUrl,
-    especialista: this.sb.storage.from('avatars').getPublicUrl('system/doctor.jpg').data.publicUrl,
-    admin: this.sb.storage.from('avatars').getPublicUrl('system/admin.jpg').data.publicUrl,
+    paciente: this.sb.storage.from('avatars').getPublicUrl('system/user.jpg')
+      .data.publicUrl,
+    especialista: this.sb.storage
+      .from('avatars')
+      .getPublicUrl('system/doctor.jpg').data.publicUrl,
+    admin: this.sb.storage.from('avatars').getPublicUrl('system/admin.jpg').data
+      .publicUrl,
   };
 
-   quickUsers: QuickUser[] = [
-    { label: 'Paciente 1', role: 'paciente', email: 'lucamerolla124@gmail.com', password: '123456', avatar: this.avatars.paciente },
-    { label: 'Paciente 2', role: 'paciente', email: 'pepeargento@yopmail.com', password: '123456', avatar: this.avatars.paciente },
-    { label: 'Paciente 3', role: 'paciente', email: 'cockyargento@yopmail.com', password: '123456', avatar: this.avatars.paciente },
-    { label: 'Especialista 1', role: 'especialista', email: 'terala6344@fergetic.com', password: '123456', avatar: this.avatars.especialista },
-    { label: 'Especialista 2', role: 'especialista', email: 'especialista@yopmail.com', password: '123456', avatar: this.avatars.especialista },
-    { label: 'Admin', role: 'admin', email: 'joaquin.messina@gmail.com', password: '123456', avatar: this.avatars.admin },
+  quickUsers: QuickUser[] = [
+    {
+      label: 'Paciente 1',
+      role: 'paciente',
+      email: 'lucamerolla124@gmail.com',
+      password: '123456',
+      avatar: this.avatars.paciente,
+    },
+    {
+      label: 'Paciente 2',
+      role: 'paciente',
+      email: 'pepeargento@yopmail.com',
+      password: '123456',
+      avatar: this.avatars.paciente,
+    },
+    {
+      label: 'Paciente 3',
+      role: 'paciente',
+      email: 'cockyargento@yopmail.com',
+      password: '123456',
+      avatar: this.avatars.paciente,
+    },
+    {
+      label: 'Especialista 1',
+      role: 'especialista',
+      email: 'terala6344@fergetic.com',
+      password: '123456',
+      avatar: this.avatars.especialista,
+    },
+    {
+      label: 'Especialista 2',
+      role: 'especialista',
+      email: 'especialista@yopmail.com',
+      password: '123456',
+      avatar: this.avatars.especialista,
+    },
+    {
+      label: 'Admin',
+      role: 'admin',
+      email: 'joaquin.messina@gmail.com',
+      password: '123456',
+      avatar: this.avatars.admin,
+    },
   ];
-  
+
   email = '';
   password = '';
 
@@ -65,17 +105,16 @@ export class LoginComponent {
       const r = await this.auth.signInEmailChecked(this.email, this.password);
       if (!r.ok) {
         if (r.code === 'PENDIENTE') {
-          alert('Pendiente de aprobación.');
+          alert(this.i18n.t('login.error.pending'));
         } else if (r.code === 'CREDENCIALES') {
-          alert('Email o contraseña incorrectos.');
+          alert(this.i18n.t('login.error.credentials'));
         } else {
-          alert('No pudimos iniciar sesión. Intentá nuevamente.');
+          alert(this.i18n.t('login.error.generic'));
         }
         return;
       }
 
       await this.session.refresh();
-
       await this.completarPerfilPendienteDespuesDeLogin();
 
       const prof = this.session.profile();
@@ -141,7 +180,7 @@ export class LoginComponent {
         dni: payload.dni,
         obra_social: payload.rol === 'paciente' ? payload.obra_social : null,
         is_approved: payload.rol === 'especialista' ? false : true,
-        email: this.email, 
+        email: this.email,
         avatar_url: avatarUrl,
         extra_img_url: payload.rol === 'paciente' ? extraUrl ?? null : null,
       },

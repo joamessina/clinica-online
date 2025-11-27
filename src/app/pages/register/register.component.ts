@@ -12,13 +12,20 @@ import { RecaptchaComponent } from '../../shared/recaptcha/recaptcha.component';
 import { environment } from '../../../environments/environment';
 import { CaptchaDirective } from '../../shared/directives/captcha.directive';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { I18nService } from '../../core/i18n/i18n.service';
 
 type Rol = 'paciente' | 'especialista';
 
 @Component({
   standalone: true,
   selector: 'app-register',
-  imports: [CommonModule, FormsModule, RecaptchaComponent, CaptchaDirective,TranslatePipe],
+  imports: [
+    CommonModule,
+    FormsModule,
+    RecaptchaComponent,
+    CaptchaDirective,
+    TranslatePipe,
+  ],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
 })
@@ -41,6 +48,7 @@ export class RegisterComponent implements OnInit {
   private auth = inject(AuthService);
   private specialtySvc = inject(SpecialtyService);
   private toast = inject(ToastService);
+  private i18n = inject(I18nService);
   rol: Rol | null = null;
 
   patientImgUrl = this.sb.storage
@@ -137,11 +145,10 @@ export class RegisterComponent implements OnInit {
   addSpecialty() {
     const name = this.specialtyOtherInput.trim();
     if (!name) {
-      this.toast.error('Escribí el nombre de la nueva especialidad.');
+      this.toast.error(this.i18n.t('register.error.newSpecialtyEmpty'));
       return;
     }
 
-    // ¿Ya existe una especialidad con ese nombre? -> la usamos
     const current = this.specialties();
     const existing = current.find(
       (s) => s.nombre.toLowerCase() === name.toLowerCase()
@@ -151,7 +158,6 @@ export class RegisterComponent implements OnInit {
     if (existing) {
       id = existing.id;
     } else {
-      // Creamos una especialidad "custom" solo en memoria
       id = `custom:${Date.now()}`;
       this.specialties.set([...current, { id, nombre: name, isCustom: true }]);
     }
@@ -160,12 +166,10 @@ export class RegisterComponent implements OnInit {
       this.selectedSpecialtyIds.push(id);
     }
 
-    // Limpiamos el input
     this.specialtyOtherInput = '';
-    this.toast.success('Especialidad agregada a tu selección.');
+    this.toast.success(this.i18n.t('register.success.newSpecialtyAdded'));
   }
 
-  // Cerrar el dropdown si se hace click fuera
   @HostListener('document:click', ['$event'])
   onDocumentClick(ev: MouseEvent) {
     const target = ev.target as HTMLElement | null;
@@ -177,30 +181,35 @@ export class RegisterComponent implements OnInit {
   }
 
   private validar(): string | null {
-    if (!this.nombre.trim()) return 'Nombre requerido';
-    if (!this.apellido.trim()) return 'Apellido requerido';
-    if (!this.edad || this.edad <= 0) return 'Edad inválida';
-    if (!/^\d{6,}$/.test(this.dni)) return 'DNI inválido';
-    if (!/^\S+@\S+\.\S+$/.test(this.email)) return 'Email inválido';
+    if (!this.nombre.trim()) return this.i18n.t('register.error.nameRequired');
+    if (!this.apellido.trim())
+      return this.i18n.t('register.error.lastnameRequired');
+    if (!this.edad || this.edad <= 0)
+      return this.i18n.t('register.error.ageInvalid');
+    if (!/^\d{6,}$/.test(this.dni))
+      return this.i18n.t('register.error.dniInvalid');
+    if (!/^\S+@\S+\.\S+$/.test(this.email))
+      return this.i18n.t('register.error.emailInvalid');
     if ((this.password ?? '').length < 6)
-      return 'Contraseña mínima 6 caracteres';
+      return this.i18n.t('register.error.passwordMin');
 
     if (this.rol === 'paciente') {
-      if (!this.obra_social.trim()) return 'Obra social requerida';
+      if (!this.obra_social.trim())
+        return this.i18n.t('register.error.healthRequired');
       if (!this.foto1 || !this.foto2)
-        return 'Pacientes: subí 2 imágenes de perfil';
+        return this.i18n.t('register.error.photosPatient');
     } else {
-      if (this.selectedSpecialtyIds.length === 0) {
-        return 'Elegí al menos una especialidad';
-      }
-      if (!this.fotoEsp) return 'Especialistas: subí una imagen de perfil';
+      if (this.selectedSpecialtyIds.length === 0)
+        return this.i18n.t('register.error.specialtyRequired');
+      if (!this.fotoEsp)
+        return this.i18n.t('register.error.photoSpecialistRequired');
     }
     return null;
   }
 
   async submit() {
     if (!this.rol) {
-      this.toast.error('Elegí un perfil.');
+      this.toast.error(this.i18n.t('register.error.chooseRole'));
       return;
     }
 
@@ -213,7 +222,7 @@ export class RegisterComponent implements OnInit {
     // ---- Validación de captcha (se puede deshabilitar por environment) ----
     if (this.captchaEnabled) {
       if (!this.captchaToken) {
-        this.toast.error('Completá el captcha.');
+        this.toast.error(this.i18n.t('register.error.captchaRequired'));
         return;
       }
 
@@ -225,7 +234,7 @@ export class RegisterComponent implements OnInit {
       );
 
       if (vErr || !verify?.success) {
-        this.toast.error('Captcha inválido. Intentá nuevamente.');
+        this.toast.error(this.i18n.t('register.error.captchaInvalid'));
         return;
       }
     }
@@ -296,7 +305,7 @@ export class RegisterComponent implements OnInit {
 
       if (ppErr) {
         console.warn('[register] rpc upsert_pending_profile error:', ppErr);
-        this.toast.error('No se pudo preparar el registro');
+        this.toast.error(this.i18n.t('register.error.prepare'));
         return;
       }
 
@@ -308,11 +317,11 @@ export class RegisterComponent implements OnInit {
       );
       if (dniChkErr) {
         console.warn('[register] dni_exists error:', dniChkErr);
-        this.toast.error('No se pudo validar el DNI. Intentá de nuevo.');
+        this.toast.error(this.i18n.t('register.error.dniCheck'));
         return;
       }
       if (dniTaken) {
-        this.toast.error('Ese DNI ya está registrado.');
+        this.toast.error(this.i18n.t('register.error.dniTaken'));
         return;
       }
 
@@ -342,9 +351,7 @@ export class RegisterComponent implements OnInit {
         return;
       }
 
-      this.toast.success(
-        'Te enviamos un correo para confirmar la cuenta. Luego iniciá sesión para completar el perfil.'
-      );
+      this.toast.success(this.i18n.t('register.success.signupEmail'));
       this.router.navigateByUrl('/login');
     }, 'register');
   }

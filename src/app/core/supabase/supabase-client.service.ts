@@ -11,17 +11,17 @@ export class SupabaseClientService {
     // ID estable por pestaña (persiste con F5; NO entre tabs)
     let tabId = sessionStorage.getItem('sb_tab_id');
     if (!tabId) {
-      tabId = (crypto.randomUUID?.() ?? Math.random().toString(36).slice(2));
+      tabId = crypto.randomUUID?.() ?? Math.random().toString(36).slice(2);
       sessionStorage.setItem('sb_tab_id', tabId);
     }
 
     const authOpts: any = {
       persistSession: true,
-      autoRefreshToken: false,          // << desactivamos el auto-refresh (clave)
+      autoRefreshToken: false, // << desactivamos el auto-refresh (clave)
       detectSessionInUrl: false,
-      storage: sessionStorage,          // aísla por pestaña
+      storage: sessionStorage,
       storageKey: `clinica-auth-${tabId}`,
-      multiTab: false                   // por si la lib lo respeta en tu versión
+      multiTab: false,
     };
 
     this._client = createClient(
@@ -31,5 +31,7 @@ export class SupabaseClientService {
     );
   }
 
-  get client() { return this._client; }
+  get client() {
+    return this._client;
+  }
 }
