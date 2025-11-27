@@ -218,8 +218,8 @@ export class HistoryService {
       presion,
       fecha,
       hora,
-      specialist_name,
-      specialty_name,
+      especialista_nombre,
+      especialidad_nombre,
       extras
     `
       )

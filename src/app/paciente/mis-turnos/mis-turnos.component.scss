@@ -277,3 +277,30 @@ td.actions .btn {
 .turno-modal .cancel-text {
   color: #ffffff !important;
 }
+
+.star-rating {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.star-btn {
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.turno-modal .star-char {
+  font-size: 1.6rem;
+  color: #adb5bd !important; // gris por defecto
+}
+
+.turno-modal .star-btn.active .star-char {
+  color: #ffc107 !important; // amarillo cuando está seleccionada
+}
+
+.star-btn:focus {
+  outline: none;
+}
