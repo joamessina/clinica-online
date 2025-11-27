@@ -17,7 +17,7 @@ export class SupabaseClientService {
 
     const authOpts: any = {
       persistSession: true,
-      autoRefreshToken: false, // << desactivamos el auto-refresh (clave)
+      autoRefreshToken: true,
       detectSessionInUrl: false,
       storage: sessionStorage,
       storageKey: `clinica-auth-${tabId}`,
