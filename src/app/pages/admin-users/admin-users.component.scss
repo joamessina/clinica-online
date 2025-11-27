@@ -266,3 +266,32 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.page-header-pill {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border-radius: 0.85rem;
+  background-color: #ffffffdd; // misma pastilla blanca que en Reportes
+  backdrop-filter: blur(4px);
+}
+
+.admin-actions {
+  .btn-outline-primary,
+  .btn-outline-secondary {
+    background-color: #ffffffee; // blanco casi sólido
+    border-color: #cbd5e1; // gris clarito
+  }
+
+  .btn-outline-primary {
+    color: #0d6efd; // azul bootstrap
+  }
+
+  .btn-outline-secondary {
+    color: #4b5563; // gris oscuro
+  }
+
+  .btn-outline-primary:hover,
+  .btn-outline-secondary:hover {
+    background-color: #e5edff; // leve highlight al hover
+    border-color: #94a3b8;
+  }
+}
