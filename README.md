@@ -42,49 +42,47 @@ La Clinica Online es una aplicación web para la gestión de turnos, pacientes, 
    - https://postimg.cc/MMff3sH3
 
 1. **Registro / Login**
-   - El usuario se registra como **paciente** o **especialista**.
-   - El paciente carga datos personales y dos imágenes de perfil.
-   - El especialista carga datos personales, imagen de perfil y sus especialidades.
-   - Luego inicia sesión con su correo y contraseña desde la pantalla de **Login**.
+   - El usuario se registra como **paciente** o **especialista**. (https://postimg.cc/PvGpgm8b)
+   - El paciente carga datos personales y dos imágenes de perfil. (https://postimg.cc/JHbDMGbT)
+   - El especialista carga datos personales, imagen de perfil y sus especialidades. (https://postimg.cc/5QcYhwFm)
+   - Luego inicia sesión con su correo y contraseña desde la pantalla de **Login**. (https://postimg.cc/Vr00Z7vD)
 
 2. **Solicitar turnos (paciente)**
-   - El paciente elige **especialidad**, **especialista**, día y horario disponible.
+   - El paciente elige **especialidad**, **especialista**, día y horario disponible. (https://postimg.cc/ZvkBGryp)
    - Se genera un turno en estado **“PENDIENTE”**.
-   - El turno aparece en la sección **Mis turnos** del paciente.
+   - El turno aparece en la sección **Mis turnos** del paciente.(https://postimg.cc/ThmWrHZr)
 
 3. **Gestión de turnos**
-   - **Especialista**: acepta, rechaza, cancela o finaliza turnos desde **Mis turnos especialista**.
+   - **Especialista**: acepta, rechaza, cancela o finaliza turnos desde **Mis turnos especialista**. (https://postimg.cc/gwJZ8cWn)
    - **Paciente**: puede cancelar sus turnos mientras no hayan sido realizados.
-   - **Administrador**: puede ver todos los turnos de la clínica y cancelarlos cuando sea necesario.
 
 4. **Historia clínica**
-   - Al finalizar el turno, el especialista carga la reseña de la consulta.
-   - Esa información se guarda en la **historia clínica** del paciente.
-   - Se pueden consultar las atenciones anteriores de cada paciente.
+   - Al finalizar el turno, el especialista carga la informacion clinica de la consulta. (https://postimg.cc/F7y3Qnpr)
+   - Esa información se guarda en la **historia clínica** del paciente. (https://postimg.cc/F7y3Qnpr)
+   
 
 5. **Calificación y encuesta de la atención**
    - Cuando el turno se marca como realizado, el paciente puede:
-     - Calificar la atención con un puntaje de **1 a 5 estrellas**.
-     - Completar una **encuesta de satisfacción** con preguntas rápidas y un comentario opcional.
+     - Calificar la atención con un puntaje de **1 a 5 estrellas**. (https://postimg.cc/XZzy8Mjw)
+     - Completar una **encuesta de satisfacción** con preguntas rápidas y un comentario opcional. (https://postimg.cc/gwT6D9zt)
 
 6. **Descargar historia clínica (paciente)**
-   - Desde su panel, el paciente puede descargar su **historia clínica completa**.
+   - Desde su panel, el paciente puede descargar su **historia clínica completa**. (https://postimg.cc/0zZSzMhF)
 
 7. **Ver historias clínicas y turnos del paciente (especialista)**
-   - El especialista puede ver las historias clínicas de pacientes que atendió alguna vez.
-   - Desde ahí también ve los turnos pasados y futuros de cada paciente.
+   - El especialista puede ver las historias clínicas de pacientes que atendió alguna vez. (https://postimg.cc/zyphyb9m)
 
 8. **Panel de administración – usuarios**
-   - El administrador ve el listado completo de usuarios.
-   - Puede aprobar especialistas, cambiar roles, activar o desactivar cuentas.
-   - Puede descargar los turnos asociados a cada usuario **Excel**.
+   - El administrador ve el listado completo de usuarios. (https://postimg.cc/hXMmXzHK)
+   - Puede aprobar especialistas, cambiar roles, activar o desactivar cuentas. (https://postimg.cc/w3sDwBsV)
+   - Puede descargar los turnos asociados a cada usuario **Excel**. (https://postimg.cc/yk4ctzF5)
 
 9. **Panel de administración – turnos**
-   - Vista general de todos los turnos de la clínica.
-   - Filtros por estado, fecha, paciente y especialista.
+   - Vista general de todos los turnos de la clínica. (https://postimg.cc/ZWVhX4yH)
+   - Filtros por estado, fecha, paciente y especialista. (https://postimg.cc/3knHzYD2)
 
 10. **Informes y reportes de la clínica**
-    - Sección de **Reportes** para el administrador.
+    - Sección de **Reportes** para el administrador. (https://postimg.cc/ctQg0rQz)
     - Incluye:
       - Log de ingresos al sistema.
       - Indicadores de visitas, turnos totales, pacientes únicos y encuestas recibidas.
