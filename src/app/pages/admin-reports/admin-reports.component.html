@@ -5,281 +5,121 @@
       class="col-12 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2"
     >
       <div>
-<h1 class="h4 mb-1">
-  <span class="hero-pill">Reportes y estadísticas</span>
-</h1>
-<p class="text-muted small mb-0">
-  <span class="hero-pill hero-pill--sm">
-    Visualizá el log de ingresos, las visitas a la clínica y las estadísticas de turnos y encuestas.
-  </span>
-</p>
+        <h1 class="h4 mb-1">
+          <span class="hero-pill">Reportes y estadísticas</span>
+        </h1>
+        <p class="text-muted small mb-0">
+          <span class="hero-pill hero-pill--sm">
+            Visualizá el log de ingresos, las visitas a la clínica y las
+            estadísticas de turnos y encuestas.
+          </span>
+        </p>
 
- <div class="small text-muted" *ngIf="lastUpdated() as lu">
-    <span class="hero-pill hero-pill--sm">
-      Última actualización: {{ lu | date : 'short' }}
-    </span>
-  </div>
-</div>
-</div>
-<!-- LOADING -->
-<div *ngIf="loading()" class="text-center text-muted py-5">
-  <div class="spinner-border text-primary mb-2" role="status"></div>
-  <div>
-    <span class="hero-pill hero-pill--sm">
-      Cargando reportes…
-    </span>
-  </div>
-</div>
-
-<!-- CONTENIDO -->
-<div *ngIf="!loading()">
-  <!-- INDICADORES RESUMEN -->
-  <div class="row g-3 mb-3 small">
-    <div class="col-6 col-md-3">
-      <div class="fw-semibold text-muted text-uppercase mb-1">
-        <span class="hero-pill hero-pill--sm">
-          Visitas (turnos realizados)
-        </span>
+        <div class="small text-muted" *ngIf="lastUpdated() as lu">
+          <span class="hero-pill hero-pill--sm">
+            Última actualización: {{ lu | date : "short" }}
+          </span>
+        </div>
       </div>
-      <div class="h5 mb-0">
-        <span class="hero-pill">
-          {{ visitasRealizadas() }}
-        </span>
-      </div>
-      <div class="text-muted">
-        <span class="hero-pill hero-pill--sm">
-          Últimos 6 meses
-        </span>
+    </div>
+    <!-- LOADING -->
+    <div *ngIf="loading()" class="text-center text-muted py-5">
+      <div class="spinner-border text-primary mb-2" role="status"></div>
+      <div>
+        <span class="hero-pill hero-pill--sm"> Cargando reportes… </span>
       </div>
     </div>
 
-    <div class="col-6 col-md-3">
-      <div class="fw-semibold text-muted text-uppercase mb-1">
-        <span class="hero-pill hero-pill--sm">
-          Turnos totales
-        </span>
-      </div>
-      <div class="h5 mb-0">
-        <span class="hero-pill">
-          {{ totalTurnos() }}
-        </span>
-      </div>
-      <div class="text-muted">
-        <span class="hero-pill hero-pill--sm">
-          En el mismo período
-        </span>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-3">
-      <div class="fw-semibold text-muted text-uppercase mb-1">
-        <span class="hero-pill hero-pill--sm">
-          Pacientes únicos
-        </span>
-      </div>
-      <div class="h5 mb-0">
-        <span class="hero-pill">
-          {{ totalPacientesUnicos() }}
-        </span>
-      </div>
-      <div class="text-muted">
-        <span class="hero-pill hero-pill--sm">
-          Con al menos un turno
-        </span>
-      </div>
-    </div>
-
-    <div class="col-6 col-md-3">
-      <div class="fw-semibold text-muted text-uppercase mb-1">
-        <span class="hero-pill hero-pill--sm">
-          Encuestas recibidas
-        </span>
-      </div>
-      <div class="h5 mb-0">
-        <span class="hero-pill">
-          {{ surveyStats().total }}
-        </span>
-      </div>
-      <div class="text-muted">
-        <span class="hero-pill hero-pill--sm">
-          Últimos 30 días
-        </span>
-      </div>
-    </div>
-  </div>
-
-    <!-- FILA PRINCIPAL DE CARDS -->
-    <div class="row g-3">
-      <!-- LOG INGRESOS -->
-      <div class="col-12 col-xl-5">
-        <div class="card shadow-sm report-card h-100">
-          <div
-            class="card-header d-flex justify-content-between align-items-center"
-          >
-            <div>
-              <div class="fw-semibold small text-uppercase text-muted">
-                Log de ingresos
-              </div>
-              <div class="small text-muted">
-                Últimos {{ loginLogs().length }} ingresos al sistema.
-              </div>
-            </div>
-            <div class="btn-group btn-group-sm">
-              <button
-                class="btn btn-outline-secondary"
-                (click)="exportLoginsPdf()"
-              >
-                <i class="bi bi-file-earmark-pdf"></i>
-                PDF
-              </button>
-              <button
-                class="btn btn-outline-success"
-                (click)="exportLoginsExcel()"
-              >
-                <i class="bi bi-file-earmark-excel"></i>
-                Excel
-              </button>
-            </div>
+    <!-- CONTENIDO -->
+    <div *ngIf="!loading()">
+      <!-- INDICADORES RESUMEN -->
+      <div class="row g-3 mb-3 small">
+        <div class="col-6 col-md-3">
+          <div class="fw-semibold text-muted text-uppercase mb-1">
+            <span class="hero-pill hero-pill--sm">
+              Visitas (turnos realizados)
+            </span>
           </div>
+          <div class="h5 mb-0">
+            <span class="hero-pill">
+              {{ visitasRealizadas() }}
+            </span>
+          </div>
+          <div class="text-muted">
+            <span class="hero-pill hero-pill--sm"> Últimos 6 meses </span>
+          </div>
+        </div>
 
-          <div class="card-body p-0">
-            <div class="table-responsive small">
-              <table
-                class="table table-sm mb-0 align-middle table-striped table-hover"
-              >
-                <thead class="table-light">
-                  <tr>
-                    <th>Usuario</th>
-                    <th>Rol</th>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let l of loginLogs()">
-                    <td>{{ l.email }}</td>
-                    <td>{{ l.role || '—' }}</td>
-                    <td>{{ l.logged_at | date : 'shortDate' }}</td>
-                    <td>{{ l.logged_at | date : 'shortTime' }}</td>
-                  </tr>
-                  <tr *ngIf="!loginLogs().length">
-                    <td colspan="4" class="text-muted text-center py-3">
-                      No hay ingresos registrados todavía.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+        <div class="col-6 col-md-3">
+          <div class="fw-semibold text-muted text-uppercase mb-1">
+            <span class="hero-pill hero-pill--sm"> Turnos totales </span>
+          </div>
+          <div class="h5 mb-0">
+            <span class="hero-pill">
+              {{ totalTurnos() }}
+            </span>
+          </div>
+          <div class="text-muted">
+            <span class="hero-pill hero-pill--sm"> En el mismo período </span>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <div class="fw-semibold text-muted text-uppercase mb-1">
+            <span class="hero-pill hero-pill--sm"> Pacientes únicos </span>
+          </div>
+          <div class="h5 mb-0">
+            <span class="hero-pill">
+              {{ totalPacientesUnicos() }}
+            </span>
+          </div>
+          <div class="text-muted">
+            <span class="hero-pill hero-pill--sm"> Con al menos un turno </span>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3">
+          <div class="fw-semibold text-muted text-uppercase mb-1">
+            <span class="hero-pill hero-pill--sm"> Encuestas recibidas </span>
+          </div>
+          <div class="h5 mb-0">
+            <span class="hero-pill">
+              {{ surveyStats().total }}
+            </span>
+          </div>
+          <div class="text-muted">
+            <span class="hero-pill hero-pill--sm"> Últimos 30 días </span>
           </div>
         </div>
       </div>
 
-      <!-- TURNOS POR ESPECIALIDAD -->
-      <div class="col-12 col-xl-7">
-        <div class="card shadow-sm report-card h-100">
-          <div
-            class="card-header d-flex justify-content-between align-items-center"
-          >
-            <div>
-              <div class="fw-semibold small text-uppercase text-muted">
-                Turnos por especialidad
-              </div>
-              <div class="small text-muted">
-                Distribución de turnos en los últimos meses.
-              </div>
-            </div>
-            <div class="btn-group btn-group-sm">
-              <button
-                class="btn btn-outline-secondary"
-                (click)="exportEspecialidadPdf()"
-              >
-                <i class="bi bi-file-earmark-pdf"></i>
-                PDF
-              </button>
-              <button
-                class="btn btn-outline-success"
-                (click)="exportEspecialidadExcel()"
-              >
-                <i class="bi bi-file-earmark-excel"></i>
-                Excel
-              </button>
-            </div>
-          </div>
-
-          <div class="card-body">
-            <div class="chart-wrapper">
-              <canvas #especialidadChart></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TURNOS POR DÍA -->
-      <div class="col-12 col-xl-6">
-        <div class="card shadow-sm report-card h-100">
-          <div
-            class="card-header d-flex justify-content-between align-items-center"
-          >
-            <div>
-              <div class="fw-semibold small text-uppercase text-muted">
-                Turnos por día
-              </div>
-              <div class="small text-muted">
-                Cantidad de turnos agendados por fecha.
-              </div>
-            </div>
-            <div class="btn-group btn-group-sm">
-              <button
-                class="btn btn-outline-secondary"
-                (click)="exportDiaPdf()"
-              >
-                <i class="bi bi-file-earmark-pdf"></i>
-                PDF
-              </button>
-              <button
-                class="btn btn-outline-success"
-                (click)="exportDiaExcel()"
-              >
-                <i class="bi bi-file-earmark-excel"></i>
-                Excel
-              </button>
-            </div>
-          </div>
-
-          <div class="card-body">
-            <div class="chart-wrapper">
-              <canvas #diaChart></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- TURNOS POR MÉDICO -->
-      <div class="col-12 col-xl-6">
-        <div class="card shadow-sm report-card h-100">
-          <div class="card-header">
+      <!-- FILA PRINCIPAL DE CARDS -->
+      <div class="row g-3">
+        <!-- LOG INGRESOS -->
+        <div class="col-12 col-xl-5">
+          <div class="card shadow-sm report-card h-100">
             <div
-              class="d-flex justify-content-between align-items-center mb-2 gap-2"
+              class="card-header d-flex justify-content-between align-items-center"
             >
               <div>
                 <div class="fw-semibold small text-uppercase text-muted">
-                  Turnos por médico
+                  Log de ingresos
                 </div>
                 <div class="small text-muted">
-                  Solicitados vs finalizados en un rango de fechas.
+                  Últimos {{ loginLogs().length }} ingresos al sistema.
                 </div>
               </div>
               <div class="btn-group btn-group-sm">
                 <button
                   class="btn btn-outline-secondary"
-                  (click)="exportMedicoPdf()"
+                  (click)="exportLoginsPdf()"
                 >
                   <i class="bi bi-file-earmark-pdf"></i>
                   PDF
                 </button>
                 <button
                   class="btn btn-outline-success"
-                  (click)="exportMedicoExcel()"
+                  (click)="exportLoginsExcel()"
                 >
                   <i class="bi bi-file-earmark-excel"></i>
                   Excel
@@ -287,174 +127,320 @@
               </div>
             </div>
 
-            <div class="row g-2 small">
-              <div class="col-6">
-                <label class="form-label mb-1">Desde</label>
-                <input
-                  type="date"
-                  class="form-control form-control-sm"
-                  [value]="rangeFrom()"
-                  (change)="onRangeChange($any($event.target).value, 'from')"
-                />
-              </div>
-              <div class="col-6">
-                <label class="form-label mb-1">Hasta</label>
-                <input
-                  type="date"
-                  class="form-control form-control-sm"
-                  [value]="rangeTo()"
-                  (change)="onRangeChange($any($event.target).value, 'to')"
-                />
+            <div class="card-body p-0">
+              <div class="log-table-wrapper table-responsive small">
+                <table
+                  class="table table-sm mb-0 align-middle table-striped table-hover"
+                >
+                  <thead class="table-light">
+                    <tr>
+                      <th>Usuario</th>
+                      <th>Rol</th>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let l of loginLogs()">
+                      <td>{{ l.email }}</td>
+                      <td>{{ l.role || "—" }}</td>
+                      <td>{{ l.logged_at | date : "shortDate" }}</td>
+                      <td>{{ l.logged_at | date : "shortTime" }}</td>
+                    </tr>
+                    <tr *ngIf="!loginLogs().length">
+                      <td colspan="4" class="text-muted text-center py-3">
+                        No hay ingresos registrados todavía.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-          </div>
-
-          <div class="card-body">
-            <div class="chart-wrapper">
-              <canvas #medicoChart></canvas>
-            </div>
-            <p class="small text-muted mt-2 mb-0">
-              Mostrando {{ medicoStats().length }} médico(s) con turnos en el
-              rango seleccionado.
-            </p>
           </div>
         </div>
-      </div>
 
-      <!-- PACIENTES POR ESPECIALIDAD -->
-      <div class="col-12 col-xl-6">
-        <div class="card shadow-sm report-card h-100">
-          <div
-            class="card-header d-flex justify-content-between align-items-center"
-          >
-            <div>
-              <div class="fw-semibold small text-uppercase text-muted">
-                Pacientes por especialidad
+        <!-- TURNOS POR ESPECIALIDAD -->
+        <div class="col-12 col-xl-7">
+          <div class="card shadow-sm report-card h-100">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <div class="fw-semibold small text-uppercase text-muted">
+                  Turnos por especialidad
+                </div>
+                <div class="small text-muted">
+                  Distribución de turnos en los últimos meses.
+                </div>
               </div>
-              <div class="small text-muted">
-                Cantidad de pacientes únicos por especialidad (últimos 6
-                meses).
+              <div class="btn-group btn-group-sm">
+                <button
+                  class="btn btn-outline-secondary"
+                  (click)="exportEspecialidadPdf()"
+                >
+                  <i class="bi bi-file-earmark-pdf"></i>
+                  PDF
+                </button>
+                <button
+                  class="btn btn-outline-success"
+                  (click)="exportEspecialidadExcel()"
+                >
+                  <i class="bi bi-file-earmark-excel"></i>
+                  Excel
+                </button>
               </div>
             </div>
-            <div class="btn-group btn-group-sm">
-              <button
-                class="btn btn-outline-secondary"
-                (click)="downloadPacientesEspPng()"
+
+            <div class="card-body">
+              <div class="chart-wrapper">
+                <canvas #especialidadChart></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TURNOS POR DÍA -->
+        <div class="col-12 col-xl-6">
+          <div class="card shadow-sm report-card h-100">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <div class="fw-semibold small text-uppercase text-muted">
+                  Turnos por día
+                </div>
+                <div class="small text-muted">
+                  Cantidad de turnos agendados por fecha.
+                </div>
+              </div>
+              <div class="btn-group btn-group-sm">
+                <button
+                  class="btn btn-outline-secondary"
+                  (click)="exportDiaPdf()"
+                >
+                  <i class="bi bi-file-earmark-pdf"></i>
+                  PDF
+                </button>
+                <button
+                  class="btn btn-outline-success"
+                  (click)="exportDiaExcel()"
+                >
+                  <i class="bi bi-file-earmark-excel"></i>
+                  Excel
+                </button>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="chart-wrapper">
+                <canvas #diaChart></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TURNOS POR MÉDICO -->
+        <div class="col-12 col-xl-6">
+          <div class="card shadow-sm report-card h-100">
+            <div class="card-header">
+              <div
+                class="d-flex justify-content-between align-items-center mb-2 gap-2"
               >
-                <i class="bi bi-image"></i>
-                PNG
-              </button>
-            </div>
-          </div>
-
-          <div class="card-body">
-            <div class="chart-wrapper">
-              <canvas #pacientesEspChart></canvas>
-            </div>
-            <p class="small text-muted mt-2 mb-0">
-              Total pacientes únicos: {{ totalPacientesUnicos() }}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- MÉDICOS POR ESPECIALIDAD -->
-      <div class="col-12 col-xl-6">
-        <div class="card shadow-sm report-card h-100">
-          <div
-            class="card-header d-flex justify-content-between align-items-center"
-          >
-            <div>
-              <div class="fw-semibold small text-uppercase text-muted">
-                Médicos por especialidad
-              </div>
-              <div class="small text-muted">
-                Cantidad de médicos con turnos por especialidad (últimos 6
-                meses).
-              </div>
-            </div>
-            <div class="btn-group btn-group-sm">
-              <button
-                class="btn btn-outline-secondary"
-                (click)="downloadMedicosEspPng()"
-              >
-                <i class="bi bi-image"></i>
-                PNG
-              </button>
-            </div>
-          </div>
-
-          <div class="card-body">
-            <div class="chart-wrapper">
-              <canvas #medicosEspChart></canvas>
-            </div>
-            <p class="small text-muted mt-2 mb-0">
-              Total médicos con turnos: {{ totalMedicosUnicos() }}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- ENCUESTA DE ATENCIÓN -->
-      <div class="col-12">
-        <div class="card shadow-sm report-card">
-          <div
-            class="card-header d-flex justify-content-between align-items-center"
-          >
-            <div>
-              <div class="fw-semibold small text-uppercase text-muted">
-                Encuesta de atención al paciente
-              </div>
-              <div class="small text-muted">
-                Resultados de las encuestas de satisfacción (últimos 30 días).
-              </div>
-            </div>
-          </div>
-
-          <div class="card-body">
-            <ng-container *ngIf="surveyStats().total; else noSurveyData">
-              <div class="row g-3">
-                <div class="col-12 col-md-6">
-                  <div class="chart-wrapper">
-                    <canvas #surveyChart></canvas>
+                <div>
+                  <div class="fw-semibold small text-uppercase text-muted">
+                    Turnos por médico
+                  </div>
+                  <div class="small text-muted">
+                    Solicitados vs finalizados en un rango de fechas.
                   </div>
                 </div>
-                <div class="col-12 col-md-6 small">
-                  <ul class="list-unstyled mb-0">
-                    <li>
-                      <strong>Total encuestas:</strong>
-                      {{ surveyStats().total }}
-                    </li>
-                    <li>
-                      <strong>Promedio calificación:</strong>
-                      {{ surveyStats().avgRating || '-' }} / 5
-                    </li>
-                    <li>
-                      <strong>Atendidos a horario (Sí):</strong>
-                      {{ surveyStats().p1Si }}
-                    </li>
-                    <li>
-                      <strong>Atendidos a horario (No):</strong>
-                      {{ surveyStats().p1No }}
-                    </li>
-                    <li>
-                      <strong>Recomendarían al especialista (Sí):</strong>
-                      {{ surveyStats().p2Si }}
-                    </li>
-                    <li>
-                      <strong>Recomendarían al especialista (No):</strong>
-                      {{ surveyStats().p2No }}
-                    </li>
-                  </ul>
+                <div class="btn-group btn-group-sm">
+                  <button
+                    class="btn btn-outline-secondary"
+                    (click)="exportMedicoPdf()"
+                  >
+                    <i class="bi bi-file-earmark-pdf"></i>
+                    PDF
+                  </button>
+                  <button
+                    class="btn btn-outline-success"
+                    (click)="exportMedicoExcel()"
+                  >
+                    <i class="bi bi-file-earmark-excel"></i>
+                    Excel
+                  </button>
                 </div>
               </div>
-            </ng-container>
 
-            <ng-template #noSurveyData>
-              <p class="small text-muted mb-0">
-                Todavía no hay encuestas registradas en los últimos 30 días.
+              <div class="row g-2 small">
+                <div class="col-6">
+                  <label class="form-label mb-1">Desde</label>
+                  <input
+                    type="date"
+                    class="form-control form-control-sm"
+                    [value]="rangeFrom()"
+                    (change)="onRangeChange($any($event.target).value, 'from')"
+                  />
+                </div>
+                <div class="col-6">
+                  <label class="form-label mb-1">Hasta</label>
+                  <input
+                    type="date"
+                    class="form-control form-control-sm"
+                    [value]="rangeTo()"
+                    (change)="onRangeChange($any($event.target).value, 'to')"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="chart-wrapper">
+                <canvas #medicoChart></canvas>
+              </div>
+              <p class="small text-muted mt-2 mb-0">
+                Mostrando {{ medicoStats().length }} médico(s) con turnos en el
+                rango seleccionado.
               </p>
-            </ng-template>
+            </div>
+          </div>
+        </div>
+
+        <!-- PACIENTES POR ESPECIALIDAD -->
+        <div class="col-12 col-xl-6">
+          <div class="card shadow-sm report-card h-100">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <div class="fw-semibold small text-uppercase text-muted">
+                  Pacientes por especialidad
+                </div>
+                <div class="small text-muted">
+                  Cantidad de pacientes únicos por especialidad (últimos 6
+                  meses).
+                </div>
+              </div>
+              <div class="btn-group btn-group-sm">
+                <button
+                  class="btn btn-outline-secondary"
+                  (click)="downloadPacientesEspPng()"
+                >
+                  <i class="bi bi-image"></i>
+                  PNG
+                </button>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="chart-wrapper">
+                <canvas #pacientesEspChart></canvas>
+              </div>
+              <p class="small text-muted mt-2 mb-0">
+                Total pacientes únicos: {{ totalPacientesUnicos() }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÉDICOS POR ESPECIALIDAD -->
+        <div class="col-12 col-xl-6">
+          <div class="card shadow-sm report-card h-100">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <div class="fw-semibold small text-uppercase text-muted">
+                  Médicos por especialidad
+                </div>
+                <div class="small text-muted">
+                  Cantidad de médicos con turnos por especialidad (últimos 6
+                  meses).
+                </div>
+              </div>
+              <div class="btn-group btn-group-sm">
+                <button
+                  class="btn btn-outline-secondary"
+                  (click)="downloadMedicosEspPng()"
+                >
+                  <i class="bi bi-image"></i>
+                  PNG
+                </button>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <div class="chart-wrapper">
+                <canvas #medicosEspChart></canvas>
+              </div>
+              <p class="small text-muted mt-2 mb-0">
+                Total médicos con turnos: {{ totalMedicosUnicos() }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ENCUESTA DE ATENCIÓN -->
+        <div class="col-12">
+          <div class="card shadow-sm report-card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <div class="fw-semibold small text-uppercase text-muted">
+                  Encuesta de atención al paciente
+                </div>
+                <div class="small text-muted">
+                  Resultados de las encuestas de satisfacción (últimos 30 días).
+                </div>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <ng-container *ngIf="surveyStats().total; else noSurveyData">
+                <div class="row g-3">
+                  <div class="col-12 col-md-6">
+                    <div class="chart-wrapper">
+                      <canvas #surveyChart></canvas>
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6 small">
+                    <ul class="list-unstyled mb-0">
+                      <li>
+                        <strong>Total encuestas:</strong>
+                        {{ surveyStats().total }}
+                      </li>
+                      <li>
+                        <strong>Promedio calificación:</strong>
+                        {{ surveyStats().avgRating || "-" }} / 5
+                      </li>
+                      <li>
+                        <strong>Atendidos a horario (Sí):</strong>
+                        {{ surveyStats().p1Si }}
+                      </li>
+                      <li>
+                        <strong>Atendidos a horario (No):</strong>
+                        {{ surveyStats().p1No }}
+                      </li>
+                      <li>
+                        <strong>Recomendarían al especialista (Sí):</strong>
+                        {{ surveyStats().p2Si }}
+                      </li>
+                      <li>
+                        <strong>Recomendarían al especialista (No):</strong>
+                        {{ surveyStats().p2No }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-template #noSurveyData>
+                <p class="small text-muted mb-0">
+                  Todavía no hay encuestas registradas en los últimos 30 días.
+                </p>
+              </ng-template>
+            </div>
           </div>
         </div>
       </div>

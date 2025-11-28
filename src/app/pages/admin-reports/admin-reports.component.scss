@@ -28,8 +28,8 @@
 }
 
 .hero-pill {
-  background: #e5f1ff;              // azul muy suave
-  border: 1px solid #c4ddff;        // borde azul clarito
+  background: #e5f1ff; // azul muy suave
+  border: 1px solid #c4ddff; // borde azul clarito
   border-radius: 999px;
   padding: 0.4rem 0.9rem;
   display: inline-flex;
@@ -43,19 +43,18 @@
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #1d4ed8;                   // azul un poco más fuerte
+  color: #1d4ed8; // azul un poco más fuerte
 }
 
 .hero-pill__value {
   font-weight: 600;
-  color: #0f172a;                   // casi negro para el número
+  color: #0f172a; // casi negro para el número
 }
 
 .hero-pill__hint {
   font-size: 0.75rem;
-  color: #334155;                   // gris azulado
+  color: #334155; // gris azulado
 }
-
 
 /* versión un poquito más chica para subtítulos / leyendas */
 .hero-pill--sm {
@@ -66,4 +65,17 @@
 /* que el texto interno no quede gris clarito */
 .hero-pill .text-muted {
   color: #111827 !important;
+}
+
+.log-table-wrapper {
+  max-height: 360px; // ajustá el número si querés más/menos alto
+  overflow-y: auto;
+}
+
+/* opcional: que los encabezados queden fijos mientras scrolleás */
+.log-table-wrapper thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #f9fafb; // mismo tono que la cabecera
 }
