@@ -39,6 +39,7 @@ La Clinica Online es una aplicación web para la gestión de turnos, pacientes, 
 0. **Bienvenida**
    - Pantalla de bienvenida con la descripción de la clínica.
    - Botones para ir a **Login** o **Registro**.
+   - https://postimg.cc/MMff3sH3
 
 1. **Registro / Login**
    - El usuario se registra como **paciente** o **especialista**.
@@ -76,12 +77,11 @@ La Clinica Online es una aplicación web para la gestión de turnos, pacientes, 
 8. **Panel de administración – usuarios**
    - El administrador ve el listado completo de usuarios.
    - Puede aprobar especialistas, cambiar roles, activar o desactivar cuentas.
-   - Puede descargar los turnos asociados a cada usuario.
+   - Puede descargar los turnos asociados a cada usuario **Excel**.
 
 9. **Panel de administración – turnos**
    - Vista general de todos los turnos de la clínica.
    - Filtros por estado, fecha, paciente y especialista.
-   - Posibilidad de descargar los turnos de los pacientes en **Excel**.
 
 10. **Informes y reportes de la clínica**
     - Sección de **Reportes** para el administrador.
