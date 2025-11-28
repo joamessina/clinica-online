@@ -1,95 +1,96 @@
 # 🏥 Clínica Online
 
-Aplicación web para gestión de **turnos**, **pacientes** y **especialistas**. Frontend en **Angular 19** y backend **Supabase** (Auth, Postgres, Storage & Edge Functions).  
-Este README cubre **hasta lo implementado en el Sprint 2**.
+La Clinica Online es una aplicación web para la gestión de turnos, pacientes, historias clínicas y especialistas de la salud. Desarrollada con Angular 19 y Supabase como backend, permite a pacientes, especialistas y administradores interactuar en la plataforma.
+
+🚀 Características principales
+---
+- Registro y autenticacion de usuarios (paciente, especialista, administrador)
+- Asignacion y gestion de turnos
+- Carga y visualizacion de historias clinicas
+- Comentarios y reseñas sobre la atencion recibida
+- Gestion de horarios personalizados por especialidad
+- Panel de administrador con control sobre usuarios y turnos
 
 ---
-
 ## 👥 Roles y capacidades
 
 ### 👤 Paciente
 
-- **Solicitar turno**: elegir **Especialidad → Especialista → día/hora** (en 15 días próximos).
-- **Mis turnos**: ver solo sus turnos, **filtro único** por especialidad/especialista.
-  - **Cancelar** (si _PENDIENTE_ o _ACEPTADO_) con **motivo**.
-  - **Ver reseña** (si existe reseña del especialista).
-  - **Completar encuesta** (si el especialista marcó como _REALIZADO_ y dejó reseña).
-  - **Calificar atención** (si _REALIZADO_).
+- Solicita turnos con especialistas segun la especialidad
+- Puede cancelar turnos, calificar la atencion y completar encuestas
+- Visualizar su historial clinico
 
 ### 🩺 Especialista
 
-- **Mis turnos**: ver turnos asignados, **filtro único** por especialidad/paciente.
-  - **Aceptar** (si no está _REALIZADO_, _CANCELADO_ o _RECHAZADO_).
-  - **Rechazar** (si no está _ACEPTADO_, _REALIZADO_ o _CANCELADO_) con **motivo**.
-  - **Cancelar** (si no está _ACEPTADO_, _REALIZADO_ o _RECHAZADO_) con **motivo**.
-  - **Finalizar** (si _ACEPTADO_) con **reseña** de la consulta.
-  - **Ver reseña** (si existe).
-- **Mis horarios**: carga de disponibilidad por **especialidad** (weekday, desde–hasta, tamaño de **slot**).
+- Planifica sus horarios por especialidad
+- Puede aceptar o rechazar turnos (debe dar motivo de cancelar)
+- Carga la historia clinica
 
 ### 🛠️ Administrador
 
-- **Usuarios**: aprobar/desaprobar especialistas, cambio de rol, alta manual (básico).
-- **Turnos**: listado global con **filtro** y **cancelación** (si procede).
+- Visualiza todos los turnos del sistema
+- Gestiona todos los usuarios y sus permisos
+- Genera Reportes segun necesidad
 
 ---
 
-## 🔄 Flujo funcional principal
+## 🔄 Flujo funcional de la aplicación
 
-1. **Bienvenida** → enlaces a **Login** / **Registro**.
-2. **Registro + reCAPTCHA** (Paciente o Especialista). Se valida el token vía `verify-recaptcha`.
-3. **Login** → redirección al **panel** según rol.
-4. **Solicitar turno (Paciente/Admin)**
-   - Seleccionar **Especialidad** → **Especialista** → ver **slots disponibles** (próximos 15 días).
-   - Confirmar; se crea turno en estado **PENDIENTE**.
-5. **Gestión de turnos**
-   - **Paciente**: cancelar / ver reseña / completar encuesta / calificar (según estado).
-   - **Especialista**: aceptar / rechazar / cancelar / finalizar con reseña (según estado).
-   - **Admin**: visualizar todos y cancelar cuando aplica.
-6. **Perfil**
-   - Datos del usuario; si es especialista, se listan **especialidades** y acceso a **Mis horarios**.
+0. **Bienvenida**
+   - Pantalla de bienvenida con la descripción de la clínica.
+   - Botones para ir a **Login** o **Registro**.
 
----
+1. **Registro / Login**
+   - El usuario se registra como **paciente** o **especialista**.
+   - El paciente carga datos personales y dos imágenes de perfil.
+   - El especialista carga datos personales, imagen de perfil y sus especialidades.
+   - Luego inicia sesión con su correo y contraseña desde la pantalla de **Login**.
 
-## 🧭 Navegación (rutas)
+2. **Solicitar turnos (paciente)**
+   - El paciente elige **especialidad**, **especialista**, día y horario disponible.
+   - Se genera un turno en estado **“PENDIENTE”**.
+   - El turno aparece en la sección **Mis turnos** del paciente.
 
-- **Públicas**
+3. **Gestión de turnos**
+   - **Especialista**: acepta, rechaza, cancela o finaliza turnos desde **Mis turnos especialista**.
+   - **Paciente**: puede cancelar sus turnos mientras no hayan sido realizados.
+   - **Administrador**: puede ver todos los turnos de la clínica y cancelarlos cuando sea necesario.
 
-  - `/` → Bienvenida
-  - `/login` | `/registro`
+4. **Historia clínica**
+   - Al finalizar el turno, el especialista carga la reseña de la consulta.
+   - Esa información se guarda en la **historia clínica** del paciente.
+   - Se pueden consultar las atenciones anteriores de cada paciente.
 
-- **Paciente (auth)**
+5. **Calificación y encuesta de la atención**
+   - Cuando el turno se marca como realizado, el paciente puede:
+     - Calificar la atención con un puntaje de **1 a 5 estrellas**.
+     - Completar una **encuesta de satisfacción** con preguntas rápidas y un comentario opcional.
 
-  - `/paciente` → Panel paciente
-  - `/paciente/mis-turnos` → Mis turnos
-  - `/turnos/solicitar` → Solicitar turno
-  - `/perfil` → Mi perfil
+6. **Descargar historia clínica (paciente)**
+   - Desde su panel, el paciente puede descargar su **historia clínica completa**.
 
-- **Especialista (auth + rol)**
+7. **Ver historias clínicas y turnos del paciente (especialista)**
+   - El especialista puede ver las historias clínicas de pacientes que atendió alguna vez.
+   - Desde ahí también ve los turnos pasados y futuros de cada paciente.
 
-  - `/especialista` → Panel especialista
-  - `/especialista/mis-turnos` → Mis turnos
-  - `/especialista/mis-horarios` → Mis horarios
-  - `/perfil` → Mi perfil
+8. **Panel de administración – usuarios**
+   - El administrador ve el listado completo de usuarios.
+   - Puede aprobar especialistas, cambiar roles, activar o desactivar cuentas.
+   - Puede descargar los turnos asociados a cada usuario.
 
-- **Admin (auth + rol)**
-  - `/admin/usuarios` → Gestión de usuarios
-  - `/admin/turnos` → Turnos de la clínica
+9. **Panel de administración – turnos**
+   - Vista general de todos los turnos de la clínica.
+   - Filtros por estado, fecha, paciente y especialista.
+   - Posibilidad de descargar los turnos de los pacientes en **Excel**.
 
-> El **navbar** muestra “Mi perfil” y accesos contextuales según el rol.  
-> Se agregaron **botones de volver** en vistas de detalle/listados.
+10. **Informes y reportes de la clínica**
+    - Sección de **Reportes** para el administrador.
+    - Incluye:
+      - Log de ingresos al sistema.
+      - Indicadores de visitas, turnos totales, pacientes únicos y encuestas recibidas.
+      - Gráficos de turnos por especialidad, por día y por médico.
+    - Los reportes se pueden exportar a **PDF** o **Excel**.
 
----
-
-## 🗓️ Estados del turno y acciones
-
-| Estado    | Paciente                                   | Especialista                                            | Admin    |
-| --------- | ------------------------------------------ | ------------------------------------------------------- | -------- |
-| PENDIENTE | Cancelar (con motivo)                      | Aceptar / Rechazar (con motivo) / Cancelar (con motivo) | Cancelar |
-| ACEPTADO  | Cancelar (con motivo)                      | Finalizar (carga de reseña)                             | —        |
-| RECHAZADO | —                                          | —                                                       | —        |
-| CANCELADO | —                                          | —                                                       | —        |
-| REALIZADO | Ver reseña / Encuesta / Calificar atención | Ver reseña                                              | —        |
-
-> En UI solo se muestran las **acciones permitidas** por estado/rol.
-
----
+11. **Idiomas**
+    - Selector de idioma en la barra superior.
+    - La aplicación puede usarse en **Español, Inglés y Portugués**.
