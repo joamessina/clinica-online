@@ -17,6 +17,8 @@ export interface Turno {
   especialidad_nombre?: string | null;
   especialista_nombre?: string | null;
   paciente_nombre?: string | null;
+  hasPatientFeedback?: boolean;
+  hasPatientSurvey?: boolean;
 
   specialty_id?: string;
   specialist_id?: string;
@@ -253,6 +255,93 @@ export class AppointmentsService {
       respuestas,
     });
     return { error };
+  }
+
+  async hasPatientFeedback(appointmentId: string): Promise<boolean> {
+    const { data: auth } = await this.sb.auth.getUser();
+    const uid = auth.user?.id;
+    if (!uid) return false;
+
+    const { data, error } = await this.sb
+      .from('patient_feedback')
+      .select('appointment_id')
+      .eq('appointment_id', appointmentId)
+      .eq('patient_id', uid)
+      .limit(1)
+      .maybeSingle();
+
+    if (error && error.code !== 'PGRST116') {
+      console.warn('[appointments] hasPatientFeedback error:', error.message);
+    }
+
+    return !!data;
+  }
+
+  async hasPatientSurvey(appointmentId: string): Promise<boolean> {
+    const { data: auth } = await this.sb.auth.getUser();
+    const uid = auth.user?.id;
+    if (!uid) return false;
+
+    const { data, error } = await this.sb
+      .from('patient_survey')
+      .select('appointment_id')
+      .eq('appointment_id', appointmentId)
+      .eq('patient_id', uid)
+      .limit(1)
+      .maybeSingle();
+
+    if (error && error.code !== 'PGRST116') {
+      console.warn('[appointments] hasPatientSurvey error:', error.message);
+    }
+
+    return !!data;
+  }
+
+  async listPatientFeedbackIds(appointmentIds: string[]): Promise<Set<string>> {
+    if (!appointmentIds.length) return new Set();
+
+    const { data: auth } = await this.sb.auth.getUser();
+    const uid = auth.user?.id;
+    if (!uid) return new Set();
+
+    const { data, error } = await this.sb
+      .from('patient_feedback')
+      .select('appointment_id')
+      .eq('patient_id', uid)
+      .in('appointment_id', appointmentIds);
+
+    if (error) {
+      console.warn(
+        '[appointments] listPatientFeedbackIds error:',
+        error.message
+      );
+      return new Set();
+    }
+
+    const ids = (data ?? []).map((r: any) => r.appointment_id as string);
+    return new Set(ids);
+  }
+
+  async listPatientSurveyIds(appointmentIds: string[]): Promise<Set<string>> {
+    if (!appointmentIds.length) return new Set();
+
+    const { data: auth } = await this.sb.auth.getUser();
+    const uid = auth.user?.id;
+    if (!uid) return new Set();
+
+    const { data, error } = await this.sb
+      .from('patient_survey')
+      .select('appointment_id')
+      .eq('patient_id', uid)
+      .in('appointment_id', appointmentIds);
+
+    if (error) {
+      console.warn('[appointments] listPatientSurveyIds error:', error.message);
+      return new Set();
+    }
+
+    const ids = (data ?? []).map((r: any) => r.appointment_id as string);
+    return new Set(ids);
   }
 
   async listSpecialist() {

@@ -50,7 +50,6 @@ export class MisTurnosPacienteComponent implements OnInit {
   surveyOtro = signal(false);
   surveyOtroTexto = signal('');
 
-
   async ngOnInit() {
     await this.load();
   }
@@ -58,36 +57,55 @@ export class MisTurnosPacienteComponent implements OnInit {
   private async load() {
     const base = await this.svc.listPatient();
 
-    const withHistory = await Promise.all(
+    if (!base.length) {
+      this.turnos.set([]);
+      return;
+    }
+
+    const ids = base.map((t) => t.id);
+
+    const [feedbackSet, surveySet] = await Promise.all([
+      this.svc.listPatientFeedbackIds(ids),
+      this.svc.listPatientSurveyIds(ids),
+    ]);
+
+    const withExtras = await Promise.all(
       base.map(async (t) => {
         let historia_texto = '';
 
-        try {
-          const h = await this.history.getByAppointment(t.id);
-          if (h) {
-            const extrasTxt = (h.extras ?? [])
-              .map((e) => `${e.key}: ${e.value}`)
-              .join(' ');
+        if (t.estado === 'REALIZADO') {
+          try {
+            const h = await this.history.getByAppointment(t.id);
+            if (h) {
+              const extrasTxt = (h.extras ?? [])
+                .map((e) => `${e.key}: ${e.value}`)
+                .join(' ');
 
-            historia_texto = [
-              h.altura ? `altura: ${h.altura}` : '',
-              h.peso ? `peso: ${h.peso}` : '',
-              h.temperatura ? `temp: ${h.temperatura}` : '',
-              h.presion ? `presion: ${h.presion}` : '',
-              extrasTxt,
-            ]
-              .filter(Boolean)
-              .join(' ');
+              historia_texto = [
+                h.altura ? `altura: ${h.altura}` : '',
+                h.peso ? `peso: ${h.peso}` : '',
+                h.temperatura ? `temp: ${h.temperatura}` : '',
+                h.presion ? `presion: ${h.presion}` : '',
+                extrasTxt,
+              ]
+                .filter(Boolean)
+                .join(' ');
+            }
+          } catch (e) {
+            console.warn('Error cargando historia para turno', t.id, e);
           }
-        } catch (e) {
-          console.warn('Error cargando historia para turno', t.id, e);
         }
 
-        return { ...t, historia_texto };
+        return {
+          ...t,
+          historia_texto,
+          hasPatientFeedback: feedbackSet.has(t.id),
+          hasPatientSurvey: surveySet.has(t.id),
+        };
       })
     );
 
-    this.turnos.set(withHistory);
+    this.turnos.set(withExtras);
   }
 
   filtered = computed(() => {
@@ -115,10 +133,12 @@ export class MisTurnosPacienteComponent implements OnInit {
     return ['PENDIENTE', 'ACEPTADO'].includes(t.estado);
   }
   canFeedback(t: Turno) {
-    return t.estado === 'REALIZADO';
+    return t.estado === 'REALIZADO' && !t.hasPatientFeedback;
   }
   canSurvey(t: Turno) {
-    return t.estado === 'REALIZADO' && !!t.resena_especialista;
+    return (
+      t.estado === 'REALIZADO' && !!t.resena_especialista && !t.hasPatientSurvey
+    );
   }
   hasResena(t: Turno) {
     return !!t.resena_especialista;
@@ -212,7 +232,7 @@ export class MisTurnosPacienteComponent implements OnInit {
   }
 
   // ===== ENCUESTA =====
-abrirEncuesta(t: Turno) {
+  abrirEncuesta(t: Turno) {
     this.selectedTurno.set(t);
 
     this.surveyP1.set('');
@@ -229,8 +249,7 @@ abrirEncuesta(t: Turno) {
     this.showSurveyModal.set(true);
   }
 
-
- closeSurveyModal() {
+  closeSurveyModal() {
     this.showSurveyModal.set(false);
     this.selectedTurno.set(null);
 
@@ -270,8 +289,8 @@ abrirEncuesta(t: Turno) {
       p1,
       p2,
       comentario,
-      rating, 
-      satisfaction, 
+      rating,
+      satisfaction,
       aspects: {
         puntualidad: this.surveyPuntualidad(),
         atencion: this.surveyAtencion(),
